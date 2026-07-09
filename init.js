@@ -100,14 +100,14 @@ async function main() {
   const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'));
   
   const finalProjectName = project.name === '.' ? path.basename(destPath) : project.name;
-  pkg.name = finalProjectName.toLowerCase().replace(/[^a-z0-9-]/g, '-');
+  pkg.name = finalProjectName;
   
   if (project.description) pkg.description = project.description;
   if (project.author) pkg.author = project.author;
   
   // Clean up template-specific package.json fields
   delete pkg.bin;
-  pkg.version = '0.1.0';
+  pkg.version = '0.0.0';
   
   if (pkg.scripts && pkg.scripts.create) {
     delete pkg.scripts.create;

@@ -1,6 +1,6 @@
 {
   "name": "k3vin-starter-template",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "type": "module",
   "bin": {
     "kevin": "./init.js"

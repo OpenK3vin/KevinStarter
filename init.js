@@ -105,9 +105,17 @@ async function main() {
   if (project.description) pkg.description = project.description;
   if (project.author) pkg.author = project.author;
   
-  // Remove the create script from the new project
+  // Clean up template-specific package.json fields
+  delete pkg.bin;
+  pkg.version = '0.1.0';
+  
   if (pkg.scripts && pkg.scripts.create) {
     delete pkg.scripts.create;
+  }
+  
+  if (pkg.devDependencies) {
+    delete pkg.devDependencies['@clack/prompts'];
+    delete pkg.devDependencies['picocolors'];
   }
 
   fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n');

@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -31,21 +32,21 @@ async function main() {
 
   const project = await p.group(
     {
-      dir: () =>
+      name: () =>
         p.text({
-          message: 'Where should we create your project?',
-          placeholder: './my-new-app',
-          validate: (value) => {
-            if (!value) return 'Please enter a path.';
-          },
-        }),
-      name: ({ results }) =>
-        p.text({
-          message: 'What is your project named?',
-          initialValue: path.basename(path.resolve(results.dir)).toLowerCase().replace(/[^a-z0-9-]/g, '-'),
+          message: 'What is your project named? (This will be the folder name)',
+          placeholder: 'my-new-app',
           validate: (value) => {
             if (!value) return 'Please enter a name.';
-            if (value.match(/[^a-zA-Z0-9-]/)) return 'Name can only contain letters, numbers, and hyphens.';
+            if (value !== '.' && value.match(/[^a-zA-Z0-9-]/)) return 'Name can only contain letters, numbers, and hyphens (or "." for current directory).';
+          },
+        }),
+      dir: () =>
+        p.text({
+          message: 'Where should we create it? (Enter the parent directory)',
+          initialValue: './',
+          validate: (value) => {
+            if (!value) return 'Please enter a path.';
           },
         }),
       description: () =>
@@ -74,7 +75,10 @@ async function main() {
 
   const s = p.spinner();
   
-  const destPath = path.resolve(process.cwd(), project.dir);
+  const destPath = project.name === '.'
+    ? path.resolve(process.cwd(), project.dir)
+    : path.resolve(process.cwd(), project.dir, project.name);
+    
   s.start(`Scaffolding project in ${destPath}...`);
   
   if (!fs.existsSync(destPath)) {
@@ -95,7 +99,9 @@ async function main() {
   const pkgPath = path.join(destPath, 'package.json');
   const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'));
   
-  pkg.name = project.name.toLowerCase();
+  const finalProjectName = project.name === '.' ? path.basename(destPath) : project.name;
+  pkg.name = finalProjectName.toLowerCase().replace(/[^a-z0-9-]/g, '-');
+  
   if (project.description) pkg.description = project.description;
   if (project.author) pkg.author = project.author;
   
@@ -111,17 +117,17 @@ async function main() {
     try {
       await execAsync('pnpm install', { cwd: destPath });
       await execAsync('pnpm run db:push', { cwd: destPath });
-      s.stop(`Project successfully created and database initialized at ${project.dir}`);
+      s.stop(`Project successfully created and database initialized at ${destPath}`);
     } catch (e) {
       s.stop('Finished with errors during installation.');
       p.log.error(e.message || String(e));
     }
   } else {
     await setTimeout(1000);
-    s.stop(`Project successfully created at ${project.dir}`);
+    s.stop(`Project successfully created at ${destPath}`);
   }
 
-  p.note(`Next steps:\n1. cd ${project.dir}\n${project.install ? '' : '2. pnpm install\n3. pnpm run db:push\n'}4. pnpm dev`, 'Ready to go!');
+  p.note(`Next steps:\n1. cd ${path.relative(process.cwd(), destPath) || '.'}\n${project.install ? '' : '2. pnpm install\n3. pnpm run db:push\n'}4. pnpm dev`, 'Ready to go!');
 
   p.outro(`Done! Have fun building.`);
 }

@@ -1,27 +1,34 @@
-import { useSuspenseQuery } from '@tanstack/react-query'
-import { getExamples } from '../api/example'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { useFeatureFlag } from '@/modules/feature-flags'
-import type { ExampleRow } from '@/db/schema'
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { getExamples } from "../api/example";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { useFeatureFlag } from "@/modules/feature-flags";
+import type { ExampleRow } from "@/db/schema";
 
 export function HomePage() {
   // Use TanStack Query to call our server function
   const { data } = useSuspenseQuery({
-    queryKey: ['examples'],
+    queryKey: ["examples"],
     queryFn: () => getExamples(),
-  })
+  });
 
   // Access feature flags
-  const isExampleFlagEnabled = useFeatureFlag('example')
+  const isExampleFlagEnabled = useFeatureFlag("example");
 
   return (
     <div className="page-wrap py-12 space-y-8 rise-in">
       <header className="space-y-2">
         <h1 className="text-4xl font-bold display-title text-sea-ink">
-          Welcome to KevinPulse Starter
+          Welcome to Kevin Starter
         </h1>
         <p className="text-sea-ink-soft text-lg">
-          The ultimate boilerplate with TanStack Start, TanStack Router, Tailwind v4, Shadcn, and Drizzle SQLite.
+          The ultimate boilerplate with TanStack Start, TanStack Router,
+          Tailwind v4, Shadcn, and Drizzle SQLite.
         </p>
       </header>
 
@@ -32,7 +39,7 @@ export function HomePage() {
             <div className="flex items-center gap-4">
               <span className="font-medium">VITE_FF_EXAMPLE:</span>
               <span className="px-2 py-1 bg-sea-ink text-white rounded text-sm">
-                {isExampleFlagEnabled ? 'Enabled' : 'Disabled'}
+                {isExampleFlagEnabled ? "Enabled" : "Disabled"}
               </span>
             </div>
             <p className="text-sm text-sea-ink-soft mt-2">
@@ -67,5 +74,5 @@ export function HomePage() {
         </div>
       </section>
     </div>
-  )
+  );
 }

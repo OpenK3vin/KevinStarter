@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { getRequestHeaders } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { auth } from "@/lib/auth";
-import { can } from "@/modules/rbac";
+import { can } from "@/modules/rbac/can";
 import { db } from "@/db";
 import { examples } from "@/db/schema";
 import { eq } from "drizzle-orm";

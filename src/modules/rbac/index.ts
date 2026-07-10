@@ -1,8 +1,7 @@
 // Types
 export type { GlobalRole, ResourceAction, ResourceRole, RbacUser, RbacContextValue } from './types'
 
-// Server-only authorization helpers (import only in server functions / loaders)
-export { can, batchCan } from './can'
+// Server-only authorization helpers should be imported directly from '@/modules/rbac/can'
 
 // Client-side provider + hooks
 export { RbacProvider } from './RbacProvider'

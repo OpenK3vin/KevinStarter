@@ -1,14 +1,14 @@
-import { sqliteTable, text, integer, uniqueIndex, index } from 'drizzle-orm/sqlite-core'
+import { pgTable, text, timestamp, boolean, uniqueIndex, index } from 'drizzle-orm/pg-core'
 
 /**
- * `examples` — starter table to demonstrate the Drizzle + SQLite pattern.
+ * `examples` — starter table to demonstrate the Drizzle + PostgreSQL pattern.
  *
  * Replace or extend this with your own domain tables.
  * Nested objects should be stored as JSON text columns (serialize before
  * insert, parse after select) — see KevinPulse's fuel_price_entries for
  * a real-world example.
  */
-export const examples = sqliteTable('examples', {
+export const examples = pgTable('examples', {
   /** UUID string — generate with crypto.randomUUID() */
   id: text('id').primaryKey(),
 
@@ -18,8 +18,8 @@ export const examples = sqliteTable('examples', {
   /** Optional description */
   description: text('description'),
 
-  /** Unix timestamp (ms) — set on insert, never updated */
-  createdAt: integer('created_at').notNull(),
+  /** Timestamp — set on insert, never updated */
+  createdAt: timestamp('created_at', { mode: 'date' }).notNull(),
 })
 
 export type ExampleRow = typeof examples.$inferSelect
@@ -28,11 +28,11 @@ export type NewExampleRow = typeof examples.$inferInsert
 /**
  * `projects` — a demo table for RBAC.
  */
-export const projects = sqliteTable('projects', {
+export const projects = pgTable('projects', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
   description: text('description'),
-  createdAt: integer('created_at').notNull(),
+  createdAt: timestamp('created_at', { mode: 'date' }).notNull(),
 })
 
 export type ProjectRow = typeof projects.$inferSelect
@@ -43,27 +43,27 @@ export type NewProjectRow = typeof projects.$inferInsert
 // ---------------------------------------------------------------------------
 
 /** Core user record. `role` / `banned` columns added by the admin plugin. */
-export const user = sqliteTable('user', {
+export const user = pgTable('user', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
   email: text('email').notNull().unique(),
-  emailVerified: integer('email_verified', { mode: 'boolean' }).notNull().default(false),
+  emailVerified: boolean('email_verified').notNull().default(false),
   image: text('image'),
-  createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
-  updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull(),
+  createdAt: timestamp('created_at', { mode: 'date' }).notNull(),
+  updatedAt: timestamp('updated_at', { mode: 'date' }).notNull(),
   // admin plugin columns
   role: text('role'),
-  banned: integer('banned', { mode: 'boolean' }),
+  banned: boolean('banned'),
   banReason: text('ban_reason'),
-  banExpires: integer('ban_expires', { mode: 'timestamp' }),
+  banExpires: timestamp('ban_expires', { mode: 'date' }),
 })
 
-export const session = sqliteTable('session', {
+export const session = pgTable('session', {
   id: text('id').primaryKey(),
-  expiresAt: integer('expires_at', { mode: 'timestamp' }).notNull(),
+  expiresAt: timestamp('expires_at', { mode: 'date' }).notNull(),
   token: text('token').notNull().unique(),
-  createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
-  updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull(),
+  createdAt: timestamp('created_at', { mode: 'date' }).notNull(),
+  updatedAt: timestamp('updated_at', { mode: 'date' }).notNull(),
   ipAddress: text('ip_address'),
   userAgent: text('user_agent'),
   userId: text('user_id')
@@ -71,7 +71,7 @@ export const session = sqliteTable('session', {
     .references(() => user.id, { onDelete: 'cascade' }),
 })
 
-export const account = sqliteTable('account', {
+export const account = pgTable('account', {
   id: text('id').primaryKey(),
   accountId: text('account_id').notNull(),
   providerId: text('provider_id').notNull(),
@@ -81,21 +81,21 @@ export const account = sqliteTable('account', {
   accessToken: text('access_token'),
   refreshToken: text('refresh_token'),
   idToken: text('id_token'),
-  accessTokenExpiresAt: integer('access_token_expires_at', { mode: 'timestamp' }),
-  refreshTokenExpiresAt: integer('refresh_token_expires_at', { mode: 'timestamp' }),
+  accessTokenExpiresAt: timestamp('access_token_expires_at', { mode: 'date' }),
+  refreshTokenExpiresAt: timestamp('refresh_token_expires_at', { mode: 'date' }),
   scope: text('scope'),
   password: text('password'),
-  createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
-  updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull(),
+  createdAt: timestamp('created_at', { mode: 'date' }).notNull(),
+  updatedAt: timestamp('updated_at', { mode: 'date' }).notNull(),
 })
 
-export const verification = sqliteTable('verification', {
+export const verification = pgTable('verification', {
   id: text('id').primaryKey(),
   identifier: text('identifier').notNull(),
   value: text('value').notNull(),
-  expiresAt: integer('expires_at', { mode: 'timestamp' }).notNull(),
-  createdAt: integer('created_at', { mode: 'timestamp' }),
-  updatedAt: integer('updated_at', { mode: 'timestamp' }),
+  expiresAt: timestamp('expires_at', { mode: 'date' }).notNull(),
+  createdAt: timestamp('created_at', { mode: 'date' }),
+  updatedAt: timestamp('updated_at', { mode: 'date' }),
 })
 
 // ---------------------------------------------------------------------------
@@ -113,7 +113,7 @@ export const verification = sqliteTable('verification', {
  *
  * Global admins bypass this table entirely (see src/modules/rbac/can.ts).
  */
-export const resourceRoles = sqliteTable(
+export const resourceRoles = pgTable(
   'resource_roles',
   {
     id: text('id').primaryKey(),
@@ -126,7 +126,7 @@ export const resourceRoles = sqliteTable(
     resourceId: text('resource_id').notNull(),
     /** e.g. 'editor', 'viewer' — see src/modules/rbac/resourcePermissions.ts */
     role: text('role').notNull(),
-    createdAt: integer('created_at').notNull(),
+    createdAt: timestamp('created_at', { mode: 'date' }).notNull(),
   },
   (t) => [
     uniqueIndex('resource_roles_uniq').on(t.userId, t.resourceType, t.resourceId),

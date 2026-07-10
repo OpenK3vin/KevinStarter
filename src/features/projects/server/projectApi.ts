@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { getRequestHeaders } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { auth } from "@/lib/auth";
-import { can, batchCan } from "@/modules/rbac";
+import { can, batchCan } from "@/modules/rbac/can";
 import { db } from "@/db";
 import { projects, resourceRoles } from "@/db/schema";
 import { eq } from "drizzle-orm";
@@ -36,7 +36,7 @@ export const createProject = createServerFn({ method: "POST" })
     }
 
     const projectId = crypto.randomUUID();
-    const now = Date.now();
+    const now = new Date();
 
     // 1. Create project
     await db.insert(projects).values({

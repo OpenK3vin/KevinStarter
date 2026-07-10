@@ -23,7 +23,7 @@ export function HomePage() {
   return (
     <div className="page-wrap py-12 space-y-8 rise-in">
       <header className="space-y-2">
-        <h1 className="text-4xl font-bold display-title text-sea-ink">
+        <h1 className="text-4xl font-bold text-sea-ink">
           Welcome to Kevin Starter
         </h1>
         <p className="text-sea-ink-soft text-lg">

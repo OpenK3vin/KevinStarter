@@ -1,18 +1,14 @@
-import Database from 'better-sqlite3'
-import { drizzle } from 'drizzle-orm/better-sqlite3'
-import { migrate } from 'drizzle-orm/better-sqlite3/migrator'
+import postgres from 'postgres'
+import { drizzle } from 'drizzle-orm/postgres-js'
+import { migrate } from 'drizzle-orm/postgres-js/migrator'
 import * as schema from './schema'
 
-const DB_PATH = './sqlite.db'
 const MIGRATIONS_PATH = './src/db/migrations'
 
-// Singleton SQLite connection — reused across server function calls
-const sqlite = new Database(DB_PATH)
+// Singleton PostgreSQL connection — reused across server function calls
+const queryClient = postgres(process.env.DATABASE_URL as string, { max: 1 })
 
-// Enable WAL mode for better concurrent read performance
-sqlite.pragma('journal_mode = WAL')
-
-export const db = drizzle(sqlite, { schema })
+export const db = drizzle(queryClient, { schema })
 
 /**
  * Run pending migrations on startup.
@@ -23,5 +19,4 @@ export const db = drizzle(sqlite, { schema })
  */
 export function runMigrations() {
   migrate(db, { migrationsFolder: MIGRATIONS_PATH })
-}
 }

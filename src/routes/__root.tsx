@@ -6,6 +6,7 @@ import {
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 import { Toaster } from 'sonner'
+import { TooltipProvider } from '@/components/ui/tooltip'
 import { FeatureFlagProvider, getEnvFlags } from '@/modules/feature-flags'
 import { RbacProvider } from '@/modules/rbac'
 
@@ -63,8 +64,10 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <body suppressHydrationWarning className="bg-background text-foreground antialiased min-h-screen">
         <FeatureFlagProvider flags={getEnvFlags()}>
           <RbacProvider>
+            <TooltipProvider>
             {children}
-            <Toaster theme="light" closeButton richColors position="top-right" />
+              <Toaster theme="light" closeButton richColors position="top-right" />
+            </TooltipProvider>
           <TanStackDevtools
             config={{
               position: 'bottom-right',

@@ -3,6 +3,20 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import { getProject, updateProject } from '@/features/projects/server/projectApi'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { useState } from 'react'
+import { z } from 'zod'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
 
 export const Route = createFileRoute('/_authenticated/projects/$projectId/edit')({
   loader: async ({ params: { projectId }, context: { queryClient } }) => {
@@ -15,6 +29,13 @@ export const Route = createFileRoute('/_authenticated/projects/$projectId/edit')
   component: ProjectEditPage,
 })
 
+const projectSchema = z.object({
+  name: z.string().min(1, 'Project name is required'),
+  description: z.string().optional(),
+})
+
+type ProjectValues = z.infer<typeof projectSchema>
+
 function ProjectEditPage() {
   const { projectId } = Route.useParams()
   const router = useRouter()
@@ -24,21 +45,26 @@ function ProjectEditPage() {
     queryFn: () => getProject({ data: { id: projectId } }),
   })
 
-  const [name, setName] = useState(project.name)
-  const [description, setDescription] = useState(project.description ?? '')
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  async function handleSave(e: React.FormEvent) {
-    e.preventDefault()
+  const form = useForm<ProjectValues>({
+    resolver: zodResolver(projectSchema),
+    defaultValues: {
+      name: project.name,
+      description: project.description ?? '',
+    },
+  })
+
+  async function onSubmit(values: ProjectValues) {
     setIsSaving(true)
     setError(null)
     try {
       await updateProject({
         data: {
           id: projectId,
-          name,
-          description: description || undefined,
+          name: values.name,
+          description: values.description || undefined,
         },
       })
       await router.invalidate()
@@ -62,47 +88,60 @@ function ProjectEditPage() {
           <CardDescription>Update the project details below</CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSave} className="space-y-4">
-            {error && (
-              <div className="px-4 py-3 text-sm rounded-lg bg-destructive/10 text-destructive border border-destructive/20">
-                {error}
-              </div>
-            )}
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              {error && (
+                <div className="px-4 py-3 text-sm rounded-lg bg-destructive/10 text-destructive border border-destructive/20">
+                  {error}
+                </div>
+              )}
 
-            <div className="space-y-1.5">
-              <label htmlFor="name" className="text-sm font-medium text-sea-ink">
-                Name
-              </label>
-              <input
-                id="name"
-                required
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full px-3 py-2 text-sm rounded-lg border border-line bg-background focus:outline-none focus:ring-2 focus:ring-sea-ink/30 transition"
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Name</FormLabel>
+                    <FormControl>
+                      <Input
+                        id="name"
+                        placeholder="Project Name"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
 
-            <div className="space-y-1.5">
-              <label htmlFor="desc" className="text-sm font-medium text-sea-ink">
-                Description
-              </label>
-              <textarea
-                id="desc"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                rows={4}
-                className="w-full px-3 py-2 text-sm rounded-lg border border-line bg-background focus:outline-none focus:ring-2 focus:ring-sea-ink/30 transition"
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Description</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        id="desc"
+                        rows={4}
+                        placeholder="Optional description"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
 
-            <button
-              type="submit"
-              disabled={isSaving}
-              className="w-full py-2.5 px-4 rounded-lg bg-sea-ink text-white text-sm font-medium transition hover:opacity-90 disabled:opacity-50"
-            >
-              {isSaving ? 'Saving...' : 'Save Changes'}
-            </button>
-          </form>
+              <Button
+                type="submit"
+                disabled={isSaving}
+                className="w-full"
+              >
+                {isSaving ? 'Saving...' : 'Save Changes'}
+              </Button>
+            </form>
+          </Form>
         </CardContent>
       </Card>
     </div>

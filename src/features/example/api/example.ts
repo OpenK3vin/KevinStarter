@@ -28,13 +28,12 @@ export const createExample = createServerFn({ method: "POST" })
   })
   .handler(async ({ data }) => {
     const newId = crypto.randomUUID();
-    const now = Date.now();
 
     await db.insert(examples).values({
       id: newId,
       name: data.name,
       description: data.description ?? null,
-      createdAt: now,
+      createdAt: new Date(),
     });
 
     return { id: newId };

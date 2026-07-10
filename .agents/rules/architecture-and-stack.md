@@ -23,4 +23,5 @@ When instructed to add UI components or design new interfaces:
 - **Component Structure**: Keep components modular. Separate logic from presentation where appropriate.
 - **Routing**: Manage all page transitions, path parameters, and query state using TanStack Router hooks like `useNavigate`, `useParams`, and `useSearch`.
 - **State**: Keep local state local. Use Jotai for state that needs to be shared across the routing boundaries or deep component trees.
+- **Forms**: Use `react-hook-form` in combination with Shadcn UI's `<Form>` components and Zod schema validation for all forms. Avoid raw React state for form inputs.
 - **Styling**: Rely heavily on Shadcn's provided utility classes and extend them carefully. Always use `cn` utility (clsx + tailwind-merge) when composing class names in components.

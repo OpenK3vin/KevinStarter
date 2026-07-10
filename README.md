@@ -73,9 +73,10 @@ This template includes all `.agents/` rules and skills from KevinPulse.
 - **Colors**: **Strict OKLCH policy**. All colors in CSS, Tailwind tokens, or inline styles must be in `oklch()`. Do not generate HEX, RGB, or HSL values. See `.agents/rules/oklch-color-rules.md`.
 - **Components**: Use Shadcn UI (New York, Zinc). Always check for existing UI components in `src/components/ui/` before building custom ones.
 
-### 2. State & Data Fetching
+### 2. State, Data Fetching & Forms
 - **Server State**: Use TanStack Query v5 + `useSuspenseQuery` paired with TanStack Start's `createServerFn` RPCs.
 - **Global Client State**: Use **Jotai**. Avoid Context API unless required by libraries. Do not use Redux or Zustand.
+- **Forms**: All forms must be built using `react-hook-form`, `zod` for validation, and the Shadcn `<Form>` components. Do not use raw React state for forms.
 - **Database**: Drizzle ORM over a local `better-sqlite3` instance. Schemas must reside in `src/db/schema.ts` and migrations must be generated via `drizzle-kit`.
 - **Validation**: Zod schema validation is required for API boundaries, search params, and form inputs.
 

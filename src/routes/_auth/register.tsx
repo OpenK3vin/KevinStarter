@@ -1,6 +1,9 @@
 import { createFileRoute, Link, useRouter } from '@tanstack/react-router'
 import { useState } from 'react'
 import { authClient } from '@/lib/auth-client'
+import { z } from 'zod'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import {
   Card,
   CardContent,
@@ -10,29 +13,49 @@ import {
 } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
 
 export const Route = createFileRoute('/_auth/register')({
   component: RegisterPage,
 })
 
+const registerSchema = z.object({
+  name: z.string().min(1, 'Name is required'),
+  email: z.string().min(1, 'Email is required').email('Invalid email address'),
+  password: z.string().min(8, 'Password must be at least 8 characters'),
+})
+
+type RegisterValues = z.infer<typeof registerSchema>
+
 function RegisterPage() {
   const router = useRouter()
-  const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
+  const form = useForm<RegisterValues>({
+    resolver: zodResolver(registerSchema),
+    defaultValues: {
+      name: '',
+      email: '',
+      password: '',
+    },
+  })
+
+  async function onSubmit(values: RegisterValues) {
     setError(null)
     setIsLoading(true)
 
     const { error: signUpError } = await authClient.signUp.email({
-      name,
-      email,
-      password,
+      name: values.name,
+      email: values.email,
+      password: values.password,
     })
 
     setIsLoading(false)
@@ -67,66 +90,88 @@ function RegisterPage() {
           <CardDescription>Fill in the details below to create your account</CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {error && (
-              <div
-                id="register-error"
-                role="alert"
-                className="px-4 py-3 text-sm rounded-lg bg-destructive/10 text-destructive border border-destructive/20"
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              {error && (
+                <div
+                  id="register-error"
+                  role="alert"
+                  className="px-4 py-3 text-sm rounded-lg bg-destructive/10 text-destructive border border-destructive/20"
+                >
+                  {error}
+                </div>
+              )}
+
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Full name</FormLabel>
+                    <FormControl>
+                      <Input
+                        id="register-name"
+                        type="text"
+                        autoComplete="name"
+                        placeholder="Jane Doe"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input
+                        id="register-email"
+                        type="email"
+                        autoComplete="email"
+                        placeholder="you@example.com"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input
+                        id="register-password"
+                        type="password"
+                        autoComplete="new-password"
+                        placeholder="Minimum 8 characters"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <Button
+                id="register-submit"
+                type="submit"
+                disabled={isLoading}
+                className="w-full"
               >
-                {error}
-              </div>
-            )}
-
-            <div className="space-y-1.5">
-              <Label htmlFor="register-name">Full name</Label>
-              <Input
-                id="register-name"
-                type="text"
-                autoComplete="name"
-                required
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Jane Doe"
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <Label htmlFor="register-email">Email</Label>
-              <Input
-                id="register-email"
-                type="email"
-                autoComplete="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <Label htmlFor="register-password">Password</Label>
-              <Input
-                id="register-password"
-                type="password"
-                autoComplete="new-password"
-                required
-                minLength={8}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Minimum 8 characters"
-              />
-            </div>
-
-            <Button
-              id="register-submit"
-              type="submit"
-              disabled={isLoading}
-              className="w-full"
-            >
-              {isLoading ? 'Creating account…' : 'Create Account'}
-            </Button>
-          </form>
+                {isLoading ? 'Creating account…' : 'Create Account'}
+              </Button>
+            </form>
+          </Form>
 
           <div className="mt-4 flex items-center before:flex-1 before:border-t before:border-border after:flex-1 after:border-t after:border-border">
             <span className="px-3 text-xs text-muted-foreground uppercase tracking-wider">or</span>

@@ -24,3 +24,4 @@ export const db = drizzle(sqlite, { schema })
 export function runMigrations() {
   migrate(db, { migrationsFolder: MIGRATIONS_PATH })
 }
+}

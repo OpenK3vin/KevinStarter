@@ -7,6 +7,7 @@ import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 import { Toaster } from 'sonner'
 import { FeatureFlagProvider, getEnvFlags } from '@/modules/feature-flags'
+import { RbacProvider } from '@/modules/rbac'
 
 import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
 
@@ -61,8 +62,9 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body suppressHydrationWarning className="bg-background text-foreground antialiased min-h-screen">
         <FeatureFlagProvider flags={getEnvFlags()}>
-          {children}
-          <Toaster theme="light" closeButton richColors position="top-right" />
+          <RbacProvider>
+            {children}
+            <Toaster theme="light" closeButton richColors position="top-right" />
           <TanStackDevtools
             config={{
               position: 'bottom-right',
@@ -75,7 +77,8 @@ function RootDocument({ children }: { children: React.ReactNode }) {
               TanStackQueryDevtools,
             ]}
           />
-          <Scripts />
+            <Scripts />
+          </RbacProvider>
         </FeatureFlagProvider>
       </body>
     </html>

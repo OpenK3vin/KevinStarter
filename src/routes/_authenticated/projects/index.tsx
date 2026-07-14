@@ -4,7 +4,7 @@ import { getProjects, createProject } from '@/features/projects/server/projectAp
 import { useHasGlobalRole } from '@/modules/rbac'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { useState } from 'react'
-import { AppContent, AppContentHeader, AppContentTitle, AppContentDescription, AppContentActions, AppContentMain } from '@/components/ui/app-content'
+import { PageLayout } from '@/components/layout/page-layout'
 
 export const Route = createFileRoute('/_authenticated/projects/')({
   loader: async ({ context: { queryClient } }) => {
@@ -38,25 +38,22 @@ function ProjectsListPage() {
   }
 
   return (
-    <AppContent>
-      <AppContentHeader>
-        <AppContentTitle>Projects</AppContentTitle>
-        <AppContentDescription>Projects you have access to.</AppContentDescription>
-        {canCreate && (
-          <AppContentActions>
-            <button
-              onClick={handleCreate}
-              disabled={isCreating}
-              className="px-4 py-2 bg-sea-ink text-white rounded-lg text-sm font-medium transition hover:opacity-90 disabled:opacity-50"
-            >
-              {isCreating ? 'Creating...' : 'Create Project'}
-            </button>
-          </AppContentActions>
-        )}
-      </AppContentHeader>
-      
-      <AppContentMain>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <PageLayout
+      title="Projects"
+      description="Projects you have access to."
+      actions={
+        canCreate && (
+          <button
+            onClick={handleCreate}
+            disabled={isCreating}
+            className="px-4 py-2 bg-sea-ink text-white rounded-lg text-sm font-medium transition hover:opacity-90 disabled:opacity-50"
+          >
+            {isCreating ? 'Creating...' : 'Create Project'}
+          </button>
+        )
+      }
+    >
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {projects.length === 0 ? (
           <div className="col-span-full p-8 text-center text-sea-ink-soft border border-dashed border-line rounded-xl">
             No projects found. You might not have access to any yet.
@@ -83,8 +80,7 @@ function ProjectsListPage() {
             </Link>
           ))
         )}
-        </div>
-      </AppContentMain>
-    </AppContent>
+      </div>
+    </PageLayout>
   )
 }

@@ -4,7 +4,7 @@ import { getProject, deleteProject } from '@/features/projects/server/projectApi
 import { Card, CardContent } from '@/components/ui/card'
 import { useState } from 'react'
 import { useRbac } from '@/modules/rbac'
-import { AppContent, AppContentHeader, AppContentTitle, AppContentDescription, AppContentActions, AppContentMain } from '@/components/ui/app-content'
+import { PageLayout } from '@/components/layout/page-layout'
 export const Route = createFileRoute('/_authenticated/projects/$projectId/')({
   loader: async ({ params: { projectId }, context: { queryClient } }) => {
     // This inherently checks 'read' access on the server
@@ -41,17 +41,17 @@ function ProjectViewPage() {
   }
 
   return (
-    <AppContent className="max-w-3xl">
-      <div className="mb-4">
+    <PageLayout
+      className="max-w-3xl"
+      backLink={
         <Link to="/projects" className="text-sm font-medium text-sea-ink hover:underline">
           &larr; Back to projects
         </Link>
-      </div>
-
-      <AppContentHeader>
-        <AppContentTitle>{project.name}</AppContentTitle>
-        <AppContentDescription>ID: {project.id}</AppContentDescription>
-        <AppContentActions>
+      }
+      title={project.name}
+      description={`ID: ${project.id}`}
+      actions={
+        <>
           {/* Note: In a real app you might want to fetch explicit per-resource grants 
               for the UI check here, but the server will strictly enforce it when they click edit anyway. */}
           <Link
@@ -71,22 +71,20 @@ function ProjectViewPage() {
               {isDeleting ? 'Deleting...' : 'Delete'}
             </button>
           )}
-        </AppContentActions>
-      </AppContentHeader>
-
-      <AppContentMain>
-        <Card className="island-shell border-none">
-          <CardContent className="pt-6">
-            <div className="prose prose-sm text-sea-ink-soft">
-              {project.description ? (
-                <p>{project.description}</p>
-              ) : (
-                <p className="italic text-sea-ink-soft/60">No description provided.</p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      </AppContentMain>
-    </AppContent>
+        </>
+      }
+    >
+      <Card className="island-shell border-none">
+        <CardContent className="pt-6">
+          <div className="prose prose-sm text-sea-ink-soft">
+            {project.description ? (
+              <p>{project.description}</p>
+            ) : (
+              <p className="italic text-sea-ink-soft/60">No description provided.</p>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    </PageLayout>
   )
 }

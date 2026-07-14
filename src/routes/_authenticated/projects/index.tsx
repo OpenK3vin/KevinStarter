@@ -4,7 +4,7 @@ import { getProjects, createProject } from '@/features/projects/server/projectAp
 import { useHasGlobalRole } from '@/modules/rbac'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { useState } from 'react'
-import { Dashboard, DashboardHeader, DashboardTitle, DashboardDescription, DashboardAction, DashboardContent } from '@/components/ui/dashboard'
+import { AppContent, AppContentHeader, AppContentTitle, AppContentDescription, AppContentActions, AppContentMain } from '@/components/ui/app-content'
 
 export const Route = createFileRoute('/_authenticated/projects/')({
   loader: async ({ context: { queryClient } }) => {
@@ -38,12 +38,12 @@ function ProjectsListPage() {
   }
 
   return (
-    <Dashboard>
-      <DashboardHeader>
-        <DashboardTitle>Projects</DashboardTitle>
-        <DashboardDescription>Projects you have access to.</DashboardDescription>
+    <AppContent>
+      <AppContentHeader>
+        <AppContentTitle>Projects</AppContentTitle>
+        <AppContentDescription>Projects you have access to.</AppContentDescription>
         {canCreate && (
-          <DashboardAction>
+          <AppContentActions>
             <button
               onClick={handleCreate}
               disabled={isCreating}
@@ -51,11 +51,11 @@ function ProjectsListPage() {
             >
               {isCreating ? 'Creating...' : 'Create Project'}
             </button>
-          </DashboardAction>
+          </AppContentActions>
         )}
-      </DashboardHeader>
+      </AppContentHeader>
       
-      <DashboardContent>
+      <AppContentMain>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {projects.length === 0 ? (
           <div className="col-span-full p-8 text-center text-sea-ink-soft border border-dashed border-line rounded-xl">
@@ -84,7 +84,7 @@ function ProjectsListPage() {
           ))
         )}
         </div>
-      </DashboardContent>
-    </Dashboard>
+      </AppContentMain>
+    </AppContent>
   )
 }

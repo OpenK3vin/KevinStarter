@@ -2,7 +2,7 @@ import { createFileRoute, Link, useRouter } from '@tanstack/react-router'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { getProject, updateProject } from '@/features/projects/server/projectApi'
 import { Card, CardContent } from '@/components/ui/card'
-import { Dashboard, DashboardHeader, DashboardTitle, DashboardDescription, DashboardContent } from '@/components/ui/dashboard'
+import { AppContent, AppContentHeader, AppContentTitle, AppContentDescription, AppContentMain } from '@/components/ui/app-content'
 import { useState } from 'react'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
@@ -78,19 +78,19 @@ function ProjectEditPage() {
   }
 
   return (
-    <Dashboard className="max-w-2xl">
+    <AppContent className="max-w-2xl">
       <div className="mb-4">
         <Link to="/projects/$projectId" params={{ projectId }} className="text-sm font-medium text-sea-ink hover:underline">
           &larr; Back to project
         </Link>
       </div>
 
-      <DashboardHeader>
-        <DashboardTitle>Edit Project</DashboardTitle>
-        <DashboardDescription>Update the project details below</DashboardDescription>
-      </DashboardHeader>
+      <AppContentHeader>
+        <AppContentTitle>Edit Project</AppContentTitle>
+        <AppContentDescription>Update the project details below</AppContentDescription>
+      </AppContentHeader>
 
-      <DashboardContent>
+      <AppContentMain>
         <Card className="island-shell border-none">
           <CardContent className="pt-6">
             <Form {...form}>
@@ -149,7 +149,7 @@ function ProjectEditPage() {
           </Form>
           </CardContent>
         </Card>
-      </DashboardContent>
-    </Dashboard>
+      </AppContentMain>
+    </AppContent>
   )
 }

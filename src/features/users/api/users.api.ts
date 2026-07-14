@@ -1,20 +1,6 @@
 import { createServerFn } from '@tanstack/react-start'
-import { getRequestHeaders } from '@tanstack/react-start/server'
 import { auth } from '@/lib/auth'
-
-// ---------------------------------------------------------------------------
-// Auth guard — only super_admin may manage users
-// ---------------------------------------------------------------------------
-
-async function requireSuperAdmin() {
-  const headers = getRequestHeaders()
-  const session = await auth.api.getSession({ headers })
-  const role = (session?.user as { role?: string } | undefined)?.role
-  if (!session?.user || role !== 'super_admin') {
-    throw new Error('Forbidden: super_admin access required')
-  }
-  return session
-}
+import { requirePermission } from '@/lib/auth.middleware'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -53,15 +39,14 @@ export interface BanInput {
 // ---------------------------------------------------------------------------
 
 /**
- * List all users (super_admin only).
+ * List all users. Requires 'list' permission on 'user'.
+ * (Currently only super_admin)
  */
-export const listUsers = createServerFn({ method: 'GET' }).handler(
-  async (): Promise<ManagedUser[]> => {
-    await requireSuperAdmin()
-    const headers = getRequestHeaders()
-
+export const listUsers = createServerFn({ method: 'GET' })
+  .middleware([requirePermission('user', 'list')])
+  .handler(async ({ context }): Promise<ManagedUser[]> => {
     const result = await auth.api.listUsers({
-      headers,
+      headers: context.headers,
       query: { limit: 200 },
     })
 
@@ -80,18 +65,16 @@ export const listUsers = createServerFn({ method: 'GET' }).handler(
         : String(u.createdAt),
       image: u.image ?? null,
     }))
-  },
-)
+  })
 
 /**
- * Create a new user with an initial role (super_admin only).
+ * Create a new user with an initial role. Requires 'create' permission on 'user'.
+ * (Currently only super_admin)
  */
 export const createUser = createServerFn({ method: 'POST' })
+  .middleware([requirePermission('user', 'create')])
   .validator((input: CreateUserInput) => input)
-  .handler(async ({ data }): Promise<ManagedUser> => {
-    await requireSuperAdmin()
-    const headers = getRequestHeaders()
-
+  .handler(async ({ data, context }): Promise<ManagedUser> => {
     const validRoles = ['user', 'admin', 'editor'] as const
     type ValidRole = typeof validRoles[number]
     const safeRole = (validRoles as readonly string[]).includes(data.role)
@@ -99,7 +82,7 @@ export const createUser = createServerFn({ method: 'POST' })
       : 'user'
 
     const result = await auth.api.createUser({
-      headers,
+      headers: context.headers,
       body: {
         name: data.name,
         email: data.email,
@@ -124,14 +107,13 @@ export const createUser = createServerFn({ method: 'POST' })
   })
 
 /**
- * Update a user's role (super_admin only).
+ * Update a user's role. Requires 'set-role' permission on 'user'.
+ * (admin and super_admin)
  */
 export const updateUserRole = createServerFn({ method: 'POST' })
+  .middleware([requirePermission('user', 'set-role')])
   .validator((input: UpdateRoleInput) => input)
-  .handler(async ({ data }): Promise<void> => {
-    await requireSuperAdmin()
-    const headers = getRequestHeaders()
-
+  .handler(async ({ data, context }): Promise<void> => {
     const validRoles = ['user', 'admin', 'editor'] as const
     type ValidRole = typeof validRoles[number]
     const safeRole = (validRoles as readonly string[]).includes(data.role)
@@ -139,46 +121,43 @@ export const updateUserRole = createServerFn({ method: 'POST' })
       : 'user'
 
     await auth.api.setRole({
-      headers,
+      headers: context.headers,
       body: { userId: data.userId, role: safeRole },
     })
   })
 
 /**
- * Ban a user (super_admin only).
+ * Ban a user. Requires 'ban' permission on 'user'.
+ * (admin and super_admin)
  */
 export const banUser = createServerFn({ method: 'POST' })
+  .middleware([requirePermission('user', 'ban')])
   .validator((input: BanInput) => input)
-  .handler(async ({ data }): Promise<void> => {
-    await requireSuperAdmin()
-    const headers = getRequestHeaders()
-
+  .handler(async ({ data, context }): Promise<void> => {
     await auth.api.banUser({
-      headers,
+      headers: context.headers,
       body: { userId: data.userId, banReason: data.reason },
     })
   })
 
 /**
- * Unban a user (super_admin only).
+ * Unban a user. Requires 'ban' permission on 'user'.
+ * (admin and super_admin)
  */
 export const unbanUser = createServerFn({ method: 'POST' })
+  .middleware([requirePermission('user', 'ban')])
   .validator((userId: string) => userId)
-  .handler(async ({ data: userId }): Promise<void> => {
-    await requireSuperAdmin()
-    const headers = getRequestHeaders()
-
-    await auth.api.unbanUser({ headers, body: { userId } })
+  .handler(async ({ data: userId, context }): Promise<void> => {
+    await auth.api.unbanUser({ headers: context.headers, body: { userId } })
   })
 
 /**
- * Delete a user permanently (super_admin only).
+ * Delete a user permanently. Requires 'delete' permission on 'user'.
+ * (Currently only super_admin)
  */
 export const removeUser = createServerFn({ method: 'POST' })
+  .middleware([requirePermission('user', 'delete')])
   .validator((userId: string) => userId)
-  .handler(async ({ data: userId }): Promise<void> => {
-    await requireSuperAdmin()
-    const headers = getRequestHeaders()
-
-    await auth.api.removeUser({ headers, body: { userId } })
+  .handler(async ({ data: userId, context }): Promise<void> => {
+    await auth.api.removeUser({ headers: context.headers, body: { userId } })
   })

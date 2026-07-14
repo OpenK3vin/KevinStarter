@@ -10,12 +10,20 @@ import { createAccessControl } from 'better-auth/plugins/access'
  */
 export const statement = {
   project: ['create', 'read', 'update', 'delete'],
-  user: ['ban', 'set-role'],
+  user: ['create', 'ban', 'set-role', 'impersonate'],
 } as const
 
 export const ac = createAccessControl(statement)
 
 export const roles = {
+  /**
+   * super_admin — full platform control, including creating users and
+   * managing roles. Only assignable by another super_admin.
+   */
+  super_admin: ac.newRole({
+    project: ['create', 'read', 'update', 'delete'],
+    user: ['create', 'ban', 'set-role', 'impersonate'],
+  }),
   admin: ac.newRole({
     project: ['create', 'read', 'update', 'delete'],
     user: ['ban', 'set-role'],

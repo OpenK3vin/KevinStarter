@@ -29,7 +29,12 @@ export const auth = betterAuth({
     },
   },
   plugins: [
-    adminPlugin({ ac, roles, defaultRole: 'user' }),
+    adminPlugin({ 
+      ac, 
+      roles, 
+      defaultRole: 'user',
+      adminRole: ['super_admin', 'admin']
+    }),
     tanstackStartCookies(), // must be last
   ],
 })

@@ -10,7 +10,7 @@ import { createAccessControl } from 'better-auth/plugins/access'
  */
 export const statement = {
   project: ['create', 'read', 'update', 'delete'],
-  user: ['create', 'ban', 'set-role', 'impersonate'],
+  user: ['create', 'list', 'read', 'update', 'delete', 'ban', 'set-role', 'impersonate'],
 } as const
 
 export const ac = createAccessControl(statement)
@@ -22,7 +22,7 @@ export const roles = {
    */
   super_admin: ac.newRole({
     project: ['create', 'read', 'update', 'delete'],
-    user: ['create', 'ban', 'set-role', 'impersonate'],
+    user: ['create', 'list', 'read', 'update', 'delete', 'ban', 'set-role', 'impersonate'],
   }),
   admin: ac.newRole({
     project: ['create', 'read', 'update', 'delete'],

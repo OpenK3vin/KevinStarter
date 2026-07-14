@@ -24,7 +24,7 @@
 import { auth } from "../lib/auth";
 import { db } from "./index";
 import { examples, projects, resourceRoles, user } from "./schema";
-import { eq, inArray } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 
 // ── Seed data ────────────────────────────────────────────────────────────────
 

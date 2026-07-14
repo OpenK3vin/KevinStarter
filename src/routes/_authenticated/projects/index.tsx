@@ -4,6 +4,7 @@ import { getProjects, createProject } from '@/features/projects/server/projectAp
 import { useHasGlobalRole } from '@/modules/rbac'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { useState } from 'react'
+import { Dashboard, DashboardHeader, DashboardTitle, DashboardDescription, DashboardAction, DashboardContent } from '@/components/ui/dashboard'
 
 export const Route = createFileRoute('/_authenticated/projects/')({
   loader: async ({ context: { queryClient } }) => {
@@ -37,26 +38,25 @@ function ProjectsListPage() {
   }
 
   return (
-    <div className="p-8 space-y-6 rise-in max-w-5xl mx-auto">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-sea-ink">Projects</h1>
-          <p className="text-sea-ink-soft">Projects you have access to.</p>
-        </div>
-        
-        {/* Only visible to users with editor or admin global role */}
+    <Dashboard>
+      <DashboardHeader>
+        <DashboardTitle>Projects</DashboardTitle>
+        <DashboardDescription>Projects you have access to.</DashboardDescription>
         {canCreate && (
-          <button
-            onClick={handleCreate}
-            disabled={isCreating}
-            className="px-4 py-2 bg-sea-ink text-white rounded-lg text-sm font-medium transition hover:opacity-90 disabled:opacity-50"
-          >
-            {isCreating ? 'Creating...' : 'Create Project'}
-          </button>
+          <DashboardAction>
+            <button
+              onClick={handleCreate}
+              disabled={isCreating}
+              className="px-4 py-2 bg-sea-ink text-white rounded-lg text-sm font-medium transition hover:opacity-90 disabled:opacity-50"
+            >
+              {isCreating ? 'Creating...' : 'Create Project'}
+            </button>
+          </DashboardAction>
         )}
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      </DashboardHeader>
+      
+      <DashboardContent>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {projects.length === 0 ? (
           <div className="col-span-full p-8 text-center text-sea-ink-soft border border-dashed border-line rounded-xl">
             No projects found. You might not have access to any yet.
@@ -83,7 +83,8 @@ function ProjectsListPage() {
             </Link>
           ))
         )}
-      </div>
-    </div>
+        </div>
+      </DashboardContent>
+    </Dashboard>
   )
 }

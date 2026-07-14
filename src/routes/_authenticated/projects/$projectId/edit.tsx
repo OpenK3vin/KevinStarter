@@ -1,7 +1,8 @@
 import { createFileRoute, Link, useRouter } from '@tanstack/react-router'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { getProject, updateProject } from '@/features/projects/server/projectApi'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
+import { Dashboard, DashboardHeader, DashboardTitle, DashboardDescription, DashboardContent } from '@/components/ui/dashboard'
 import { useState } from 'react'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
@@ -77,19 +78,23 @@ function ProjectEditPage() {
   }
 
   return (
-    <div className="p-8 space-y-6 rise-in max-w-2xl mx-auto">
-      <Link to="/projects/$projectId" params={{ projectId }} className="text-sm font-medium text-sea-ink hover:underline">
-        &larr; Back to project
-      </Link>
+    <Dashboard className="max-w-2xl">
+      <div className="mb-4">
+        <Link to="/projects/$projectId" params={{ projectId }} className="text-sm font-medium text-sea-ink hover:underline">
+          &larr; Back to project
+        </Link>
+      </div>
 
-      <Card className="island-shell border-none">
-        <CardHeader>
-          <CardTitle>Edit Project</CardTitle>
-          <CardDescription>Update the project details below</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <DashboardHeader>
+        <DashboardTitle>Edit Project</DashboardTitle>
+        <DashboardDescription>Update the project details below</DashboardDescription>
+      </DashboardHeader>
+
+      <DashboardContent>
+        <Card className="island-shell border-none">
+          <CardContent className="pt-6">
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               {error && (
                 <div className="px-4 py-3 text-sm rounded-lg bg-destructive/10 text-destructive border border-destructive/20">
                   {error}
@@ -142,8 +147,9 @@ function ProjectEditPage() {
               </Button>
             </form>
           </Form>
-        </CardContent>
-      </Card>
-    </div>
+          </CardContent>
+        </Card>
+      </DashboardContent>
+    </Dashboard>
   )
 }

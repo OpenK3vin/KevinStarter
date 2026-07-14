@@ -9,11 +9,11 @@ import { UserManagementDashboard } from '@/features/users/components/UserManagem
  * The session is passed through context so the dashboard can read it
  * without an extra network round-trip.
  */
-export const Route = createFileRoute('/_authenticated/admin/users')({
+export const Route = createFileRoute('/_authenticated/admin/users/')({
   beforeLoad: async () => {
     const session = await getAuthSession()
     const role = (session?.user as { role?: string } | undefined)?.role
-    if (!session || role !== 'super_admin') {
+    if (!session || (role !== 'super_admin' && role !== 'admin')) {
       throw redirect({ to: '/' })
     }
     return { session }

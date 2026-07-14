@@ -139,7 +139,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   const navMain = [
     ...data.navMain,
-    ...(role === "super_admin"
+    ...(role === "super_admin" || role === "admin"
       ? [
           {
             title: "User Management",

@@ -25,7 +25,7 @@ export async function can(
   resourceId: string,
 ): Promise<boolean> {
   // Global admin bypasses all resource-scoped checks
-  if (user.role === 'admin') return true
+  if (user.role === 'admin' || user.role === 'super_admin') return true
 
   const grant = await db.query.resourceRoles.findFirst({
     where: and(
@@ -60,7 +60,7 @@ export async function batchCan(
   if (resourceIds.length === 0) return new Map()
 
   // Global admin can do everything
-  if (user.role === 'admin') {
+  if (user.role === 'admin' || user.role === 'super_admin') {
     return new Map(resourceIds.map((id) => [id, true]))
   }
 

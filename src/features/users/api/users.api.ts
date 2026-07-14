@@ -1,6 +1,10 @@
 import { createServerFn } from '@tanstack/react-start'
 import { auth } from '@/lib/auth'
 import { requirePermission } from '@/lib/auth.middleware'
+import { z } from 'zod'
+import { db } from '@/db'
+import { resourceRoles, projects } from '@/db/schema'
+import { eq, and } from 'drizzle-orm'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -160,4 +164,106 @@ export const removeUser = createServerFn({ method: 'POST' })
   .validator((userId: string) => userId)
   .handler(async ({ data: userId, context }): Promise<void> => {
     await auth.api.removeUser({ headers: context.headers, body: { userId } })
+  })
+
+// ---------------------------------------------------------------------------
+// Get single user
+// ---------------------------------------------------------------------------
+
+/**
+ * Fetch a single user by ID. Requires 'read' permission on 'user'.
+ */
+export const getUserById = createServerFn({ method: 'GET' })
+  .middleware([requirePermission('user', 'read')])
+  .validator((userId: string) => userId)
+  .handler(async ({ data: userId, context }): Promise<ManagedUser> => {
+    const result = await auth.api.listUsers({
+      headers: context.headers,
+      query: { limit: 200 },
+    })
+    const users = (result as any).users ?? []
+    const u = users.find((u: any) => u.id === userId)
+    if (!u) throw new Error('User not found')
+    return {
+      id: u.id,
+      name: u.name,
+      email: u.email,
+      role: u.role ?? 'user',
+      banned: u.banned ?? false,
+      banReason: u.banReason ?? null,
+      createdAt: u.createdAt instanceof Date ? u.createdAt.toISOString() : String(u.createdAt),
+      image: u.image ?? null,
+    }
+  })
+
+// ---------------------------------------------------------------------------
+// Resource Roles
+// ---------------------------------------------------------------------------
+
+export const getUserResources = createServerFn({ method: 'GET' })
+  .middleware([requirePermission('user', 'read')])
+  .validator((userId: string) => userId)
+  .handler(async ({ data: userId }) => {
+    // We join with projects to get project names
+    const assignments = await db
+      .select({
+        id: resourceRoles.id,
+        resourceId: resourceRoles.resourceId,
+        resourceType: resourceRoles.resourceType,
+        role: resourceRoles.role,
+        projectName: projects.name,
+      })
+      .from(resourceRoles)
+      .leftJoin(projects, eq(resourceRoles.resourceId, projects.id))
+      .where(eq(resourceRoles.userId, userId))
+
+    return assignments
+  })
+
+const AssignResourceInput = z.object({
+  userId: z.string(),
+  resourceType: z.enum(['project']),
+  resourceId: z.string(),
+  role: z.enum(['editor', 'viewer']),
+})
+
+export const assignResourceRole = createServerFn({ method: 'POST' })
+  .middleware([requirePermission('user', 'set-role')])
+  .validator((data: unknown) => AssignResourceInput.parse(data))
+  .handler(async ({ data }) => {
+    // Check if assignment already exists
+    const existing = await db.query.resourceRoles.findFirst({
+      where: and(
+        eq(resourceRoles.userId, data.userId),
+        eq(resourceRoles.resourceType, data.resourceType),
+        eq(resourceRoles.resourceId, data.resourceId)
+      )
+    })
+
+    if (existing) {
+      // Update role if exists
+      await db.update(resourceRoles)
+        .set({ role: data.role })
+        .where(eq(resourceRoles.id, existing.id))
+      return { success: true }
+    }
+
+    await db.insert(resourceRoles).values({
+      id: crypto.randomUUID(),
+      userId: data.userId,
+      resourceType: data.resourceType,
+      resourceId: data.resourceId,
+      role: data.role,
+      createdAt: new Date(),
+    })
+
+    return { success: true }
+  })
+
+export const revokeResourceRole = createServerFn({ method: 'POST' })
+  .middleware([requirePermission('user', 'set-role')])
+  .validator((assignmentId: string) => assignmentId)
+  .handler(async ({ data: assignmentId }) => {
+    await db.delete(resourceRoles).where(eq(resourceRoles.id, assignmentId))
+    return { success: true }
   })

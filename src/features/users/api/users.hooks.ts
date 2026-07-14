@@ -7,9 +7,22 @@ import {
   banUser,
   unbanUser,
   removeUser,
+  getUserById,
+  getUserResources,
+  assignResourceRole,
+  revokeResourceRole,
 } from './users.api'
 
 const QUERY_KEY = ['users'] as const
+
+export function useUser(userId: string) {
+  return useQuery({
+    queryKey: ['user', userId] as const,
+    queryFn: () => getUserById({ data: userId }),
+    enabled: !!userId,
+    staleTime: 30_000,
+  })
+}
 
 export function useUsers() {
   return useQuery({
@@ -89,6 +102,44 @@ export function useRemoveUser() {
         prev.filter((u) => u.id !== userId),
       )
       queryClient.invalidateQueries({ queryKey: QUERY_KEY })
+    },
+  })
+}
+
+// ---------------------------------------------------------------------------
+// Resource Roles
+// ---------------------------------------------------------------------------
+
+export const resourceKeys = {
+  all: ['user-resources'] as const,
+  byUser: (userId: string) => [...resourceKeys.all, userId] as const,
+}
+
+export function useUserResources(userId: string) {
+  return useQuery({
+    queryKey: resourceKeys.byUser(userId),
+    queryFn: () => getUserResources({ data: userId }),
+    enabled: !!userId,
+  })
+}
+
+export function useAssignResourceRole(userId: string) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (input: { resourceType: 'project', resourceId: string, role: 'editor' | 'viewer' }) => 
+      assignResourceRole({ data: { userId, ...input } }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: resourceKeys.byUser(userId) })
+    },
+  })
+}
+
+export function useRevokeResourceRole(userId: string) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (assignmentId: string) => revokeResourceRole({ data: assignmentId }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: resourceKeys.byUser(userId) })
     },
   })
 }

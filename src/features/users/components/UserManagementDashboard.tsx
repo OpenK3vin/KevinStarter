@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { Link } from '@tanstack/react-router'
 import { toast } from 'sonner'
 import { authClient } from '@/lib/auth-client'
 import {
@@ -10,6 +11,7 @@ import {
 import type { ManagedUser } from '@/features/users/api/users.api'
 import { InviteUserDialog } from './InviteUserDialog'
 import { EditRoleDialog } from './EditRoleDialog'
+import { AssignResourceDialog } from './AssignResourceDialog'
 import {
   IconUsers,
   IconShieldCheck,
@@ -25,6 +27,8 @@ import {
   IconChevronUp,
   IconChevronDown,
   IconSelector,
+  IconFolder,
+  IconExternalLink,
 } from '@tabler/icons-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -179,6 +183,7 @@ export function UserManagementDashboard() {
 
   // Dialogs
   const [editRoleUser, setEditRoleUser] = useState<ManagedUser | null>(null)
+  const [assignResourceUser, setAssignResourceUser] = useState<ManagedUser | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<ManagedUser | null>(null)
   const [banTarget, setBanTarget] = useState<ManagedUser | null>(null)
 
@@ -496,13 +501,27 @@ export function UserManagementDashboard() {
                               <IconDotsVertical size={14} />
                             </Button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="w-44">
+                          <DropdownMenuContent align="end" className="w-48">
+                            <DropdownMenuItem asChild className="gap-2 cursor-pointer">
+                              <Link to="/admin/users/$userId" params={{ userId: user.id }}>
+                                <IconExternalLink size={14} />
+                                Manage User
+                              </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
                             <DropdownMenuItem
                               className="gap-2 cursor-pointer"
                               onSelect={() => setEditRoleUser(user)}
                             >
                               <IconEdit size={14} />
                               Change Role
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              className="gap-2 cursor-pointer"
+                              onSelect={() => setAssignResourceUser(user)}
+                            >
+                              <IconFolder size={14} />
+                              Assign Resources
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             {user.banned ? (
@@ -556,6 +575,15 @@ export function UserManagementDashboard() {
           user={editRoleUser}
           open={!!editRoleUser}
           onOpenChange={(open) => { if (!open) setEditRoleUser(null) }}
+        />
+      )}
+
+      {/* ── Assign Resource Dialog ── */}
+      {assignResourceUser && (
+        <AssignResourceDialog
+          user={assignResourceUser}
+          open={!!assignResourceUser}
+          onOpenChange={(open) => { if (!open) setAssignResourceUser(null) }}
         />
       )}
 

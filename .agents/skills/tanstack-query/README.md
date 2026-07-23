@@ -7,6 +7,7 @@ TanStack Query v5 data fetching patterns with useSuspenseQuery and cache managem
 **Skill:** `tanstack-query`
 
 Covers:
+
 - useSuspenseQuery (primary pattern)
 - useQuery (legacy pattern)
 - Mutations and cache updates
@@ -30,11 +31,13 @@ This kit is automatically detected if your project has TanStack Query in `packag
 ## Installation
 
 Auto-detected projects:
+
 ```bash
 npx claude-code-setup --yes
 ```
 
 Explicit installation:
+
 ```bash
 npx claude-code-setup --kit tanstack-query,react
 ```

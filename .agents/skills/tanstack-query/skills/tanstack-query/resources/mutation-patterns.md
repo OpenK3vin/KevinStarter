@@ -6,15 +6,15 @@
 const { mutate, isPending, isError, error } = useMutation({
   mutationFn: (newPost: CreatePostDto) => createPost(newPost),
   onSuccess: (data) => {
-    console.log('Post created:', data);
+    console.log("Post created:", data)
   },
   onError: (error) => {
-    console.error('Failed to create post:', error);
-  }
-});
+    console.error("Failed to create post:", error)
+  },
+})
 
 // Trigger mutation
-mutate({ title: 'New Post', content: '...' });
+mutate({ title: "New Post", content: "..." })
 ```
 
 ## Optimistic Updates
@@ -26,28 +26,28 @@ const { mutate } = useMutation({
   mutationFn: updatePost,
   onMutate: async (newPost) => {
     // Cancel outgoing refetches
-    await queryClient.cancelQueries({ queryKey: ['posts'] });
+    await queryClient.cancelQueries({ queryKey: ["posts"] })
 
     // Snapshot previous value
-    const previousPosts = queryClient.getQueryData(['posts']);
+    const previousPosts = queryClient.getQueryData(["posts"])
 
     // Optimistically update to the new value
-    queryClient.setQueryData(['posts'], (old) =>
-      old.map(post => post.id === newPost.id ? newPost : post)
-    );
+    queryClient.setQueryData(["posts"], (old) =>
+      old.map((post) => (post.id === newPost.id ? newPost : post)),
+    )
 
     // Return context with snapshot
-    return { previousPosts };
+    return { previousPosts }
   },
   onError: (err, newPost, context) => {
     // Rollback to previous value
-    queryClient.setQueryData(['posts'], context.previousPosts);
+    queryClient.setQueryData(["posts"], context.previousPosts)
   },
   onSettled: () => {
     // Always refetch after error or success
-    queryClient.invalidateQueries({ queryKey: ['posts'] });
-  }
-});
+    queryClient.invalidateQueries({ queryKey: ["posts"] })
+  },
+})
 ```
 
 ## Sequential Mutations
@@ -57,13 +57,13 @@ Run mutations in sequence:
 ```typescript
 const createAndPublish = async (postData) => {
   // Create post
-  const post = await createPostMutation.mutateAsync(postData);
+  const post = await createPostMutation.mutateAsync(postData)
 
   // Publish post
-  const published = await publishPostMutation.mutateAsync(post.id);
+  const published = await publishPostMutation.mutateAsync(post.id)
 
-  return published;
-};
+  return published
+}
 ```
 
 ## Parallel Mutations
@@ -76,11 +76,11 @@ const { mutate } = useMutation({
     const results = await Promise.all([
       updateProfile(updates.profile),
       updateSettings(updates.settings),
-      updatePreferences(updates.preferences)
-    ]);
-    return results;
-  }
-});
+      updatePreferences(updates.preferences),
+    ])
+    return results
+  },
+})
 ```
 
 ## Mutation with Invalidation
@@ -90,12 +90,12 @@ const { mutate } = useMutation({
   mutationFn: createPost,
   onSuccess: () => {
     // Invalidate and refetch
-    queryClient.invalidateQueries({ queryKey: ['posts'] });
+    queryClient.invalidateQueries({ queryKey: ["posts"] })
 
     // Or update cache directly
-    queryClient.setQueryData(['posts'], (old) => [newPost, ...old]);
-  }
-});
+    queryClient.setQueryData(["posts"], (old) => [newPost, ...old])
+  },
+})
 ```
 
 ## Mutation with Multiple Cache Updates
@@ -105,17 +105,15 @@ const { mutate } = useMutation({
   mutationFn: deletePost,
   onSuccess: (_, deletedPostId) => {
     // Update posts list
-    queryClient.setQueryData(['posts'], (old) =>
-      old.filter(post => post.id !== deletedPostId)
-    );
+    queryClient.setQueryData(["posts"], (old) => old.filter((post) => post.id !== deletedPostId))
 
     // Update post count
-    queryClient.setQueryData(['postsCount'], (old) => old - 1);
+    queryClient.setQueryData(["postsCount"], (old) => old - 1)
 
     // Invalidate related queries
-    queryClient.invalidateQueries({ queryKey: ['user', 'stats'] });
-  }
-});
+    queryClient.invalidateQueries({ queryKey: ["user", "stats"] })
+  },
+})
 ```
 
 ## Error Handling
@@ -124,18 +122,18 @@ const { mutate } = useMutation({
 const { mutate, isError, error, reset } = useMutation({
   mutationFn: createPost,
   onError: (error) => {
-    if (error.code === 'VALIDATION_ERROR') {
-      setFormErrors(error.fields);
-    } else if (error.code === 'NETWORK_ERROR') {
-      showRetryDialog();
+    if (error.code === "VALIDATION_ERROR") {
+      setFormErrors(error.fields)
+    } else if (error.code === "NETWORK_ERROR") {
+      showRetryDialog()
     } else {
-      showGenericError();
+      showGenericError()
     }
-  }
-});
+  },
+})
 
 // Clear error state
-reset();
+reset()
 ```
 
 ## Retry Failed Mutations
@@ -143,9 +141,9 @@ reset();
 ```typescript
 const { mutate } = useMutation({
   mutationFn: createPost,
-  retry: 3,  // Retry 3 times on failure
-  retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000)  // Exponential backoff
-});
+  retry: 3, // Retry 3 times on failure
+  retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff
+})
 ```
 
 ## Mutation with Loading State
@@ -178,11 +176,11 @@ function CreatePostForm() {
 
 ```typescript
 const { mutate, variables } = useMutation({
-  mutationFn: updatePost
-});
+  mutationFn: updatePost,
+})
 
 // Access last mutation variables
-console.log('Last updated post:', variables);
+console.log("Last updated post:", variables)
 ```
 
 ## Mutation Callbacks
@@ -191,18 +189,18 @@ console.log('Last updated post:', variables);
 const { mutate } = useMutation({
   mutationFn: createPost,
   onMutate: (variables) => {
-    console.log('Starting mutation with:', variables);
+    console.log("Starting mutation with:", variables)
   },
   onSuccess: (data, variables, context) => {
-    console.log('Success!', data);
+    console.log("Success!", data)
   },
   onError: (error, variables, context) => {
-    console.error('Error!', error);
+    console.error("Error!", error)
   },
   onSettled: (data, error, variables, context) => {
-    console.log('Mutation finished (success or error)');
-  }
-});
+    console.log("Mutation finished (success or error)")
+  },
+})
 ```
 
 ## Mutation with Form Integration
@@ -245,13 +243,13 @@ function CreatePostForm() {
 
 ```typescript
 const { mutate, data, error, reset } = useMutation({
-  mutationFn: createPost
-});
+  mutationFn: createPost,
+})
 
 // Clear mutation state
 const handleReset = () => {
-  reset();  // Clears data, error, status, etc.
-};
+  reset() // Clears data, error, status, etc.
+}
 ```
 
 ## Global Mutation Configuration
@@ -264,11 +262,11 @@ const queryClient = new QueryClient({
       retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
       onError: (error) => {
         // Global error handler
-        console.error('Mutation error:', error);
-      }
-    }
-  }
-});
+        console.error("Mutation error:", error)
+      },
+    },
+  },
+})
 ```
 
 ## Mutation Lifecycle
@@ -310,9 +308,9 @@ const queryClient = new QueryClient({
 const { mutate } = useMutation({
   mutationFn: createPost,
   onSuccess: (newPost) => {
-    navigate(`/posts/${newPost.id}`);
-  }
-});
+    navigate(`/posts/${newPost.id}`)
+  },
+})
 ```
 
 ### Update with Toast
@@ -321,12 +319,12 @@ const { mutate } = useMutation({
 const { mutate } = useMutation({
   mutationFn: updatePost,
   onSuccess: () => {
-    toast.success('Post updated!');
+    toast.success("Post updated!")
   },
   onError: () => {
-    toast.error('Failed to update post');
-  }
-});
+    toast.error("Failed to update post")
+  },
+})
 ```
 
 ### Delete with Confirmation
@@ -335,12 +333,12 @@ const { mutate } = useMutation({
 const { mutate } = useMutation({
   mutationFn: deletePost,
   onMutate: async () => {
-    const confirmed = await confirm('Are you sure?');
-    if (!confirmed) throw new Error('Cancelled');
+    const confirmed = await confirm("Are you sure?")
+    if (!confirmed) throw new Error("Cancelled")
   },
   onSuccess: () => {
-    toast.success('Post deleted');
-    navigate('/posts');
-  }
-});
+    toast.success("Post deleted")
+    navigate("/posts")
+  },
+})
 ```

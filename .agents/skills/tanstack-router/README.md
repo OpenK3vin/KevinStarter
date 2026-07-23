@@ -7,6 +7,7 @@ TanStack Router file-based routing with type-safe navigation and route loaders.
 **Skill:** `tanstack-router`
 
 Covers:
+
 - File-based routing structure
 - Route parameters and search params
 - Route loaders for data fetching
@@ -30,11 +31,13 @@ This kit is automatically detected if your project has TanStack Router in `packa
 ## Installation
 
 Auto-detected projects:
+
 ```bash
 npx claude-code-setup --yes
 ```
 
 Explicit installation:
+
 ```bash
 npx claude-code-setup --kit tanstack-router,react
 ```
@@ -46,6 +49,7 @@ npx claude-code-setup --kit tanstack-router,react
 TanStack Router is a React routing library.
 
 Works well with:
+
 - `tanstack-query` - Data fetching in route loaders
 
 ## Documentation

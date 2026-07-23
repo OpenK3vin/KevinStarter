@@ -1,52 +1,29 @@
-import { useState, useMemo } from 'react'
-import { Link } from '@tanstack/react-router'
-import { toast } from 'sonner'
-import { authClient } from '@/lib/auth-client'
+import { useMemo, useState } from "react"
+import { Link } from "@tanstack/react-router"
+
 import {
-  useUsers,
-  useBanUser,
-  useUnbanUser,
-  useRemoveUser,
-} from '@/features/users/api/users.hooks'
-import type { ManagedUser } from '@/features/users/api/users.api'
-import { InviteUserDialog } from './InviteUserDialog'
-import { EditRoleDialog } from './EditRoleDialog'
-import { AssignResourceDialog } from './AssignResourceDialog'
-import {
-  IconUsers,
-  IconShieldCheck,
-  IconUserOff,
-  IconUserCheck,
-  IconSearch,
+  IconBan,
+  IconChevronDown,
+  IconChevronUp,
   IconDotsVertical,
   IconEdit,
-  IconBan,
-  IconTrash,
-  IconRefresh,
-  IconLoader2,
-  IconChevronUp,
-  IconChevronDown,
-  IconSelector,
-  IconFolder,
   IconExternalLink,
-} from '@tabler/icons-react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Badge } from '@/components/ui/badge'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+  IconFolder,
+  IconLoader2,
+  IconRefresh,
+  IconSearch,
+  IconSelector,
+  IconShieldCheck,
+  IconTrash,
+  IconUserCheck,
+  IconUserOff,
+  IconUsers,
+} from "@tabler/icons-react"
+import { toast } from "sonner"
+
+import { authClient } from "@/lib/auth-client"
+import type { ManagedUser } from "@/features/users/api/users.api"
+import { useBanUser, useRemoveUser, useUnbanUser, useUsers } from "@/features/users/api/users.hooks"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -56,7 +33,28 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
+} from "@/components/ui/alert-dialog"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Input } from "@/components/ui/input"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+
+import { AssignResourceDialog } from "./AssignResourceDialog"
+import { EditRoleDialog } from "./EditRoleDialog"
+import { InviteUserDialog } from "./InviteUserDialog"
 
 // ---------------------------------------------------------------------------
 // Role badge styling
@@ -64,33 +62,29 @@ import {
 
 const ROLE_CONFIG: Record<string, { label: string; className: string }> = {
   super_admin: {
-    label: 'Super Admin',
-    className:
-      'bg-amber-500/15 text-amber-600 border-amber-500/30 dark:text-amber-400',
+    label: "Super Admin",
+    className: "bg-amber-500/15 text-amber-600 border-amber-500/30 dark:text-amber-400",
   },
   admin: {
-    label: 'Admin',
-    className:
-      'bg-blue-500/15 text-blue-600 border-blue-500/30 dark:text-blue-400',
+    label: "Admin",
+    className: "bg-blue-500/15 text-blue-600 border-blue-500/30 dark:text-blue-400",
   },
   editor: {
-    label: 'Editor',
-    className:
-      'bg-emerald-500/15 text-emerald-600 border-emerald-500/30 dark:text-emerald-400',
+    label: "Editor",
+    className: "bg-emerald-500/15 text-emerald-600 border-emerald-500/30 dark:text-emerald-400",
   },
   user: {
-    label: 'User',
-    className:
-      'bg-slate-500/15 text-slate-600 border-slate-500/30 dark:text-slate-400',
+    label: "User",
+    className: "bg-slate-500/15 text-slate-600 border-slate-500/30 dark:text-slate-400",
   },
 }
 
 function RoleBadge({ role }: { role: string | null }) {
-  const cfg = ROLE_CONFIG[role ?? 'user'] ?? ROLE_CONFIG.user
+  const cfg = ROLE_CONFIG[role ?? "user"] ?? ROLE_CONFIG.user
   return (
     <Badge
       variant="outline"
-      className={`text-[11px] font-semibold tracking-wide px-2 py-0.5 ${cfg.className}`}
+      className={`px-2 py-0.5 text-[11px] font-semibold tracking-wide ${cfg.className}`}
     >
       {cfg.label}
     </Badge>
@@ -101,7 +95,7 @@ function StatusChip({ banned }: { banned: boolean | null }) {
   if (banned) {
     return (
       <span className="inline-flex items-center gap-1.5 text-xs font-medium text-red-500">
-        <span className="size-1.5 rounded-full bg-red-500 animate-pulse" />
+        <span className="size-1.5 animate-pulse rounded-full bg-red-500" />
         Banned
       </span>
     )
@@ -118,12 +112,12 @@ function StatusChip({ banned }: { banned: boolean | null }) {
 // Sort helpers
 // ---------------------------------------------------------------------------
 
-type SortKey = 'name' | 'email' | 'role' | 'createdAt' | 'banned'
-type SortDir = 'asc' | 'desc' | null
+type SortKey = "name" | "email" | "role" | "createdAt" | "banned"
+type SortDir = "asc" | "desc" | null
 
 function SortIcon({ dir }: { dir: SortDir }) {
-  if (dir === 'asc') return <IconChevronUp size={12} className="ml-1 opacity-70" />
-  if (dir === 'desc') return <IconChevronDown size={12} className="ml-1 opacity-70" />
+  if (dir === "asc") return <IconChevronUp size={12} className="ml-1 opacity-70" />
+  if (dir === "desc") return <IconChevronDown size={12} className="ml-1 opacity-70" />
   return <IconSelector size={12} className="ml-1 opacity-40" />
 }
 
@@ -144,17 +138,14 @@ function StatCard({
 }) {
   return (
     <div
-      className={`relative overflow-hidden rounded-xl border border-border/60 bg-card p-4 shadow-sm
-        before:absolute before:inset-0 before:opacity-5 ${accent}`}
+      className={`relative overflow-hidden rounded-xl border border-border/60 bg-card p-4 shadow-sm before:absolute before:inset-0 before:opacity-5 ${accent}`}
     >
       <div className="relative flex items-start justify-between">
         <div>
-          <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
+          <p className="text-xs font-medium tracking-widest text-muted-foreground uppercase">
             {label}
           </p>
-          <p className="mt-1 text-2xl font-bold tracking-tight tabular-nums">
-            {value}
-          </p>
+          <p className="mt-1 text-2xl font-bold tracking-tight tabular-nums">{value}</p>
         </div>
         <div className={`rounded-lg p-2 ${accent} bg-opacity-10`}>{icon}</div>
       </div>
@@ -175,11 +166,11 @@ export function UserManagementDashboard() {
   const { mutateAsync: doUnban, isPending: unbanning } = useUnbanUser()
   const { mutateAsync: doRemove, isPending: removing } = useRemoveUser()
 
-  const [search, setSearch] = useState('')
-  const [roleFilter, setRoleFilter] = useState('all')
-  const [statusFilter, setStatusFilter] = useState('all')
-  const [sortKey, setSortKey] = useState<SortKey>('createdAt')
-  const [sortDir, setSortDir] = useState<SortDir>('desc')
+  const [search, setSearch] = useState("")
+  const [roleFilter, setRoleFilter] = useState("all")
+  const [statusFilter, setStatusFilter] = useState("all")
+  const [sortKey, setSortKey] = useState<SortKey>("createdAt")
+  const [sortDir, setSortDir] = useState<SortDir>("desc")
 
   // Dialogs
   const [editRoleUser, setEditRoleUser] = useState<ManagedUser | null>(null)
@@ -192,10 +183,10 @@ export function UserManagementDashboard() {
   // ---------------------------------------------------------------------------
   function handleSort(key: SortKey) {
     if (sortKey === key) {
-      setSortDir((d) => (d === 'asc' ? 'desc' : d === 'desc' ? null : 'asc'))
+      setSortDir((d) => (d === "asc" ? "desc" : d === "desc" ? null : "asc"))
     } else {
       setSortKey(key)
-      setSortDir('asc')
+      setSortDir("asc")
     }
   }
 
@@ -206,9 +197,7 @@ export function UserManagementDashboard() {
     const total = users.length
     const active = users.filter((u) => !u.banned).length
     const banned = users.filter((u) => u.banned).length
-    const admins = users.filter(
-      (u) => u.role === 'admin' || u.role === 'super_admin',
-    ).length
+    const admins = users.filter((u) => u.role === "admin" || u.role === "super_admin").length
     return { total, active, banned, admins }
   }, [users])
 
@@ -221,33 +210,39 @@ export function UserManagementDashboard() {
     if (search.trim()) {
       const q = search.toLowerCase()
       list = list.filter(
-        (u) =>
-          u.name.toLowerCase().includes(q) ||
-          u.email.toLowerCase().includes(q),
+        (u) => u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q),
       )
     }
 
-    if (roleFilter !== 'all') {
-      list = list.filter((u) => (u.role ?? 'user') === roleFilter)
+    if (roleFilter !== "all") {
+      list = list.filter((u) => (u.role ?? "user") === roleFilter)
     }
 
-    if (statusFilter === 'active') list = list.filter((u) => !u.banned)
-    if (statusFilter === 'banned') list = list.filter((u) => u.banned)
+    if (statusFilter === "active") list = list.filter((u) => !u.banned)
+    if (statusFilter === "banned") list = list.filter((u) => u.banned)
 
     if (sortDir) {
       list.sort((a, b) => {
-        let av: string = ''
-        let bv: string = ''
-        if (sortKey === 'name') { av = a.name; bv = b.name }
-        else if (sortKey === 'email') { av = a.email; bv = b.email }
-        else if (sortKey === 'role') { av = a.role ?? 'user'; bv = b.role ?? 'user' }
-        else if (sortKey === 'createdAt') { av = a.createdAt; bv = b.createdAt }
-        else if (sortKey === 'banned') {
-          av = a.banned ? '1' : '0'
-          bv = b.banned ? '1' : '0'
+        let av: string = ""
+        let bv: string = ""
+        if (sortKey === "name") {
+          av = a.name
+          bv = b.name
+        } else if (sortKey === "email") {
+          av = a.email
+          bv = b.email
+        } else if (sortKey === "role") {
+          av = a.role ?? "user"
+          bv = b.role ?? "user"
+        } else if (sortKey === "createdAt") {
+          av = a.createdAt
+          bv = b.createdAt
+        } else if (sortKey === "banned") {
+          av = a.banned ? "1" : "0"
+          bv = b.banned ? "1" : "0"
         }
         const cmp = av.localeCompare(bv)
-        return sortDir === 'asc' ? cmp : -cmp
+        return sortDir === "asc" ? cmp : -cmp
       })
     }
 
@@ -263,7 +258,7 @@ export function UserManagementDashboard() {
       toast.success(`${user.name} has been banned`)
       setBanTarget(null)
     } catch (err: any) {
-      toast.error(err?.message ?? 'Failed to ban user')
+      toast.error(err?.message ?? "Failed to ban user")
     }
   }
 
@@ -272,7 +267,7 @@ export function UserManagementDashboard() {
       await doUnban(user.id)
       toast.success(`${user.name} has been unbanned`)
     } catch (err: any) {
-      toast.error(err?.message ?? 'Failed to unban user')
+      toast.error(err?.message ?? "Failed to unban user")
     }
   }
 
@@ -282,7 +277,7 @@ export function UserManagementDashboard() {
       toast.success(`${user.name} deleted`)
       setDeleteTarget(null)
     } catch (err: any) {
-      toast.error(err?.message ?? 'Failed to delete user')
+      toast.error(err?.message ?? "Failed to delete user")
     }
   }
 
@@ -292,7 +287,7 @@ export function UserManagementDashboard() {
   return (
     <div className="flex flex-col gap-6 p-6">
       {/* ── Header ── */}
-      <div className="flex items-start justify-between gap-4 flex-wrap">
+      <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">User Management</h1>
           <p className="mt-0.5 text-sm text-muted-foreground">
@@ -308,7 +303,7 @@ export function UserManagementDashboard() {
             className="size-9"
             title="Refresh"
           >
-            <IconRefresh size={15} className={isFetching ? 'animate-spin' : ''} />
+            <IconRefresh size={15} className={isFetching ? "animate-spin" : ""} />
           </Button>
           <InviteUserDialog />
         </div>
@@ -344,10 +339,10 @@ export function UserManagementDashboard() {
 
       {/* ── Filters ── */}
       <div className="flex flex-wrap items-center gap-2">
-        <div className="relative flex-1 min-w-48">
+        <div className="relative min-w-48 flex-1">
           <IconSearch
             size={14}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+            className="absolute top-1/2 left-3 -translate-y-1/2 text-muted-foreground"
           />
           <Input
             id="user-search"
@@ -382,18 +377,18 @@ export function UserManagementDashboard() {
       </div>
 
       {/* ── Table ── */}
-      <div className="rounded-xl border border-border/60 overflow-hidden shadow-sm">
+      <div className="overflow-hidden rounded-xl border border-border/60 shadow-sm">
         {isLoading ? (
-          <div className="flex items-center justify-center py-24 gap-2 text-muted-foreground">
+          <div className="flex items-center justify-center gap-2 py-24 text-muted-foreground">
             <IconLoader2 size={18} className="animate-spin" />
             <span className="text-sm">Loading users…</span>
           </div>
         ) : isError ? (
           <div className="py-24 text-center text-sm text-destructive">
-            Failed to load users.{' '}
+            Failed to load users.{" "}
             <button
               onClick={() => refetch()}
-              className="underline underline-offset-2 hover:opacity-70 transition-opacity"
+              className="underline underline-offset-2 transition-opacity hover:opacity-70"
             >
               Retry
             </button>
@@ -405,27 +400,25 @@ export function UserManagementDashboard() {
                 <tr className="border-b border-border/60 bg-muted/40">
                   {(
                     [
-                      { key: 'name', label: 'Name' },
-                      { key: 'email', label: 'Email' },
-                      { key: 'role', label: 'Role' },
-                      { key: 'banned', label: 'Status' },
-                      { key: 'createdAt', label: 'Joined' },
+                      { key: "name", label: "Name" },
+                      { key: "email", label: "Email" },
+                      { key: "role", label: "Role" },
+                      { key: "banned", label: "Status" },
+                      { key: "createdAt", label: "Joined" },
                     ] as { key: SortKey; label: string }[]
                   ).map((col) => (
                     <th
                       key={col.key}
-                      className="px-4 py-3 text-left font-medium text-xs uppercase tracking-widest text-muted-foreground cursor-pointer select-none whitespace-nowrap hover:text-foreground transition-colors"
+                      className="cursor-pointer px-4 py-3 text-left text-xs font-medium tracking-widest whitespace-nowrap text-muted-foreground uppercase transition-colors select-none hover:text-foreground"
                       onClick={() => handleSort(col.key)}
                     >
                       <span className="inline-flex items-center">
                         {col.label}
-                        <SortIcon
-                          dir={sortKey === col.key ? sortDir : null}
-                        />
+                        <SortIcon dir={sortKey === col.key ? sortDir : null} />
                       </span>
                     </th>
                   ))}
-                  <th className="px-4 py-3 text-right font-medium text-xs uppercase tracking-widest text-muted-foreground">
+                  <th className="px-4 py-3 text-right text-xs font-medium tracking-widest text-muted-foreground uppercase">
                     Actions
                   </th>
                 </tr>
@@ -433,10 +426,7 @@ export function UserManagementDashboard() {
               <tbody>
                 {displayed.length === 0 ? (
                   <tr>
-                    <td
-                      colSpan={6}
-                      className="py-16 text-center text-sm text-muted-foreground"
-                    >
+                    <td colSpan={6} className="py-16 text-center text-sm text-muted-foreground">
                       No users found
                     </td>
                   </tr>
@@ -445,19 +435,21 @@ export function UserManagementDashboard() {
                     <tr
                       key={user.id}
                       className={`border-b border-border/40 transition-colors hover:bg-muted/30 ${
-                        idx % 2 === 0 ? '' : 'bg-muted/10'
-                      } ${user.id === currentUserId ? 'ring-1 ring-inset ring-amber-500/20' : ''}`}
+                        idx % 2 === 0 ? "" : "bg-muted/10"
+                      } ${user.id === currentUserId ? "ring-1 ring-amber-500/20 ring-inset" : ""}`}
                     >
                       {/* Name */}
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
-                          <div className="size-7 rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-xs font-bold text-white shrink-0">
+                          <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 text-xs font-bold text-white">
                             {user.name.charAt(0).toUpperCase()}
                           </div>
                           <span className="font-medium text-foreground">
                             {user.name}
                             {user.id === currentUserId && (
-                              <span className="ml-2 text-[10px] text-amber-500 font-semibold">(you)</span>
+                              <span className="ml-2 text-[10px] font-semibold text-amber-500">
+                                (you)
+                              </span>
                             )}
                           </span>
                         </div>
@@ -479,11 +471,11 @@ export function UserManagementDashboard() {
                       </td>
 
                       {/* Joined */}
-                      <td className="px-4 py-3 text-xs text-muted-foreground tabular-nums whitespace-nowrap">
-                        {new Date(user.createdAt).toLocaleDateString('en-US', {
-                          year: 'numeric',
-                          month: 'short',
-                          day: 'numeric',
+                      <td className="px-4 py-3 text-xs whitespace-nowrap text-muted-foreground tabular-nums">
+                        {new Date(user.createdAt).toLocaleDateString("en-US", {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
                         })}
                       </td>
 
@@ -496,13 +488,15 @@ export function UserManagementDashboard() {
                               size="icon"
                               className="size-7 opacity-60 hover:opacity-100"
                               disabled={user.id === currentUserId}
-                              title={user.id === currentUserId ? 'Cannot modify yourself' : 'Actions'}
+                              title={
+                                user.id === currentUserId ? "Cannot modify yourself" : "Actions"
+                              }
                             >
                               <IconDotsVertical size={14} />
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end" className="w-48">
-                            <DropdownMenuItem asChild className="gap-2 cursor-pointer">
+                            <DropdownMenuItem asChild className="cursor-pointer gap-2">
                               <Link to="/admin/users/$userId" params={{ userId: user.id }}>
                                 <IconExternalLink size={14} />
                                 Manage User
@@ -510,14 +504,14 @@ export function UserManagementDashboard() {
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem
-                              className="gap-2 cursor-pointer"
+                              className="cursor-pointer gap-2"
                               onSelect={() => setEditRoleUser(user)}
                             >
                               <IconEdit size={14} />
                               Change Role
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                              className="gap-2 cursor-pointer"
+                              className="cursor-pointer gap-2"
                               onSelect={() => setAssignResourceUser(user)}
                             >
                               <IconFolder size={14} />
@@ -526,7 +520,7 @@ export function UserManagementDashboard() {
                             <DropdownMenuSeparator />
                             {user.banned ? (
                               <DropdownMenuItem
-                                className="gap-2 cursor-pointer text-emerald-600 focus:text-emerald-600"
+                                className="cursor-pointer gap-2 text-emerald-600 focus:text-emerald-600"
                                 onSelect={() => handleUnban(user)}
                                 disabled={unbanning}
                               >
@@ -535,7 +529,7 @@ export function UserManagementDashboard() {
                               </DropdownMenuItem>
                             ) : (
                               <DropdownMenuItem
-                                className="gap-2 cursor-pointer text-amber-600 focus:text-amber-600"
+                                className="cursor-pointer gap-2 text-amber-600 focus:text-amber-600"
                                 onSelect={() => setBanTarget(user)}
                               >
                                 <IconBan size={14} />
@@ -544,7 +538,7 @@ export function UserManagementDashboard() {
                             )}
                             <DropdownMenuSeparator />
                             <DropdownMenuItem
-                              className="gap-2 cursor-pointer text-destructive focus:text-destructive"
+                              className="cursor-pointer gap-2 text-destructive focus:text-destructive"
                               onSelect={() => setDeleteTarget(user)}
                             >
                               <IconTrash size={14} />
@@ -574,7 +568,9 @@ export function UserManagementDashboard() {
         <EditRoleDialog
           user={editRoleUser}
           open={!!editRoleUser}
-          onOpenChange={(open) => { if (!open) setEditRoleUser(null) }}
+          onOpenChange={(open) => {
+            if (!open) setEditRoleUser(null)
+          }}
         />
       )}
 
@@ -583,27 +579,30 @@ export function UserManagementDashboard() {
         <AssignResourceDialog
           user={assignResourceUser}
           open={!!assignResourceUser}
-          onOpenChange={(open) => { if (!open) setAssignResourceUser(null) }}
+          onOpenChange={(open) => {
+            if (!open) setAssignResourceUser(null)
+          }}
         />
       )}
 
       {/* ── Ban Confirm ── */}
       <AlertDialog
         open={!!banTarget}
-        onOpenChange={(open) => { if (!open) setBanTarget(null) }}
+        onOpenChange={(open) => {
+          if (!open) setBanTarget(null)
+        }}
       >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Ban {banTarget?.name}?</AlertDialogTitle>
             <AlertDialogDescription>
-              This user will be prevented from signing in. You can unban them at
-              any time.
+              This user will be prevented from signing in. You can unban them at any time.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              className="bg-amber-500 hover:bg-amber-600 text-white gap-2"
+              className="gap-2 bg-amber-500 text-white hover:bg-amber-600"
               onClick={() => banTarget && handleBan(banTarget)}
               disabled={banning}
             >
@@ -617,20 +616,22 @@ export function UserManagementDashboard() {
       {/* ── Delete Confirm ── */}
       <AlertDialog
         open={!!deleteTarget}
-        onOpenChange={(open) => { if (!open) setDeleteTarget(null) }}
+        onOpenChange={(open) => {
+          if (!open) setDeleteTarget(null)
+        }}
       >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete {deleteTarget?.name}?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action is <strong>irreversible</strong>. All data associated
-              with this user will be permanently removed.
+              This action is <strong>irreversible</strong>. All data associated with this user will
+              be permanently removed.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              className="bg-destructive hover:bg-destructive/90 text-destructive-foreground gap-2"
+              className="gap-2 bg-destructive text-destructive-foreground hover:bg-destructive/90"
               onClick={() => deleteTarget && handleDelete(deleteTarget)}
               disabled={removing}
             >

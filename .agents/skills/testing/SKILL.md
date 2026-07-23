@@ -20,6 +20,7 @@ For verifying test effectiveness through mutation analysis, load the `mutation-t
 Never test implementation details. Test behavior through public APIs.
 
 **Why this matters:**
+
 - Tests remain valid when refactoring
 - Tests document intended behavior
 - Tests catch real bugs, not implementation changes
@@ -27,49 +28,51 @@ Never test implementation details. Test behavior through public APIs.
 ### Examples
 
 ❌ **WRONG - Testing implementation:**
+
 ```typescript
 // ❌ Testing HOW (implementation detail)
-it('should call validateAmount', () => {
-  const spy = jest.spyOn(validator, 'validateAmount');
-  processPayment(payment);
-  expect(spy).toHaveBeenCalled(); // Tests HOW, not WHAT
-});
+it("should call validateAmount", () => {
+  const spy = jest.spyOn(validator, "validateAmount")
+  processPayment(payment)
+  expect(spy).toHaveBeenCalled() // Tests HOW, not WHAT
+})
 
 // ❌ Testing private methods
-it('should validate CVV format', () => {
-  const result = validator._validateCVV('123'); // Private method!
-  expect(result).toBe(true);
-});
+it("should validate CVV format", () => {
+  const result = validator._validateCVV("123") // Private method!
+  expect(result).toBe(true)
+})
 
 // ❌ Testing internal state
-it('should set isValidated flag', () => {
-  processPayment(payment);
-  expect(processor.isValidated).toBe(true); // Internal state
-});
+it("should set isValidated flag", () => {
+  processPayment(payment)
+  expect(processor.isValidated).toBe(true) // Internal state
+})
 ```
 
 ✅ **CORRECT - Testing behavior through public API:**
+
 ```typescript
-it('should reject negative amounts', () => {
-  const payment = getMockPayment({ amount: -100 });
-  const result = processPayment(payment);
-  expect(result.success).toBe(false);
-  expect(result.error).toContain('Amount must be positive');
-});
+it("should reject negative amounts", () => {
+  const payment = getMockPayment({ amount: -100 })
+  const result = processPayment(payment)
+  expect(result.success).toBe(false)
+  expect(result.error).toContain("Amount must be positive")
+})
 
-it('should reject invalid CVV', () => {
-  const payment = getMockPayment({ cvv: '12' }); // Only 2 digits
-  const result = processPayment(payment);
-  expect(result.success).toBe(false);
-  expect(result.error).toContain('Invalid CVV');
-});
+it("should reject invalid CVV", () => {
+  const payment = getMockPayment({ cvv: "12" }) // Only 2 digits
+  const result = processPayment(payment)
+  expect(result.success).toBe(false)
+  expect(result.error).toContain("Invalid CVV")
+})
 
-it('should process valid payments', () => {
-  const payment = getMockPayment({ amount: 100, cvv: '123' });
-  const result = processPayment(payment);
-  expect(result.success).toBe(true);
-  expect(result.data.transactionId).toBeDefined();
-});
+it("should process valid payments", () => {
+  const payment = getMockPayment({ amount: 100, cvv: "123" })
+  const result = processPayment(payment)
+  expect(result.success).toBe(true)
+  expect(result.data.transactionId).toBeDefined()
+})
 ```
 
 ---
@@ -80,31 +83,31 @@ Validation code gets 100% coverage by testing the behavior it protects:
 
 ```typescript
 // Tests covering validation WITHOUT testing validator directly
-describe('processPayment', () => {
-  it('should reject negative amounts', () => {
-    const payment = getMockPayment({ amount: -100 });
-    const result = processPayment(payment);
-    expect(result.success).toBe(false);
-  });
+describe("processPayment", () => {
+  it("should reject negative amounts", () => {
+    const payment = getMockPayment({ amount: -100 })
+    const result = processPayment(payment)
+    expect(result.success).toBe(false)
+  })
 
-  it('should reject amounts over 10000', () => {
-    const payment = getMockPayment({ amount: 15000 });
-    const result = processPayment(payment);
-    expect(result.success).toBe(false);
-  });
+  it("should reject amounts over 10000", () => {
+    const payment = getMockPayment({ amount: 15000 })
+    const result = processPayment(payment)
+    expect(result.success).toBe(false)
+  })
 
-  it('should reject invalid CVV', () => {
-    const payment = getMockPayment({ cvv: '12' });
-    const result = processPayment(payment);
-    expect(result.success).toBe(false);
-  });
+  it("should reject invalid CVV", () => {
+    const payment = getMockPayment({ cvv: "12" })
+    const result = processPayment(payment)
+    expect(result.success).toBe(false)
+  })
 
-  it('should process valid payments', () => {
-    const payment = getMockPayment({ amount: 100, cvv: '123' });
-    const result = processPayment(payment);
-    expect(result.success).toBe(true);
-  });
-});
+  it("should process valid payments", () => {
+    const payment = getMockPayment({ amount: 100, cvv: "123" })
+    const result = processPayment(payment)
+    expect(result.success).toBe(true)
+  })
+})
 
 // ✅ Result: payment-validator.ts has 100% coverage through behavior
 ```
@@ -122,6 +125,7 @@ If code is inline in a function, it gets coverage through that function's behavi
 The anti-pattern is creating a 1:1 mapping between extracted helpers and test files (see "No 1:1 Mapping" below). The extracted helper is an implementation detail of its consumer. Test the consumer's behavior.
 
 ❌ **WRONG — Extracted single-use helper with its own test file:**
+
 ```typescript
 // prepare-participant-data.ts (new file, one caller)
 export const prepareParticipantData = (items: Item[]) => ({
@@ -134,21 +138,22 @@ it('filters claims', () => { ... });
 ```
 
 ✅ **CORRECT — Inline in the consuming function, tested through its behavior:**
+
 ```typescript
 // load-participant-view.ts
 export const loadParticipantView = async (db, eventId, userId) => {
-  const items = await getItems(db, eventId);
-  const yourClaims = items.filter(i => i.isClaimed && i.isClaimedByCurrentUser);
-  const available = items.filter(i => !i.isClaimedByCurrentUser);
-  return { yourClaims, available };
-};
+  const items = await getItems(db, eventId)
+  const yourClaims = items.filter((i) => i.isClaimed && i.isClaimedByCurrentUser)
+  const available = items.filter((i) => !i.isClaimedByCurrentUser)
+  return { yourClaims, available }
+}
 
 // The behavioral test for loadParticipantView covers the filtering:
-it('returns claimed gifts in yourClaims and unclaimed in available', () => {
-  const result = await loadParticipantView(db, eventId, userId);
-  expect(result.yourClaims).toHaveLength(1);
-  expect(result.available).toHaveLength(2);
-});
+it("returns claimed gifts in yourClaims and unclaimed in available", () => {
+  const result = await loadParticipantView(db, eventId, userId)
+  expect(result.yourClaims).toHaveLength(1)
+  expect(result.available).toHaveLength(2)
+})
 ```
 
 **When extraction IS justified (DRY):** If the same filtering logic is used by multiple consumers with the same business meaning, extract it. But test it through each consumer's behavior, not as an isolated unit.
@@ -171,41 +176,42 @@ For test data, use factory functions with optional overrides.
 ```typescript
 const getMockUser = (overrides?: Partial<User>): User => {
   return UserSchema.parse({
-    id: 'user-123',
-    name: 'Test User',
-    email: 'test@example.com',
-    role: 'user',
+    id: "user-123",
+    name: "Test User",
+    email: "test@example.com",
+    role: "user",
     ...overrides,
-  });
-};
+  })
+}
 
 // Usage
-it('creates user with custom email', () => {
-  const user = getMockUser({ email: 'custom@example.com' });
-  const result = createUser(user);
-  expect(result.success).toBe(true);
-});
+it("creates user with custom email", () => {
+  const user = getMockUser({ email: "custom@example.com" })
+  const result = createUser(user)
+  expect(result.success).toBe(true)
+})
 ```
 
 ### Complete Factory Example
 
 ```typescript
-import { UserSchema } from '@/schemas'; // Import real schema
+import { UserSchema } from "@/schemas" // Import real schema
 
 const getMockUser = (overrides?: Partial<User>): User => {
   return UserSchema.parse({
-    id: 'user-123',
-    name: 'Test User',
-    email: 'test@example.com',
-    role: 'user',
+    id: "user-123",
+    name: "Test User",
+    email: "test@example.com",
+    role: "user",
     isActive: true,
-    createdAt: new Date('2024-01-01'),
+    createdAt: new Date("2024-01-01"),
     ...overrides,
-  });
-};
+  })
+}
 ```
 
 **Why validate with schema?**
+
 - Ensures test data is valid according to production schema
 - Catches breaking changes early (schema changes fail tests)
 - Single source of truth (no schema redefinition)
@@ -219,38 +225,36 @@ For nested objects, compose factories:
 ```typescript
 const getMockItem = (overrides?: Partial<Item>): Item => {
   return ItemSchema.parse({
-    id: 'item-1',
-    name: 'Test Item',
+    id: "item-1",
+    name: "Test Item",
     price: 100,
     ...overrides,
-  });
-};
+  })
+}
 
 const getMockOrder = (overrides?: Partial<Order>): Order => {
   return OrderSchema.parse({
-    id: 'order-1',
-    items: [getMockItem()],      // ✅ Compose factories
-    customer: getMockCustomer(),  // ✅ Compose factories
-    payment: getMockPayment(),    // ✅ Compose factories
+    id: "order-1",
+    items: [getMockItem()], // ✅ Compose factories
+    customer: getMockCustomer(), // ✅ Compose factories
+    payment: getMockPayment(), // ✅ Compose factories
     ...overrides,
-  });
-};
+  })
+}
 
 // Usage - override nested objects
-it('calculates total with multiple items', () => {
+it("calculates total with multiple items", () => {
   const order = getMockOrder({
-    items: [
-      getMockItem({ price: 100 }),
-      getMockItem({ price: 200 }),
-    ],
-  });
-  expect(calculateTotal(order)).toBe(300);
-});
+    items: [getMockItem({ price: 100 }), getMockItem({ price: 200 })],
+  })
+  expect(calculateTotal(order)).toBe(300)
+})
 ```
 
 ### Anti-Patterns
 
 ❌ **WRONG: Using `let` and `beforeEach`**
+
 ```typescript
 let user: User;
 beforeEach(() => {
@@ -267,39 +271,43 @@ it('test 2', () => {
 ```
 
 ✅ **CORRECT: Factory per test**
-```typescript
-it('test 1', () => {
-  const user = getMockUser({ name: 'Modified User' });  // Fresh state
-  // ...
-});
 
-it('test 2', () => {
-  const user = getMockUser();  // Fresh state, not affected by test 1
-  expect(user.name).toBe('Test User');  // ✅ Passes
-});
+```typescript
+it("test 1", () => {
+  const user = getMockUser({ name: "Modified User" }) // Fresh state
+  // ...
+})
+
+it("test 2", () => {
+  const user = getMockUser() // Fresh state, not affected by test 1
+  expect(user.name).toBe("Test User") // ✅ Passes
+})
 ```
 
 ❌ **WRONG: Incomplete objects**
+
 ```typescript
 const getMockUser = () => ({
-  id: 'user-123',  // Missing name, email, role!
-});
+  id: "user-123", // Missing name, email, role!
+})
 ```
 
 ✅ **CORRECT: Complete objects**
+
 ```typescript
 const getMockUser = (overrides?: Partial<User>): User => {
   return UserSchema.parse({
-    id: 'user-123',
-    name: 'Test User',
-    email: 'test@example.com',
-    role: 'user',
-    ...overrides,  // All required fields present
-  });
-};
+    id: "user-123",
+    name: "Test User",
+    email: "test@example.com",
+    role: "user",
+    ...overrides, // All required fields present
+  })
+}
 ```
 
 ❌ **WRONG: Redefining schemas in tests**
+
 ```typescript
 // ❌ Schema already defined in src/schemas/user.ts!
 const UserSchema = z.object({ ... });
@@ -307,17 +315,18 @@ const getMockUser = () => UserSchema.parse({ ... });
 ```
 
 ✅ **CORRECT: Import real schema**
+
 ```typescript
-import { UserSchema } from '@/schemas/user';
+import { UserSchema } from "@/schemas/user"
 
 const getMockUser = (overrides?: Partial<User>): User => {
   return UserSchema.parse({
-    id: 'user-123',
-    name: 'Test User',
-    email: 'test@example.com',
+    id: "user-123",
+    name: "Test User",
+    email: "test@example.com",
     ...overrides,
-  });
-};
+  })
+}
 ```
 
 ---
@@ -329,98 +338,106 @@ Watch for these patterns that give fake 100% coverage:
 ### Pattern 1: Mock the function being tested
 
 ❌ **WRONG** - Gives 100% coverage but tests nothing:
+
 ```typescript
-it('calls validator', () => {
-  const spy = jest.spyOn(validator, 'validate');
-  validate(payment);
-  expect(spy).toHaveBeenCalled(); // Meaningless assertion
-});
+it("calls validator", () => {
+  const spy = jest.spyOn(validator, "validate")
+  validate(payment)
+  expect(spy).toHaveBeenCalled() // Meaningless assertion
+})
 ```
 
 ✅ **CORRECT** - Test actual behavior:
+
 ```typescript
-it('should reject invalid payment', () => {
-  const payment = getMockPayment({ amount: -100 });
-  const result = validate(payment);
-  expect(result.success).toBe(false);
-  expect(result.error).toContain('Amount must be positive');
-});
+it("should reject invalid payment", () => {
+  const payment = getMockPayment({ amount: -100 })
+  const result = validate(payment)
+  expect(result.success).toBe(false)
+  expect(result.error).toContain("Amount must be positive")
+})
 ```
 
 ### Pattern 2: Test only that function was called
 
 ❌ **WRONG** - No behavior validation:
+
 ```typescript
-it('processes payment', () => {
-  const spy = jest.spyOn(processor, 'process');
-  handlePayment(payment);
-  expect(spy).toHaveBeenCalledWith(payment); // So what?
-});
+it("processes payment", () => {
+  const spy = jest.spyOn(processor, "process")
+  handlePayment(payment)
+  expect(spy).toHaveBeenCalledWith(payment) // So what?
+})
 ```
 
 ✅ **CORRECT** - Verify the outcome:
+
 ```typescript
-it('should process payment and return transaction ID', () => {
-  const payment = getMockPayment();
-  const result = handlePayment(payment);
-  expect(result.success).toBe(true);
-  expect(result.transactionId).toBeDefined();
-});
+it("should process payment and return transaction ID", () => {
+  const payment = getMockPayment()
+  const result = handlePayment(payment)
+  expect(result.success).toBe(true)
+  expect(result.transactionId).toBeDefined()
+})
 ```
 
 ### Pattern 3: Test trivial getters/setters
 
 ❌ **WRONG** - Testing implementation, not behavior:
+
 ```typescript
-it('sets amount', () => {
-  payment.setAmount(100);
-  expect(payment.getAmount()).toBe(100); // Trivial
-});
+it("sets amount", () => {
+  payment.setAmount(100)
+  expect(payment.getAmount()).toBe(100) // Trivial
+})
 ```
 
 ✅ **CORRECT** - Test meaningful behavior:
+
 ```typescript
-it('should calculate total with tax', () => {
-  const order = createOrder({ items: [item1, item2] });
-  const total = order.calculateTotal();
-  expect(total).toBe(230); // 200 + 15% tax
-});
+it("should calculate total with tax", () => {
+  const order = createOrder({ items: [item1, item2] })
+  const total = order.calculateTotal()
+  expect(total).toBe(230) // 200 + 15% tax
+})
 ```
 
 ### Pattern 4: 100% line coverage, 0% branch coverage
 
 ❌ **WRONG** - Missing edge cases:
+
 ```typescript
-it('validates payment', () => {
-  const result = validate(getMockPayment());
-  expect(result.success).toBe(true); // Only happy path!
-});
+it("validates payment", () => {
+  const result = validate(getMockPayment())
+  expect(result.success).toBe(true) // Only happy path!
+})
 // Missing: negative amounts, invalid CVV, missing fields, etc.
 ```
 
 ✅ **CORRECT** - Test all branches:
+
 ```typescript
-describe('validate payment', () => {
-  it('should reject negative amounts', () => {
-    const payment = getMockPayment({ amount: -100 });
-    expect(validate(payment).success).toBe(false);
-  });
+describe("validate payment", () => {
+  it("should reject negative amounts", () => {
+    const payment = getMockPayment({ amount: -100 })
+    expect(validate(payment).success).toBe(false)
+  })
 
-  it('should reject amounts over limit', () => {
-    const payment = getMockPayment({ amount: 15000 });
-    expect(validate(payment).success).toBe(false);
-  });
+  it("should reject amounts over limit", () => {
+    const payment = getMockPayment({ amount: 15000 })
+    expect(validate(payment).success).toBe(false)
+  })
 
-  it('should reject invalid CVV', () => {
-    const payment = getMockPayment({ cvv: '12' });
-    expect(validate(payment).success).toBe(false);
-  });
+  it("should reject invalid CVV", () => {
+    const payment = getMockPayment({ cvv: "12" })
+    expect(validate(payment).success).toBe(false)
+  })
 
-  it('should accept valid payments', () => {
-    const payment = getMockPayment();
-    expect(validate(payment).success).toBe(true);
-  });
-});
+  it("should accept valid payments", () => {
+    const payment = getMockPayment()
+    expect(validate(payment).success).toBe(true)
+  })
+})
 ```
 
 ---
@@ -430,6 +447,7 @@ describe('validate payment', () => {
 Don't create test files that mirror implementation files.
 
 ❌ **WRONG:**
+
 ```
 src/
   payment-validator.ts
@@ -442,6 +460,7 @@ tests/
 ```
 
 ✅ **CORRECT:**
+
 ```
 src/
   payment-validator.ts

@@ -9,39 +9,39 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
-import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AuthRegisterRouteImport } from './routes/_auth/register'
+import { Route as AuthRouteImport } from './routes/_auth'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as AuthLoginRouteImport } from './routes/_auth/login'
+import { Route as AuthRegisterRouteImport } from './routes/_auth/register'
 import { Route as AuthenticatedProjectsIndexRouteImport } from './routes/_authenticated/projects/index'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
-import { Route as AuthenticatedProjectsProjectIdIndexRouteImport } from './routes/_authenticated/projects/$projectId/index'
 import { Route as AuthenticatedAdminUsersIndexRouteImport } from './routes/_authenticated/admin/users/index'
-import { Route as AuthenticatedProjectsProjectIdEditRouteImport } from './routes/_authenticated/projects/$projectId/edit'
 import { Route as AuthenticatedAdminUsersUserIdRouteImport } from './routes/_authenticated/admin/users/$userId'
+import { Route as AuthenticatedProjectsProjectIdIndexRouteImport } from './routes/_authenticated/projects/$projectId/index'
+import { Route as AuthenticatedProjectsProjectIdEditRouteImport } from './routes/_authenticated/projects/$projectId/edit'
 
-const AuthenticatedRoute = AuthenticatedRouteImport.update({
-  id: '/_authenticated',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/_auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
-} as any)
-const AuthRegisterRoute = AuthRegisterRouteImport.update({
-  id: '/register',
-  path: '/register',
-  getParentRoute: () => AuthRoute,
 } as any)
 const AuthLoginRoute = AuthLoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthRegisterRoute = AuthRegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
   getParentRoute: () => AuthRoute,
 } as any)
 const AuthenticatedProjectsIndexRoute =
@@ -55,28 +55,28 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedProjectsProjectIdIndexRoute =
-  AuthenticatedProjectsProjectIdIndexRouteImport.update({
-    id: '/projects/$projectId/',
-    path: '/projects/$projectId/',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
 const AuthenticatedAdminUsersIndexRoute =
   AuthenticatedAdminUsersIndexRouteImport.update({
     id: '/admin/users/',
     path: '/admin/users/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const AuthenticatedProjectsProjectIdEditRoute =
-  AuthenticatedProjectsProjectIdEditRouteImport.update({
-    id: '/projects/$projectId/edit',
-    path: '/projects/$projectId/edit',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
 const AuthenticatedAdminUsersUserIdRoute =
   AuthenticatedAdminUsersUserIdRouteImport.update({
     id: '/admin/users/$userId',
     path: '/admin/users/$userId',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedProjectsProjectIdIndexRoute =
+  AuthenticatedProjectsProjectIdIndexRouteImport.update({
+    id: '/projects/$projectId/',
+    path: '/projects/$projectId/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedProjectsProjectIdEditRoute =
+  AuthenticatedProjectsProjectIdEditRouteImport.update({
+    id: '/projects/$projectId/edit',
+    path: '/projects/$projectId/edit',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 
@@ -163,11 +163,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/_authenticated': {
-      id: '/_authenticated'
-      path: ''
+    '/': {
+      id: '/'
+      path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof AuthenticatedRouteImport
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_auth': {
@@ -177,25 +177,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+      preLoaderRoute: typeof AuthenticatedRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/_auth/register': {
-      id: '/_auth/register'
-      path: '/register'
-      fullPath: '/register'
-      preLoaderRoute: typeof AuthRegisterRouteImport
-      parentRoute: typeof AuthRoute
     }
     '/_auth/login': {
       id: '/_auth/login'
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof AuthLoginRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/register': {
+      id: '/_auth/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof AuthRegisterRouteImport
       parentRoute: typeof AuthRoute
     }
     '/_authenticated/projects/': {
@@ -212,13 +212,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/projects/$projectId/': {
-      id: '/_authenticated/projects/$projectId/'
-      path: '/projects/$projectId'
-      fullPath: '/projects/$projectId/'
-      preLoaderRoute: typeof AuthenticatedProjectsProjectIdIndexRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
     '/_authenticated/admin/users/': {
       id: '/_authenticated/admin/users/'
       path: '/admin/users'
@@ -226,18 +219,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminUsersIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/projects/$projectId/edit': {
-      id: '/_authenticated/projects/$projectId/edit'
-      path: '/projects/$projectId/edit'
-      fullPath: '/projects/$projectId/edit'
-      preLoaderRoute: typeof AuthenticatedProjectsProjectIdEditRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
     '/_authenticated/admin/users/$userId': {
       id: '/_authenticated/admin/users/$userId'
       path: '/admin/users/$userId'
       fullPath: '/admin/users/$userId'
       preLoaderRoute: typeof AuthenticatedAdminUsersUserIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/projects/$projectId/': {
+      id: '/_authenticated/projects/$projectId/'
+      path: '/projects/$projectId'
+      fullPath: '/projects/$projectId/'
+      preLoaderRoute: typeof AuthenticatedProjectsProjectIdIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/projects/$projectId/edit': {
+      id: '/_authenticated/projects/$projectId/edit'
+      path: '/projects/$projectId/edit'
+      fullPath: '/projects/$projectId/edit'
+      preLoaderRoute: typeof AuthenticatedProjectsProjectIdEditRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
   }

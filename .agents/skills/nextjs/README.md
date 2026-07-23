@@ -7,6 +7,7 @@ Next.js 15+ App Router development patterns including Server Components, Client 
 **Skill:** `nextjs`
 
 Covers:
+
 - Server Components and Client Components
 - File-based routing with App Router
 - Data fetching patterns (async/await in Server Components)
@@ -33,11 +34,13 @@ This kit is automatically detected if your project has Next.js in `package.json`
 ## Installation
 
 Auto-detected projects:
+
 ```bash
 npx claude-code-setup --yes
 ```
 
 Explicit installation:
+
 ```bash
 npx claude-code-setup --kit nextjs
 ```
@@ -45,9 +48,11 @@ npx claude-code-setup --kit nextjs
 ## Dependencies
 
 **Required:**
+
 - `react` - React kit is required for Next.js development
 
 Works well with:
+
 - `shadcn` - shadcn/ui components
 - `tailwindcss` - Tailwind CSS styling
 - `tanstack-query` - Data fetching and caching

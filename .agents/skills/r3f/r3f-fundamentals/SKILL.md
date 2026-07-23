@@ -8,9 +8,9 @@ description: React Three Fiber fundamentals - Canvas, hooks (useFrame, useThree)
 ## Quick Start
 
 ```tsx
-import { Canvas } from '@react-three/fiber'
-import { useRef } from 'react'
-import { useFrame } from '@react-three/fiber'
+import { useRef } from "react"
+
+import { Canvas, useFrame } from "@react-three/fiber"
 
 function RotatingBox() {
   const meshRef = useRef()
@@ -44,7 +44,7 @@ export default function App() {
 The root component that creates the WebGL context, scene, camera, and renderer.
 
 ```tsx
-import { Canvas } from '@react-three/fiber'
+import { Canvas } from "@react-three/fiber"
 
 function App() {
   return (
@@ -64,32 +64,32 @@ function App() {
       gl={{
         antialias: true,
         alpha: true,
-        powerPreference: 'high-performance',
-        preserveDrawingBuffer: true,  // For screenshots
+        powerPreference: "high-performance",
+        preserveDrawingBuffer: true, // For screenshots
       }}
-      dpr={[1, 2]}  // Pixel ratio min/max
+      dpr={[1, 2]} // Pixel ratio min/max
 
       // Shadows
-      shadows  // or shadows="soft" | "basic" | "percentage"
+      shadows // or shadows="soft" | "basic" | "percentage"
 
       // Color management
-      flat  // Disable automatic sRGB color management
+      flat // Disable automatic sRGB color management
 
       // Frame loop control
-      frameloop="demand"  // 'always' | 'demand' | 'never'
+      frameloop="demand" // 'always' | 'demand' | 'never'
 
       // Event handling
-      eventSource={document.getElementById('root')}
-      eventPrefix="client"  // 'offset' | 'client' | 'page' | 'layer' | 'screen'
+      eventSource={document.getElementById("root")}
+      eventPrefix="client" // 'offset' | 'client' | 'page' | 'layer' | 'screen'
 
       // Callbacks
       onCreated={(state) => {
-        console.log('Canvas ready:', state.gl, state.scene, state.camera)
+        console.log("Canvas ready:", state.gl, state.scene, state.camera)
       }}
-      onPointerMissed={() => console.log('Clicked background')}
+      onPointerMissed={() => console.log("Clicked background")}
 
       // Styling
-      style={{ width: '100%', height: '100vh' }}
+      style={{ width: "100%", height: "100vh" }}
     >
       <Scene />
     </Canvas>
@@ -100,6 +100,7 @@ function App() {
 ### Canvas Defaults
 
 R3F sets sensible defaults:
+
 - Renderer: antialias, alpha, outputColorSpace = SRGBColorSpace
 - Camera: PerspectiveCamera at [0, 0, 5]
 - Scene: Automatic resize handling
@@ -110,8 +111,9 @@ R3F sets sensible defaults:
 Subscribe to the render loop. Called every frame (typically 60fps).
 
 ```tsx
-import { useFrame } from '@react-three/fiber'
-import { useRef } from 'react'
+import { useRef } from "react"
+
+import { useFrame } from "@react-three/fiber"
 
 function AnimatedMesh() {
   const meshRef = useRef()
@@ -169,7 +171,7 @@ useFrame((state, delta) => {
 ```tsx
 function ConditionalAnimation({ active }) {
   useFrame((state, delta) => {
-    if (!active) return  // Skip when inactive
+    if (!active) return // Skip when inactive
     meshRef.current.rotation.y += delta
   })
 }
@@ -180,7 +182,7 @@ function ConditionalAnimation({ active }) {
 Access the R3F state store.
 
 ```tsx
-import { useThree } from '@react-three/fiber'
+import { useThree } from "@react-three/fiber"
 
 function CameraInfo() {
   // Get full state (triggers re-render on any change)
@@ -341,31 +343,39 @@ Use dashes for nested properties:
 Control how children attach to parents:
 
 ```tsx
-<mesh>
+;<mesh>
   <boxGeometry />
   {/* Default: attaches as 'material' */}
   <meshStandardMaterial />
 </mesh>
 
-{/* Explicit attach */}
-<mesh>
+{
+  /* Explicit attach */
+}
+;<mesh>
   <boxGeometry attach="geometry" />
   <meshStandardMaterial attach="material" />
 </mesh>
 
-{/* Array attachment */}
-<mesh>
+{
+  /* Array attachment */
+}
+;<mesh>
   <boxGeometry />
   <meshStandardMaterial attach="material-0" color="red" />
   <meshStandardMaterial attach="material-1" color="blue" />
 </mesh>
 
-{/* Custom attachment with function */}
-<someObject>
+{
+  /* Custom attachment with function */
+}
+;<someObject>
   <texture
     attach={(parent, self) => {
       parent.map = self
-      return () => { parent.map = null }  // Cleanup
+      return () => {
+        parent.map = null
+      } // Cleanup
     }}
   />
 </someObject>
@@ -383,41 +393,41 @@ function InteractiveBox() {
   return (
     <mesh
       onClick={(e) => {
-        e.stopPropagation()  // Prevent bubbling
+        e.stopPropagation() // Prevent bubbling
         setClicked(!clicked)
 
         // Event properties:
-        console.log(e.object)      // THREE.Mesh
-        console.log(e.point)       // Vector3 - intersection point
-        console.log(e.distance)    // Distance from camera
-        console.log(e.face)        // Intersected face
-        console.log(e.faceIndex)   // Face index
-        console.log(e.uv)          // UV coordinates
-        console.log(e.normal)      // Face normal
-        console.log(e.pointer)     // Normalized pointer coords
-        console.log(e.ray)         // Raycaster ray
-        console.log(e.camera)      // Camera
-        console.log(e.delta)       // Distance moved (drag events)
+        console.log(e.object) // THREE.Mesh
+        console.log(e.point) // Vector3 - intersection point
+        console.log(e.distance) // Distance from camera
+        console.log(e.face) // Intersected face
+        console.log(e.faceIndex) // Face index
+        console.log(e.uv) // UV coordinates
+        console.log(e.normal) // Face normal
+        console.log(e.pointer) // Normalized pointer coords
+        console.log(e.ray) // Raycaster ray
+        console.log(e.camera) // Camera
+        console.log(e.delta) // Distance moved (drag events)
       }}
-      onContextMenu={(e) => console.log('Right click')}
-      onDoubleClick={(e) => console.log('Double click')}
+      onContextMenu={(e) => console.log("Right click")}
+      onDoubleClick={(e) => console.log("Double click")}
       onPointerOver={(e) => {
         e.stopPropagation()
         setHovered(true)
-        document.body.style.cursor = 'pointer'
+        document.body.style.cursor = "pointer"
       }}
       onPointerOut={(e) => {
         setHovered(false)
-        document.body.style.cursor = 'default'
+        document.body.style.cursor = "default"
       }}
-      onPointerDown={(e) => console.log('Pointer down')}
-      onPointerUp={(e) => console.log('Pointer up')}
-      onPointerMove={(e) => console.log('Moving over mesh')}
-      onWheel={(e) => console.log('Wheel:', e.deltaY)}
+      onPointerDown={(e) => console.log("Pointer down")}
+      onPointerUp={(e) => console.log("Pointer up")}
+      onPointerMove={(e) => console.log("Moving over mesh")}
+      onWheel={(e) => console.log("Wheel:", e.deltaY)}
       scale={hovered ? 1.2 : 1}
     >
       <boxGeometry />
-      <meshStandardMaterial color={clicked ? 'hotpink' : 'orange'} />
+      <meshStandardMaterial color={clicked ? "hotpink" : "orange"} />
     </mesh>
   )
 }
@@ -428,11 +438,13 @@ function InteractiveBox() {
 Events bubble up through the scene graph:
 
 ```tsx
-<group onClick={(e) => console.log('Group clicked')}>
-  <mesh onClick={(e) => {
-    e.stopPropagation()  // Stop bubbling to group
-    console.log('Mesh clicked')
-  }}>
+<group onClick={(e) => console.log("Group clicked")}>
+  <mesh
+    onClick={(e) => {
+      e.stopPropagation() // Stop bubbling to group
+      console.log("Mesh clicked")
+    }}
+  >
     <boxGeometry />
     <meshStandardMaterial />
   </mesh>
@@ -444,11 +456,11 @@ Events bubble up through the scene graph:
 Use existing Three.js objects directly:
 
 ```tsx
-import * as THREE from 'three'
+import * as THREE from "three"
 
 // Existing object
 const geometry = new THREE.BoxGeometry()
-const material = new THREE.MeshStandardMaterial({ color: 'red' })
+const material = new THREE.MeshStandardMaterial({ color: "red" })
 const mesh = new THREE.Mesh(geometry, material)
 
 function Scene() {
@@ -466,8 +478,8 @@ function Model({ gltf }) {
 Register custom Three.js classes for JSX use:
 
 ```tsx
-import { extend } from '@react-three/fiber'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
+import { extend } from "@react-three/fiber"
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
 
 // Extend once (usually at module level)
 extend({ OrbitControls })
@@ -491,9 +503,10 @@ declare global {
 ## Refs and Imperative Access
 
 ```tsx
-import { useRef, useEffect } from 'react'
-import { useFrame } from '@react-three/fiber'
-import * as THREE from 'three'
+import { useEffect, useRef } from "react"
+
+import { useFrame } from "@react-three/fiber"
+import * as THREE from "three"
 
 function MeshWithRef() {
   const meshRef = useRef<THREE.Mesh>(null)
@@ -550,7 +563,7 @@ function Scene() {
   return (
     <>
       <StaticEnvironment />
-      <AnimatedObject />  {/* Only this re-renders on animation */}
+      <AnimatedObject /> {/* Only this re-renders on animation */}
     </>
   )
 }
@@ -560,7 +573,11 @@ function AnimatedObject() {
   useFrame((_, delta) => {
     ref.current.rotation.y += delta
   })
-  return <mesh ref={ref}><boxGeometry /></mesh>
+  return (
+    <mesh ref={ref}>
+      <boxGeometry />
+    </mesh>
+  )
 }
 ```
 
@@ -569,7 +586,9 @@ function AnimatedObject() {
 R3F auto-disposes geometries, materials, and textures. Override with:
 
 ```tsx
-<mesh dispose={null}>  {/* Prevent auto-dispose */}
+<mesh dispose={null}>
+  {" "}
+  {/* Prevent auto-dispose */}
   <boxGeometry />
   <meshStandardMaterial />
 </mesh>
@@ -639,12 +658,12 @@ npm install leva
 ### Basic Controls
 
 ```tsx
-import { useControls } from 'leva'
+import { useControls } from "leva"
 
 function DebugMesh() {
   const { position, color, scale, visible } = useControls({
     position: { value: [0, 0, 0], step: 0.1 },
-    color: '#ff0000',
+    color: "#ff0000",
     scale: { value: 1, min: 0.1, max: 5, step: 0.1 },
     visible: true,
   })
@@ -661,13 +680,13 @@ function DebugMesh() {
 ### Organized Folders
 
 ```tsx
-import { useControls, folder } from 'leva'
+import { folder, useControls } from "leva"
 
 function DebugScene() {
   const { lightIntensity, lightColor, shadowMapSize } = useControls({
     Lighting: folder({
       lightIntensity: { value: 1, min: 0, max: 5 },
-      lightColor: '#ffffff',
+      lightColor: "#ffffff",
       shadowMapSize: { value: 1024, options: [512, 1024, 2048, 4096] },
     }),
     Camera: folder({
@@ -689,19 +708,19 @@ function DebugScene() {
 ### Button Actions
 
 ```tsx
-import { useControls, button } from 'leva'
+import { button, useControls } from "leva"
 
 function DebugActions() {
   const meshRef = useRef()
 
   useControls({
-    'Reset Position': button(() => {
+    "Reset Position": button(() => {
       meshRef.current.position.set(0, 0, 0)
     }),
-    'Random Color': button(() => {
+    "Random Color": button(() => {
       meshRef.current.material.color.setHex(Math.random() * 0xffffff)
     }),
-    'Log State': button(() => {
+    "Log State": button(() => {
       console.log(meshRef.current.position)
     }),
   })
@@ -713,13 +732,13 @@ function DebugActions() {
 ### Hide in Production
 
 ```tsx
-import { Leva } from 'leva'
+import { Leva } from "leva"
 
 function App() {
   return (
     <>
       {/* Hide Leva panel in production */}
-      <Leva hidden={process.env.NODE_ENV === 'production'} />
+      <Leva hidden={process.env.NODE_ENV === "production"} />
 
       <Canvas>
         <Scene />
@@ -732,8 +751,8 @@ function App() {
 ### Monitor Values (Read-Only)
 
 ```tsx
-import { useControls, monitor } from 'leva'
-import { useFrame } from '@react-three/fiber'
+import { useFrame } from "@react-three/fiber"
+import { monitor, useControls } from "leva"
 
 function PerformanceMonitor() {
   const [fps, setFps] = useState(0)
@@ -757,7 +776,7 @@ function PerformanceMonitor() {
 function AnimatedDebugMesh() {
   const meshRef = useRef()
 
-  const { speed, amplitude, enabled } = useControls('Animation', {
+  const { speed, amplitude, enabled } = useControls("Animation", {
     enabled: true,
     speed: { value: 1, min: 0, max: 5 },
     amplitude: { value: 1, min: 0, max: 3 },

@@ -1,29 +1,28 @@
-import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { toast } from 'sonner'
-import type { ManagedUser } from '../api/users.api'
-import {
-  useUserResources,
-  useAssignResourceRole,
-  useRevokeResourceRole,
-} from '../api/users.hooks'
-import { getProjects } from '@/features/projects/server/projectApi'
+import { useState } from "react"
+import { useQuery } from "@tanstack/react-query"
+
+import { IconLoader2, IconTrash } from "@tabler/icons-react"
+import { toast } from "sonner"
+
+import { getProjects } from "@/features/projects/server/projectApi"
+import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
+} from "@/components/ui/dialog"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { IconTrash, IconLoader2 } from '@tabler/icons-react'
+} from "@/components/ui/select"
+
+import type { ManagedUser } from "../api/users.api"
+import { useAssignResourceRole, useRevokeResourceRole, useUserResources } from "../api/users.hooks"
 
 // ---------------------------------------------------------------------------
 // Inline role editor for existing assignments
@@ -45,30 +44,30 @@ function InlineRoleSelect({
   const [saving, setSaving] = useState(false)
   const { mutateAsync: assign } = useAssignResourceRole(userId)
 
-  async function handleChange(newRole: 'editor' | 'viewer') {
+  async function handleChange(newRole: "editor" | "viewer") {
     if (newRole === currentRole) return
     setSaving(true)
     try {
       // assignResourceRole upserts — if the row already exists it updates the role
-      await assign({ resourceType: resourceType as 'project', resourceId, role: newRole })
-      toast.success('Role updated')
+      await assign({ resourceType: resourceType as "project", resourceId, role: newRole })
+      toast.success("Role updated")
     } catch (err: any) {
-      toast.error(err?.message ?? 'Failed to update role')
+      toast.error(err?.message ?? "Failed to update role")
     } finally {
       setSaving(false)
     }
   }
 
-  if (resourceType !== 'project') {
+  if (resourceType !== "project") {
     // Non-project resources: show read-only label since we only support 'project' in UI
-    return <span className="text-sm capitalize text-muted-foreground">{currentRole}</span>
+    return <span className="text-sm text-muted-foreground capitalize">{currentRole}</span>
   }
 
   return (
     <div className="flex items-center gap-1">
       <Select
         value={currentRole}
-        onValueChange={(v) => handleChange(v as 'editor' | 'viewer')}
+        onValueChange={(v) => handleChange(v as "editor" | "viewer")}
         disabled={saving}
       >
         <SelectTrigger className="h-7 w-[90px] text-xs">
@@ -93,12 +92,12 @@ export function AssignResourceDialog({
   open: boolean
   onOpenChange: (open: boolean) => void
 }) {
-  const [selectedProjectId, setSelectedProjectId] = useState<string>('')
-  const [selectedRole, setSelectedRole] = useState<'editor' | 'viewer'>('viewer')
+  const [selectedProjectId, setSelectedProjectId] = useState<string>("")
+  const [selectedRole, setSelectedRole] = useState<"editor" | "viewer">("viewer")
 
   const { data: assignments = [], isLoading: loadingAssignments } = useUserResources(user.id)
   const { data: projects = [], isLoading: loadingProjects } = useQuery({
-    queryKey: ['projects'],
+    queryKey: ["projects"],
     queryFn: () => getProjects(),
     enabled: open,
   })
@@ -110,19 +109,19 @@ export function AssignResourceDialog({
 
   async function handleAssign() {
     if (!selectedProjectId) {
-      toast.error('Please select a project')
+      toast.error("Please select a project")
       return
     }
     try {
       await assign({
-        resourceType: 'project',
+        resourceType: "project",
         resourceId: selectedProjectId,
         role: selectedRole,
       })
-      toast.success('Resource assigned successfully')
-      setSelectedProjectId('')
+      toast.success("Resource assigned successfully")
+      setSelectedProjectId("")
     } catch (err: any) {
-      toast.error(err?.message ?? 'Failed to assign resource')
+      toast.error(err?.message ?? "Failed to assign resource")
     }
   }
 
@@ -130,9 +129,9 @@ export function AssignResourceDialog({
     setRevoking(assignmentId)
     try {
       await revoke(assignmentId)
-      toast.success('Access revoked')
+      toast.success("Access revoked")
     } catch (err: any) {
-      toast.error(err?.message ?? 'Failed to revoke access')
+      toast.error(err?.message ?? "Failed to revoke access")
     } finally {
       setRevoking(null)
     }
@@ -143,15 +142,13 @@ export function AssignResourceDialog({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Assign Resources</DialogTitle>
-          <DialogDescription>
-            Grant {user.name} access to specific projects.
-          </DialogDescription>
+          <DialogDescription>Grant {user.name} access to specific projects.</DialogDescription>
         </DialogHeader>
 
         <div className="flex flex-col gap-4 py-2">
           {/* Assignment Form */}
-          <div className="flex flex-col gap-2 p-3 bg-muted/30 rounded-lg border border-border/50">
-            <h4 className="text-sm font-medium mb-1">New Assignment</h4>
+          <div className="flex flex-col gap-2 rounded-lg border border-border/50 bg-muted/30 p-3">
+            <h4 className="mb-1 text-sm font-medium">New Assignment</h4>
             <div className="flex gap-2">
               <Select value={selectedProjectId} onValueChange={setSelectedProjectId}>
                 <SelectTrigger className="flex-1">
@@ -159,8 +156,8 @@ export function AssignResourceDialog({
                 </SelectTrigger>
                 <SelectContent>
                   {loadingProjects ? (
-                    <div className="p-2 text-sm text-muted-foreground flex items-center justify-center">
-                      <IconLoader2 size={14} className="animate-spin mr-2" /> Loading...
+                    <div className="flex items-center justify-center p-2 text-sm text-muted-foreground">
+                      <IconLoader2 size={14} className="mr-2 animate-spin" /> Loading...
                     </div>
                   ) : projects.length === 0 ? (
                     <div className="p-2 text-sm text-muted-foreground">No projects found</div>
@@ -174,7 +171,10 @@ export function AssignResourceDialog({
                 </SelectContent>
               </Select>
 
-              <Select value={selectedRole} onValueChange={(val: 'editor' | 'viewer') => setSelectedRole(val)}>
+              <Select
+                value={selectedRole}
+                onValueChange={(val: "editor" | "viewer") => setSelectedRole(val)}
+              >
                 <SelectTrigger className="w-[110px]">
                   <SelectValue />
                 </SelectTrigger>
@@ -185,47 +185,57 @@ export function AssignResourceDialog({
               </Select>
             </div>
             <Button
-              className="mt-2 w-full bg-sea-ink hover:opacity-90"
+              className="bg-sea-ink mt-2 w-full hover:opacity-90"
               onClick={handleAssign}
               disabled={assigning || !selectedProjectId}
             >
-              {assigning && <IconLoader2 size={14} className="animate-spin mr-2" />}
+              {assigning && <IconLoader2 size={14} className="mr-2 animate-spin" />}
               Assign Access
             </Button>
           </div>
 
           {/* Existing Assignments */}
           <div>
-            <h4 className="text-sm font-medium mb-2">Current Access</h4>
-            <div className="border border-border/50 rounded-lg overflow-hidden">
+            <h4 className="mb-2 text-sm font-medium">Current Access</h4>
+            <div className="overflow-hidden rounded-lg border border-border/50">
               {loadingAssignments ? (
                 <div className="p-4 text-center text-sm text-muted-foreground">
-                  <IconLoader2 size={16} className="animate-spin mx-auto mb-2" />
+                  <IconLoader2 size={16} className="mx-auto mb-2 animate-spin" />
                   Loading...
                 </div>
               ) : assignments.length === 0 ? (
-                <div className="p-4 text-center text-sm text-muted-foreground bg-muted/10">
+                <div className="bg-muted/10 p-4 text-center text-sm text-muted-foreground">
                   This user has no specific resource assignments.
                 </div>
               ) : (
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="bg-muted/40 border-b border-border/50">
-                      <th className="text-left font-medium p-2 text-muted-foreground">Resource</th>
-                      <th className="text-left font-medium p-2 text-muted-foreground">Role</th>
-                      <th className="text-right p-2"></th>
+                    <tr className="border-b border-border/50 bg-muted/40">
+                      <th className="p-2 text-left font-medium text-muted-foreground">Resource</th>
+                      <th className="p-2 text-left font-medium text-muted-foreground">Role</th>
+                      <th className="p-2 text-right"></th>
                     </tr>
                   </thead>
                   <tbody>
                     {assignments.map((a) => (
-                      <tr key={a.id} className="border-b border-border/30 last:border-0 hover:bg-muted/20">
-                        <td className="p-2 truncate max-w-[150px]" title={a.projectName || a.resourceId}>
+                      <tr
+                        key={a.id}
+                        className="border-b border-border/30 last:border-0 hover:bg-muted/20"
+                      >
+                        <td
+                          className="max-w-[150px] truncate p-2"
+                          title={a.projectName || a.resourceId}
+                        >
                           <div className="flex items-center gap-2">
-                            <span className="text-[10px] uppercase font-bold text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
+                            <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] font-bold text-muted-foreground uppercase">
                               {a.resourceType}
                             </span>
                             <span>
-                              {a.projectName || <span className="font-mono text-xs opacity-60">{a.resourceId.slice(0, 8)}...</span>}
+                              {a.projectName || (
+                                <span className="font-mono text-xs opacity-60">
+                                  {a.resourceId.slice(0, 8)}...
+                                </span>
+                              )}
                             </span>
                           </div>
                         </td>

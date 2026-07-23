@@ -8,12 +8,13 @@ description: React Three Fiber asset loading - useGLTF, useLoader, Suspense patt
 ## Quick Start
 
 ```tsx
-import { Canvas } from '@react-three/fiber'
-import { useGLTF, OrbitControls } from '@react-three/drei'
-import { Suspense } from 'react'
+import { Suspense } from "react"
+
+import { OrbitControls, useGLTF } from "@react-three/drei"
+import { Canvas } from "@react-three/fiber"
 
 function Model() {
-  const { scene } = useGLTF('/models/robot.glb')
+  const { scene } = useGLTF("/models/robot.glb")
   return <primitive object={scene} />
 }
 
@@ -37,10 +38,10 @@ The recommended way to load GLTF/GLB models.
 ### Basic Usage
 
 ```tsx
-import { useGLTF } from '@react-three/drei'
+import { useGLTF } from "@react-three/drei"
 
 function Model() {
-  const gltf = useGLTF('/models/robot.glb')
+  const gltf = useGLTF("/models/robot.glb")
 
   // gltf contains:
   // - scene: THREE.Group (the main scene)
@@ -56,21 +57,13 @@ function Model() {
 
 ```tsx
 function Model() {
-  const { nodes, materials } = useGLTF('/models/robot.glb')
+  const { nodes, materials } = useGLTF("/models/robot.glb")
 
   return (
     <group>
       {/* Use specific meshes */}
-      <mesh
-        geometry={nodes.Body.geometry}
-        material={materials.Metal}
-        position={[0, 0, 0]}
-      />
-      <mesh
-        geometry={nodes.Head.geometry}
-        material={materials.Plastic}
-        position={[0, 1, 0]}
-      />
+      <mesh geometry={nodes.Body.geometry} material={materials.Metal} position={[0, 0, 0]} />
+      <mesh geometry={nodes.Head.geometry} material={materials.Plastic} position={[0, 1, 0]} />
     </group>
   )
 }
@@ -86,8 +79,8 @@ npx gltfjsx model.glb --types
 
 ```tsx
 // Generated component
-import { useGLTF } from '@react-three/drei'
-import { GLTF } from 'three-stdlib'
+import { useGLTF } from "@react-three/drei"
+import { GLTF } from "three-stdlib"
 
 type GLTFResult = GLTF & {
   nodes: {
@@ -100,8 +93,8 @@ type GLTFResult = GLTF & {
   }
 }
 
-export function Model(props: JSX.IntrinsicElements['group']) {
-  const { nodes, materials } = useGLTF('/model.glb') as GLTFResult
+export function Model(props: JSX.IntrinsicElements["group"]) {
+  const { nodes, materials } = useGLTF("/model.glb") as GLTFResult
 
   return (
     <group {...props} dispose={null}>
@@ -111,36 +104,36 @@ export function Model(props: JSX.IntrinsicElements['group']) {
   )
 }
 
-useGLTF.preload('/model.glb')
+useGLTF.preload("/model.glb")
 ```
 
 ### Draco Compression
 
 ```tsx
-import { useGLTF } from '@react-three/drei'
+import { useGLTF } from "@react-three/drei"
 
 function Model() {
   // Drei automatically handles Draco if the file is Draco-compressed
-  const { scene } = useGLTF('/models/compressed.glb')
+  const { scene } = useGLTF("/models/compressed.glb")
   return <primitive object={scene} />
 }
 
 // Or specify Draco decoder path
-useGLTF.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/')
+useGLTF.setDecoderPath("https://www.gstatic.com/draco/versioned/decoders/1.5.6/")
 ```
 
 ### Preloading
 
 ```tsx
-import { useGLTF } from '@react-three/drei'
+import { useGLTF } from "@react-three/drei"
 
 // Preload at module level
-useGLTF.preload('/models/robot.glb')
-useGLTF.preload(['/model1.glb', '/model2.glb'])
+useGLTF.preload("/models/robot.glb")
+useGLTF.preload(["/model1.glb", "/model2.glb"])
 
 function Model() {
   // Will be instant if preloaded
-  const { scene } = useGLTF('/models/robot.glb')
+  const { scene } = useGLTF("/models/robot.glb")
   return <primitive object={scene} />
 }
 ```
@@ -149,7 +142,7 @@ function Model() {
 
 ```tsx
 function Model() {
-  const { scene } = useGLTF('/models/robot.glb')
+  const { scene } = useGLTF("/models/robot.glb")
 
   useEffect(() => {
     // Enable shadows on all meshes
@@ -172,11 +165,11 @@ For loading any Three.js asset.
 ### Basic Texture Loading
 
 ```tsx
-import { useLoader } from '@react-three/fiber'
-import { TextureLoader } from 'three'
+import { useLoader } from "@react-three/fiber"
+import { TextureLoader } from "three"
 
 function TexturedMesh() {
-  const texture = useLoader(TextureLoader, '/textures/color.jpg')
+  const texture = useLoader(TextureLoader, "/textures/color.jpg")
 
   return (
     <mesh>
@@ -192,19 +185,15 @@ function TexturedMesh() {
 ```tsx
 function MultiTexture() {
   const [colorMap, normalMap, roughnessMap] = useLoader(TextureLoader, [
-    '/textures/color.jpg',
-    '/textures/normal.jpg',
-    '/textures/roughness.jpg',
+    "/textures/color.jpg",
+    "/textures/normal.jpg",
+    "/textures/roughness.jpg",
   ])
 
   return (
     <mesh>
       <sphereGeometry args={[1, 64, 64]} />
-      <meshStandardMaterial
-        map={colorMap}
-        normalMap={normalMap}
-        roughnessMap={roughnessMap}
-      />
+      <meshStandardMaterial map={colorMap} normalMap={normalMap} roughnessMap={roughnessMap} />
     </mesh>
   )
 }
@@ -213,14 +202,14 @@ function MultiTexture() {
 ### With Extensions (Draco)
 
 ```tsx
-import { useLoader } from '@react-three/fiber'
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
-import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader'
+import { useLoader } from "@react-three/fiber"
+import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader"
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
 
 function Model() {
-  const gltf = useLoader(GLTFLoader, '/model.glb', (loader) => {
+  const gltf = useLoader(GLTFLoader, "/model.glb", (loader) => {
     const dracoLoader = new DRACOLoader()
-    dracoLoader.setDecoderPath('https://www.gstatic.com/draco/v1/decoders/')
+    dracoLoader.setDecoderPath("https://www.gstatic.com/draco/v1/decoders/")
     loader.setDRACOLoader(dracoLoader)
   })
 
@@ -234,11 +223,11 @@ function Model() {
 function Model() {
   const gltf = useLoader(
     GLTFLoader,
-    '/model.glb',
-    undefined,  // extensions
+    "/model.glb",
+    undefined, // extensions
     (progress) => {
       console.log(`Loading: ${(progress.loaded / progress.total) * 100}%`)
-    }
+    },
   )
 
   return <primitive object={gltf.scene} />
@@ -248,15 +237,15 @@ function Model() {
 ### Preloading
 
 ```tsx
-import { useLoader } from '@react-three/fiber'
-import { TextureLoader } from 'three'
+import { useLoader } from "@react-three/fiber"
+import { TextureLoader } from "three"
 
 // Preload
-useLoader.preload(TextureLoader, '/textures/color.jpg')
-useLoader.preload(TextureLoader, ['/tex1.jpg', '/tex2.jpg'])
+useLoader.preload(TextureLoader, "/textures/color.jpg")
+useLoader.preload(TextureLoader, ["/tex1.jpg", "/tex2.jpg"])
 
 // Clear cache
-useLoader.clear(TextureLoader, '/textures/color.jpg')
+useLoader.clear(TextureLoader, "/textures/color.jpg")
 ```
 
 ## Drei Loader Hooks
@@ -293,13 +282,12 @@ useTexture.preload('/texture.jpg')
 ### useCubeTexture
 
 ```tsx
-import { useCubeTexture } from '@react-three/drei'
+import { useCubeTexture } from "@react-three/drei"
 
 function EnvMap() {
-  const envMap = useCubeTexture(
-    ['px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg'],
-    { path: '/textures/cube/' }
-  )
+  const envMap = useCubeTexture(["px.jpg", "nx.jpg", "py.jpg", "ny.jpg", "pz.jpg", "nz.jpg"], {
+    path: "/textures/cube/",
+  })
 
   return (
     <mesh>
@@ -313,38 +301,38 @@ function EnvMap() {
 ### useEnvironment
 
 ```tsx
-import { useEnvironment } from '@react-three/drei'
+import { useEnvironment } from "@react-three/drei"
 
 // Preset
-const envMap = useEnvironment({ preset: 'sunset' })
+const envMap = useEnvironment({ preset: "sunset" })
 // Presets: apartment, city, dawn, forest, lobby, night, park, studio, sunset, warehouse
 
 // Custom HDR file
-const envMap = useEnvironment({ files: '/hdri/studio.hdr' })
+const envMap = useEnvironment({ files: "/hdri/studio.hdr" })
 
 // Cube map
 const envMap = useEnvironment({
-  files: ['px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg'],
-  path: '/textures/',
+  files: ["px.jpg", "nx.jpg", "py.jpg", "ny.jpg", "pz.jpg", "nz.jpg"],
+  path: "/textures/",
 })
 ```
 
 ### useVideoTexture
 
 ```tsx
-import { useVideoTexture } from '@react-three/drei'
+import { useVideoTexture } from "@react-three/drei"
 
 function VideoPlane() {
-  const texture = useVideoTexture('/video.mp4', {
+  const texture = useVideoTexture("/video.mp4", {
     start: true,
     loop: true,
     muted: true,
-    crossOrigin: 'anonymous',
+    crossOrigin: "anonymous",
   })
 
   return (
     <mesh>
-      <planeGeometry args={[16/9 * 2, 2]} />
+      <planeGeometry args={[(16 / 9) * 2, 2]} />
       <meshBasicMaterial map={texture} toneMapped={false} />
     </mesh>
   )
@@ -354,10 +342,10 @@ function VideoPlane() {
 ### useFont
 
 ```tsx
-import { useFont, Text3D } from '@react-three/drei'
+import { Text3D, useFont } from "@react-three/drei"
 
 // Preload font
-useFont.preload('/fonts/helvetiker.json')
+useFont.preload("/fonts/helvetiker.json")
 
 function Text() {
   return (
@@ -374,7 +362,7 @@ function Text() {
 ### Basic Suspense
 
 ```tsx
-import { Suspense } from 'react'
+import { Suspense } from "react"
 
 function Scene() {
   return (
@@ -399,7 +387,7 @@ function Loader() {
 ### Loading Progress UI
 
 ```tsx
-import { useProgress, Html } from '@react-three/drei'
+import { Html, useProgress } from "@react-three/drei"
 
 function Loader() {
   const { active, progress, errors, item, loaded, total } = useProgress()
@@ -431,7 +419,7 @@ function App() {
 ### Drei Loader Component
 
 ```tsx
-import { Loader } from '@react-three/drei'
+import { Loader } from "@react-three/drei"
 
 function App() {
   return (
@@ -453,13 +441,13 @@ function App() {
 ### OBJ + MTL
 
 ```tsx
-import { useLoader } from '@react-three/fiber'
-import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'
-import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader'
+import { useLoader } from "@react-three/fiber"
+import { MTLLoader } from "three/examples/jsm/loaders/MTLLoader"
+import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader"
 
 function OBJModel() {
-  const materials = useLoader(MTLLoader, '/model.mtl')
-  const obj = useLoader(OBJLoader, '/model.obj', (loader) => {
+  const materials = useLoader(MTLLoader, "/model.mtl")
+  const obj = useLoader(OBJLoader, "/model.obj", (loader) => {
     materials.preload()
     loader.setMaterials(materials)
   })
@@ -471,26 +459,26 @@ function OBJModel() {
 ### FBX
 
 ```tsx
-import { useFBX } from '@react-three/drei'
+import { useFBX } from "@react-three/drei"
 
 function FBXModel() {
-  const fbx = useFBX('/model.fbx')
+  const fbx = useFBX("/model.fbx")
 
   return <primitive object={fbx} scale={0.01} />
 }
 
 // Preload
-useFBX.preload('/model.fbx')
+useFBX.preload("/model.fbx")
 ```
 
 ### STL
 
 ```tsx
-import { useLoader } from '@react-three/fiber'
-import { STLLoader } from 'three/examples/jsm/loaders/STLLoader'
+import { useLoader } from "@react-three/fiber"
+import { STLLoader } from "three/examples/jsm/loaders/STLLoader"
 
 function STLModel() {
-  const geometry = useLoader(STLLoader, '/model.stl')
+  const geometry = useLoader(STLLoader, "/model.stl")
 
   return (
     <mesh geometry={geometry}>
@@ -503,11 +491,11 @@ function STLModel() {
 ### PLY
 
 ```tsx
-import { useLoader } from '@react-three/fiber'
-import { PLYLoader } from 'three/examples/jsm/loaders/PLYLoader'
+import { useLoader } from "@react-three/fiber"
+import { PLYLoader } from "three/examples/jsm/loaders/PLYLoader"
 
 function PLYModel() {
-  const geometry = useLoader(PLYLoader, '/model.ply')
+  const geometry = useLoader(PLYLoader, "/model.ply")
 
   useEffect(() => {
     geometry.computeVertexNormals()
@@ -524,10 +512,10 @@ function PLYModel() {
 ## Clone for Multiple Instances
 
 ```tsx
-import { useGLTF, Clone } from '@react-three/drei'
+import { Clone, useGLTF } from "@react-three/drei"
 
 function Trees() {
-  const { scene } = useGLTF('/models/tree.glb')
+  const { scene } = useGLTF("/models/tree.glb")
 
   return (
     <>
@@ -543,8 +531,8 @@ function Trees() {
 ## Error Handling
 
 ```tsx
-import { useGLTF } from '@react-three/drei'
-import { ErrorBoundary } from 'react-error-boundary'
+import { useGLTF } from "@react-three/drei"
+import { ErrorBoundary } from "react-error-boundary"
 
 function ModelWithErrorHandling() {
   return (
@@ -569,19 +557,19 @@ function FallbackModel() {
 ## Asset Caching
 
 ```tsx
-import { useGLTF, useTexture } from '@react-three/drei'
+import { useGLTF, useTexture } from "@react-three/drei"
 
 // Assets are automatically cached by URL
 // Same URL = same asset instance
 
 function Scene() {
   // These all reference the same cached asset
-  const model1 = useGLTF('/model.glb')
-  const model2 = useGLTF('/model.glb')
-  const model3 = useGLTF('/model.glb')
+  const model1 = useGLTF("/model.glb")
+  const model2 = useGLTF("/model.glb")
+  const model3 = useGLTF("/model.glb")
 
   // Clear cache if needed
-  useGLTF.clear('/model.glb')
+  useGLTF.clear("/model.glb")
 }
 ```
 
@@ -595,12 +583,12 @@ function Scene() {
 
 ```tsx
 // Preload strategy
-useGLTF.preload('/models/hero.glb')      // Critical
-useTexture.preload('/textures/main.jpg')  // Critical
+useGLTF.preload("/models/hero.glb") // Critical
+useTexture.preload("/textures/main.jpg") // Critical
 
 function LazyModel({ visible }) {
   // Only load when visible
-  const { scene } = useGLTF(visible ? '/models/detail.glb' : null)
+  const { scene } = useGLTF(visible ? "/models/detail.glb" : null)
   return scene ? <primitive object={scene} /> : null
 }
 ```

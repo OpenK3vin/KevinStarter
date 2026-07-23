@@ -194,26 +194,26 @@ function PostDetails() {
 
 ```typescript
 // Push to history (default)
-navigate({ to: '/posts' });
+navigate({ to: "/posts" })
 
 // Replace current history entry
-navigate({ to: '/posts', replace: true });
+navigate({ to: "/posts", replace: true })
 
 // Useful for redirects after form submission
 const handleLogin = async () => {
-  await login(credentials);
-  navigate({ to: '/dashboard', replace: true });
-};
+  await login(credentials)
+  navigate({ to: "/dashboard", replace: true })
+}
 ```
 
 ### Relative Navigation
 
 ```typescript
 // From /posts/123
-navigate({ to: '..' });           // Goes to /posts
-navigate({ to: '../..' });        // Goes to /
-navigate({ to: './edit' });       // Goes to /posts/123/edit
-navigate({ to: 'comments' });     // Goes to /posts/123/comments
+navigate({ to: ".." }) // Goes to /posts
+navigate({ to: "../.." }) // Goes to /
+navigate({ to: "./edit" }) // Goes to /posts/123/edit
+navigate({ to: "comments" }) // Goes to /posts/123/comments
 ```
 
 ## Router Hook
@@ -330,21 +330,21 @@ function FilteredList() {
 ### Search Param Validation
 
 ```typescript
-import { z } from 'zod';
+import { z } from "zod"
 
 const searchSchema = z.object({
-  filter: z.enum(['all', 'published', 'draft']).default('all'),
+  filter: z.enum(["all", "published", "draft"]).default("all"),
   page: z.number().int().positive().default(1),
-  sort: z.enum(['date', 'title']).default('date')
-});
+  sort: z.enum(["date", "title"]).default("date"),
+})
 
-export const Route = createFileRoute('/posts')({
+export const Route = createFileRoute("/posts")({
   validateSearch: searchSchema,
-  component: PostsList
-});
+  component: PostsList,
+})
 
 function PostsList() {
-  const search = useSearch({ from: '/posts' });
+  const search = useSearch({ from: "/posts" })
   // search is type-safe and validated
   // search.filter is 'all' | 'published' | 'draft'
   // search.page is number
@@ -388,29 +388,29 @@ function UnsavedForm() {
 ### Authenticated Navigation
 
 ```typescript
-export const Route = createFileRoute('/_authenticated')({
+export const Route = createFileRoute("/_authenticated")({
   beforeLoad: ({ context, location }) => {
     if (!context.auth.isAuthenticated) {
       throw redirect({
-        to: '/login',
+        to: "/login",
         search: {
-          redirect: location.href  // Return here after login
-        }
-      });
+          redirect: location.href, // Return here after login
+        },
+      })
     }
-  }
-});
+  },
+})
 
 // Login component
 function Login() {
-  const navigate = useNavigate();
-  const search = useSearch({ from: '/login' });
+  const navigate = useNavigate()
+  const search = useSearch({ from: "/login" })
 
   const handleLogin = async () => {
-    await loginUser();
-    const redirectTo = search.redirect || '/dashboard';
-    navigate({ to: redirectTo });
-  };
+    await loginUser()
+    const redirectTo = search.redirect || "/dashboard"
+    navigate({ to: redirectTo })
+  }
 }
 ```
 
@@ -508,21 +508,27 @@ function PostActions({ postId }: { postId: string }) {
 ## Best Practices
 
 ### 1. Use Type-Safe Links
+
 Always use the `Link` component with proper typing for params and search.
 
 ### 2. Preload Intentionally
+
 Use `preload="intent"` for frequently accessed routes.
 
 ### 3. Validate Search Params
+
 Use Zod schemas to validate and type search parameters.
 
 ### 4. Handle Navigation Errors
+
 Always handle potential navigation errors (auth redirects, not found, etc.).
 
 ### 5. Use Relative Navigation
+
 Prefer relative navigation (`to: '..'`) over absolute paths when appropriate.
 
 ### 6. Centralize Route Definitions
+
 Define route paths in a central location for easier refactoring.
 
 ```typescript

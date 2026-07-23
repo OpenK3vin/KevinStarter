@@ -15,6 +15,7 @@ This project follows a strict technology stack and architecture. You must adhere
 ## Agent Skills Enforcement
 
 When instructed to add UI components or design new interfaces:
+
 1. **Always use the `shadcn` skill** to manage, add, or compose UI components. Check if a Shadcn component exists for your needs before building a bespoke one.
 2. **Follow the `frontend-design` skill** to ensure the aesthetics match the high-quality, modern design required for this project.
 

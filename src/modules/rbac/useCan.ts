@@ -1,6 +1,7 @@
-import { useContext } from 'react'
-import { RbacContext } from './RbacContext'
-import type { GlobalRole, RbacContextValue } from './types'
+import { useContext } from "react"
+
+import { RbacContext } from "./RbacContext"
+import type { GlobalRole, RbacContextValue } from "./types"
 
 /**
  * Raw access to the RBAC context.
@@ -11,7 +12,7 @@ import type { GlobalRole, RbacContextValue } from './types'
 export function useRbac(): RbacContextValue {
   const ctx = useContext(RbacContext)
   if (!ctx) {
-    throw new Error('useRbac must be used within a RbacProvider')
+    throw new Error("useRbac must be used within a RbacProvider")
   }
   return ctx
 }

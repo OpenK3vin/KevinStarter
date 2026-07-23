@@ -1,15 +1,16 @@
-import { createFileRoute, Link, useRouter } from '@tanstack/react-router'
-import { useSuspenseQuery } from '@tanstack/react-query'
-import { getProject, updateProject } from '@/features/projects/server/projectApi'
-import { Card, CardContent } from '@/components/ui/card'
-import { PageLayout } from '@/components/layout/page-layout'
-import { useState } from 'react'
-import { z } from 'zod'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
+import { useState } from "react"
+import { useSuspenseQuery } from "@tanstack/react-query"
+import { Link, createFileRoute, useRouter } from "@tanstack/react-router"
+
+import { z } from "zod"
+
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+
+import { getProject, updateProject } from "@/features/projects/server/projectApi"
+import { PageLayout } from "@/components/layout/page-layout"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
 import {
   Form,
   FormControl,
@@ -17,13 +18,15 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form'
+} from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
 
-export const Route = createFileRoute('/_authenticated/projects/$projectId/edit')({
+export const Route = createFileRoute("/_authenticated/projects/$projectId/edit")({
   loader: async ({ params: { projectId }, context: { queryClient } }) => {
     // If they can't even read it, they definitely can't edit it
     await queryClient.ensureQueryData({
-      queryKey: ['project', projectId],
+      queryKey: ["project", projectId],
       queryFn: () => getProject({ data: { id: projectId } }),
     })
   },
@@ -31,7 +34,7 @@ export const Route = createFileRoute('/_authenticated/projects/$projectId/edit')
 })
 
 const projectSchema = z.object({
-  name: z.string().min(1, 'Project name is required'),
+  name: z.string().min(1, "Project name is required"),
   description: z.string().optional(),
 })
 
@@ -42,7 +45,7 @@ function ProjectEditPage() {
   const router = useRouter()
 
   const { data: project } = useSuspenseQuery({
-    queryKey: ['project', projectId],
+    queryKey: ["project", projectId],
     queryFn: () => getProject({ data: { id: projectId } }),
   })
 
@@ -53,7 +56,7 @@ function ProjectEditPage() {
     resolver: zodResolver(projectSchema),
     defaultValues: {
       name: project.name,
-      description: project.description ?? '',
+      description: project.description ?? "",
     },
   })
 
@@ -69,9 +72,13 @@ function ProjectEditPage() {
         },
       })
       await router.invalidate()
-      router.navigate({ to: '/projects/$projectId', params: { projectId } })
+      router.navigate({ to: "/projects/$projectId", params: { projectId } })
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Save failed. You might not have the "editor" role for this project.')
+      setError(
+        e instanceof Error
+          ? e.message
+          : 'Save failed. You might not have the "editor" role for this project.',
+      )
     } finally {
       setIsSaving(false)
     }
@@ -81,7 +88,11 @@ function ProjectEditPage() {
     <PageLayout
       className="max-w-2xl"
       backLink={
-        <Link to="/projects/$projectId" params={{ projectId }} className="text-sm font-medium text-sea-ink hover:underline">
+        <Link
+          to="/projects/$projectId"
+          params={{ projectId }}
+          className="text-sea-ink text-sm font-medium hover:underline"
+        >
           &larr; Back to project
         </Link>
       }
@@ -93,7 +104,7 @@ function ProjectEditPage() {
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               {error && (
-                <div className="px-4 py-3 text-sm rounded-lg bg-destructive/10 text-destructive border border-destructive/20">
+                <div className="rounded-lg border border-destructive/20 bg-destructive/10 px-4 py-3 text-sm text-destructive">
                   {error}
                 </div>
               )}
@@ -105,11 +116,7 @@ function ProjectEditPage() {
                   <FormItem>
                     <FormLabel>Name</FormLabel>
                     <FormControl>
-                      <Input
-                        id="name"
-                        placeholder="Project Name"
-                        {...field}
-                      />
+                      <Input id="name" placeholder="Project Name" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -123,29 +130,20 @@ function ProjectEditPage() {
                   <FormItem>
                     <FormLabel>Description</FormLabel>
                     <FormControl>
-                      <Textarea
-                        id="desc"
-                        rows={4}
-                        placeholder="Optional description"
-                        {...field}
-                      />
+                      <Textarea id="desc" rows={4} placeholder="Optional description" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
-              <Button
-                type="submit"
-                disabled={isSaving}
-                className="w-full"
-              >
-                {isSaving ? 'Saving...' : 'Save Changes'}
+              <Button type="submit" disabled={isSaving} className="w-full">
+                {isSaving ? "Saving..." : "Save Changes"}
               </Button>
             </form>
           </Form>
-          </CardContent>
-        </Card>
+        </CardContent>
+      </Card>
     </PageLayout>
   )
 }

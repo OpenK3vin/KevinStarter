@@ -8,8 +8,8 @@ description: React Three Fiber post-processing - @react-three/postprocessing, bl
 ## Quick Start
 
 ```tsx
-import { Canvas } from '@react-three/fiber'
-import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing'
+import { Canvas } from "@react-three/fiber"
+import { Bloom, EffectComposer, Vignette } from "@react-three/postprocessing"
 
 function Scene() {
   return (
@@ -40,7 +40,7 @@ npm install @react-three/postprocessing postprocessing
 The container for all post-processing effects.
 
 ```tsx
-import { EffectComposer } from '@react-three/postprocessing'
+import { EffectComposer } from "@react-three/postprocessing"
 
 function Scene() {
   return (
@@ -50,11 +50,11 @@ function Scene() {
 
       {/* Post-processing - must be inside Canvas, after scene content */}
       <EffectComposer
-        enabled={true}           // Toggle all effects
-        depthBuffer={true}       // Enable depth buffer
-        stencilBuffer={false}    // Enable stencil buffer
-        autoClear={true}         // Auto clear before render
-        multisampling={8}        // MSAA samples (0 to disable)
+        enabled={true} // Toggle all effects
+        depthBuffer={true} // Enable depth buffer
+        stencilBuffer={false} // Enable stencil buffer
+        autoClear={true} // Auto clear before render
+        multisampling={8} // MSAA samples (0 to disable)
       >
         {/* Effects go here */}
       </EffectComposer>
@@ -98,18 +98,14 @@ import { BlendFunction } from 'postprocessing'
 ### Selective Bloom
 
 ```tsx
-import { EffectComposer, Bloom, Selection, Select } from '@react-three/postprocessing'
+import { Bloom, EffectComposer, Select, Selection } from "@react-three/postprocessing"
 
 function Scene() {
   return (
     <Canvas>
       <Selection>
         <EffectComposer>
-          <Bloom
-            luminanceThreshold={0}
-            intensity={2}
-            mipmapBlur
-          />
+          <Bloom luminanceThreshold={0} intensity={2} mipmapBlur />
         </EffectComposer>
 
         {/* This mesh will bloom */}
@@ -134,19 +130,19 @@ function Scene() {
 ### Depth of Field
 
 ```tsx
-import { EffectComposer, DepthOfField } from '@react-three/postprocessing'
+// With target object
+import { useRef } from "react"
 
-<EffectComposer>
+import { DepthOfField, EffectComposer } from "@react-three/postprocessing"
+
+;<EffectComposer>
   <DepthOfField
-    focusDistance={0}     // Focus distance (0 = auto)
-    focalLength={0.02}    // Camera focal length
-    bokehScale={2}        // Bokeh size
-    height={480}          // Resolution height
+    focusDistance={0} // Focus distance (0 = auto)
+    focalLength={0.02} // Camera focal length
+    bokehScale={2} // Bokeh size
+    height={480} // Resolution height
   />
 </EffectComposer>
-
-// With target object
-import { useRef } from 'react'
 
 function Scene() {
   const targetRef = useRef()
@@ -159,11 +155,7 @@ function Scene() {
       </mesh>
 
       <EffectComposer>
-        <DepthOfField
-          target={targetRef}
-          focalLength={0.02}
-          bokehScale={2}
-        />
+        <DepthOfField target={targetRef} focalLength={0.02} bokehScale={2} />
       </EffectComposer>
     </>
   )
@@ -173,13 +165,13 @@ function Scene() {
 ### Vignette
 
 ```tsx
-import { EffectComposer, Vignette } from '@react-three/postprocessing'
+import { EffectComposer, Vignette } from "@react-three/postprocessing"
 
-<EffectComposer>
+;<EffectComposer>
   <Vignette
-    offset={0.5}          // Vignette size
-    darkness={0.5}        // Vignette intensity
-    eskil={false}         // Use Eskil's vignette technique
+    offset={0.5} // Vignette size
+    darkness={0.5} // Vignette intensity
+    eskil={false} // Use Eskil's vignette technique
   />
 </EffectComposer>
 ```
@@ -187,12 +179,12 @@ import { EffectComposer, Vignette } from '@react-three/postprocessing'
 ### Noise
 
 ```tsx
-import { EffectComposer, Noise } from '@react-three/postprocessing'
-import { BlendFunction } from 'postprocessing'
+import { EffectComposer, Noise } from "@react-three/postprocessing"
+import { BlendFunction } from "postprocessing"
 
-<EffectComposer>
+;<EffectComposer>
   <Noise
-    premultiply            // Multiply noise with input
+    premultiply // Multiply noise with input
     blendFunction={BlendFunction.ADD}
     opacity={0.5}
   />
@@ -202,13 +194,13 @@ import { BlendFunction } from 'postprocessing'
 ### Chromatic Aberration
 
 ```tsx
-import { EffectComposer, ChromaticAberration } from '@react-three/postprocessing'
-import { BlendFunction } from 'postprocessing'
+import { ChromaticAberration, EffectComposer } from "@react-three/postprocessing"
+import { BlendFunction } from "postprocessing"
 
-<EffectComposer>
+;<EffectComposer>
   <ChromaticAberration
-    offset={[0.002, 0.002]}    // Color offset
-    radialModulation={true}    // Apply radially
+    offset={[0.002, 0.002]} // Color offset
+    radialModulation={true} // Apply radially
     modulationOffset={0.5}
     blendFunction={BlendFunction.NORMAL}
   />
@@ -218,15 +210,15 @@ import { BlendFunction } from 'postprocessing'
 ### SSAO (Screen Space Ambient Occlusion)
 
 ```tsx
-import { EffectComposer, SSAO } from '@react-three/postprocessing'
-import { BlendFunction } from 'postprocessing'
+import { EffectComposer, SSAO } from "@react-three/postprocessing"
+import { BlendFunction } from "postprocessing"
 
-<EffectComposer>
+;<EffectComposer>
   <SSAO
     blendFunction={BlendFunction.MULTIPLY}
-    samples={30}              // Amount of samples
-    radius={5}                // Occlusion radius
-    intensity={30}            // Occlusion intensity
+    samples={30} // Amount of samples
+    radius={5} // Occlusion radius
+    intensity={30} // Occlusion intensity
     luminanceInfluence={0.6}
     color="black"
     worldDistanceThreshold={100}
@@ -240,7 +232,7 @@ import { BlendFunction } from 'postprocessing'
 ### Outline
 
 ```tsx
-import { EffectComposer, Outline, Selection, Select } from '@react-three/postprocessing'
+import { EffectComposer, Outline, Select, Selection } from "@react-three/postprocessing"
 
 function Scene() {
   return (
@@ -248,12 +240,12 @@ function Scene() {
       <Selection>
         <EffectComposer autoClear={false}>
           <Outline
-            visibleEdgeColor={0xffffff}    // Visible edge color
-            hiddenEdgeColor={0x22090a}     // Hidden edge color
-            edgeStrength={2.5}             // Edge strength
-            pulseSpeed={0}                 // Pulse animation speed
-            blur                           // Enable blur
-            xRay                           // Show behind objects
+            visibleEdgeColor={0xffffff} // Visible edge color
+            hiddenEdgeColor={0x22090a} // Hidden edge color
+            edgeStrength={2.5} // Edge strength
+            pulseSpeed={0} // Pulse animation speed
+            blur // Enable blur
+            xRay // Show behind objects
           />
         </EffectComposer>
 
@@ -279,16 +271,16 @@ function Scene() {
 ### Color Grading
 
 ```tsx
-import { EffectComposer, BrightnessContrast, HueSaturation } from '@react-three/postprocessing'
+import { BrightnessContrast, EffectComposer, HueSaturation } from "@react-three/postprocessing"
 
-<EffectComposer>
+;<EffectComposer>
   <BrightnessContrast
-    brightness={0}     // -1 to 1
-    contrast={0}       // -1 to 1
+    brightness={0} // -1 to 1
+    contrast={0} // -1 to 1
   />
   <HueSaturation
-    hue={0}           // Hue rotation in radians
-    saturation={0}    // -1 to 1
+    hue={0} // Hue rotation in radians
+    saturation={0} // -1 to 1
   />
 </EffectComposer>
 ```
@@ -296,10 +288,10 @@ import { EffectComposer, BrightnessContrast, HueSaturation } from '@react-three/
 ### Tone Mapping
 
 ```tsx
-import { EffectComposer, ToneMapping } from '@react-three/postprocessing'
-import { ToneMappingMode } from 'postprocessing'
+import { EffectComposer, ToneMapping } from "@react-three/postprocessing"
+import { ToneMappingMode } from "postprocessing"
 
-<EffectComposer>
+;<EffectComposer>
   <ToneMapping
     mode={ToneMappingMode.ACES_FILMIC}
     // Modes: LINEAR, REINHARD, REINHARD2, OPTIMIZED_CINEON, CINEON, ACES_FILMIC, AGX, NEUTRAL
@@ -316,17 +308,17 @@ import { ToneMappingMode } from 'postprocessing'
 ### Glitch
 
 ```tsx
-import { EffectComposer, Glitch } from '@react-three/postprocessing'
-import { GlitchMode } from 'postprocessing'
+import { EffectComposer, Glitch } from "@react-three/postprocessing"
+import { GlitchMode } from "postprocessing"
 
-<EffectComposer>
+;<EffectComposer>
   <Glitch
-    delay={[1.5, 3.5]}           // Min/max delay between glitches
-    duration={[0.6, 1.0]}        // Min/max duration
-    strength={[0.3, 1.0]}        // Min/max strength
-    mode={GlitchMode.SPORADIC}   // DISABLED, SPORADIC, CONSTANT_MILD, CONSTANT_WILD
-    active                       // Enable/disable
-    ratio={0.85}                 // Glitch ratio (0 = none, 1 = always)
+    delay={[1.5, 3.5]} // Min/max delay between glitches
+    duration={[0.6, 1.0]} // Min/max duration
+    strength={[0.3, 1.0]} // Min/max strength
+    mode={GlitchMode.SPORADIC} // DISABLED, SPORADIC, CONSTANT_MILD, CONSTANT_WILD
+    active // Enable/disable
+    ratio={0.85} // Glitch ratio (0 = none, 1 = always)
   />
 </EffectComposer>
 ```
@@ -334,11 +326,11 @@ import { GlitchMode } from 'postprocessing'
 ### Pixelation
 
 ```tsx
-import { EffectComposer, Pixelation } from '@react-three/postprocessing'
+import { EffectComposer, Pixelation } from "@react-three/postprocessing"
 
-<EffectComposer>
+;<EffectComposer>
   <Pixelation
-    granularity={5}    // Pixel size
+    granularity={5} // Pixel size
   />
 </EffectComposer>
 ```
@@ -346,14 +338,14 @@ import { EffectComposer, Pixelation } from '@react-three/postprocessing'
 ### Scanline
 
 ```tsx
-import { EffectComposer, Scanline } from '@react-three/postprocessing'
-import { BlendFunction } from 'postprocessing'
+import { EffectComposer, Scanline } from "@react-three/postprocessing"
+import { BlendFunction } from "postprocessing"
 
-<EffectComposer>
+;<EffectComposer>
   <Scanline
     blendFunction={BlendFunction.OVERLAY}
-    density={1.25}     // Line density
-    opacity={0.5}      // Effect opacity
+    density={1.25} // Line density
+    opacity={0.5} // Effect opacity
   />
 </EffectComposer>
 ```
@@ -361,14 +353,14 @@ import { BlendFunction } from 'postprocessing'
 ### Grid
 
 ```tsx
-import { EffectComposer, Grid } from '@react-three/postprocessing'
-import { BlendFunction } from 'postprocessing'
+import { EffectComposer, Grid } from "@react-three/postprocessing"
+import { BlendFunction } from "postprocessing"
 
-<EffectComposer>
+;<EffectComposer>
   <Grid
     blendFunction={BlendFunction.OVERLAY}
-    scale={1.0}        // Grid scale
-    lineWidth={0.0}    // Line width
+    scale={1.0} // Grid scale
+    lineWidth={0.0} // Line width
   />
 </EffectComposer>
 ```
@@ -376,14 +368,14 @@ import { BlendFunction } from 'postprocessing'
 ### DotScreen
 
 ```tsx
-import { EffectComposer, DotScreen } from '@react-three/postprocessing'
-import { BlendFunction } from 'postprocessing'
+import { DotScreen, EffectComposer } from "@react-three/postprocessing"
+import { BlendFunction } from "postprocessing"
 
-<EffectComposer>
+;<EffectComposer>
   <DotScreen
     blendFunction={BlendFunction.NORMAL}
-    angle={Math.PI * 0.5}    // Pattern angle
-    scale={1.0}              // Pattern scale
+    angle={Math.PI * 0.5} // Pattern angle
+    scale={1.0} // Pattern scale
   />
 </EffectComposer>
 ```
@@ -391,9 +383,11 @@ import { BlendFunction } from 'postprocessing'
 ### SMAA (Anti-Aliasing)
 
 ```tsx
-import { EffectComposer, SMAA } from '@react-three/postprocessing'
+import { EffectComposer, SMAA } from "@react-three/postprocessing"
 
-<EffectComposer multisampling={0}>  {/* Disable MSAA when using SMAA */}
+;<EffectComposer multisampling={0}>
+  {" "}
+  {/* Disable MSAA when using SMAA */}
   <SMAA />
 </EffectComposer>
 ```
@@ -401,9 +395,9 @@ import { EffectComposer, SMAA } from '@react-three/postprocessing'
 ### FXAA (Anti-Aliasing)
 
 ```tsx
-import { EffectComposer, FXAA } from '@react-three/postprocessing'
+import { EffectComposer, FXAA } from "@react-three/postprocessing"
 
-<EffectComposer multisampling={0}>
+;<EffectComposer multisampling={0}>
   <FXAA />
 </EffectComposer>
 ```
@@ -411,39 +405,30 @@ import { EffectComposer, FXAA } from '@react-three/postprocessing'
 ## Combining Multiple Effects
 
 ```tsx
-import { EffectComposer, Bloom, Vignette, ChromaticAberration, Noise, SMAA } from '@react-three/postprocessing'
-import { BlendFunction } from 'postprocessing'
+import {
+  Bloom,
+  ChromaticAberration,
+  EffectComposer,
+  Noise,
+  SMAA,
+  Vignette,
+} from "@react-three/postprocessing"
+import { BlendFunction } from "postprocessing"
 
 function PostProcessing() {
   return (
     <EffectComposer multisampling={0}>
       {/* Glow effect */}
-      <Bloom
-        intensity={1.5}
-        luminanceThreshold={0.9}
-        luminanceSmoothing={0.025}
-        mipmapBlur
-      />
+      <Bloom intensity={1.5} luminanceThreshold={0.9} luminanceSmoothing={0.025} mipmapBlur />
 
       {/* Color aberration */}
-      <ChromaticAberration
-        offset={[0.001, 0.001]}
-        radialModulation
-        modulationOffset={0.5}
-      />
+      <ChromaticAberration offset={[0.001, 0.001]} radialModulation modulationOffset={0.5} />
 
       {/* Film grain */}
-      <Noise
-        premultiply
-        blendFunction={BlendFunction.ADD}
-        opacity={0.2}
-      />
+      <Noise premultiply blendFunction={BlendFunction.ADD} opacity={0.2} />
 
       {/* Vignette */}
-      <Vignette
-        offset={0.3}
-        darkness={0.5}
-      />
+      <Vignette offset={0.3} darkness={0.5} />
 
       {/* Anti-aliasing (should be last) */}
       <SMAA />
@@ -534,8 +519,9 @@ export const Invert = wrapEffect(InvertEffect)
 ## Conditional Effects
 
 ```tsx
-import { useState } from 'react'
-import { EffectComposer, Bloom, Vignette, Glitch } from '@react-three/postprocessing'
+import { useState } from "react"
+
+import { Bloom, EffectComposer, Glitch, Vignette } from "@react-three/postprocessing"
 
 function ConditionalPostProcessing() {
   const [effects, setEffects] = useState({
@@ -547,26 +533,18 @@ function ConditionalPostProcessing() {
   return (
     <>
       <EffectComposer>
-        {effects.bloom && (
-          <Bloom intensity={1.5} luminanceThreshold={0.9} />
-        )}
-        {effects.vignette && (
-          <Vignette offset={0.5} darkness={0.5} />
-        )}
-        {effects.glitch && (
-          <Glitch delay={[1, 3]} duration={[0.5, 1]} strength={[0.3, 1]} />
-        )}
+        {effects.bloom && <Bloom intensity={1.5} luminanceThreshold={0.9} />}
+        {effects.vignette && <Vignette offset={0.5} darkness={0.5} />}
+        {effects.glitch && <Glitch delay={[1, 3]} duration={[0.5, 1]} strength={[0.3, 1]} />}
       </EffectComposer>
 
       {/* UI to toggle effects */}
       <div className="controls">
-        <button onClick={() => setEffects(e => ({ ...e, bloom: !e.bloom }))}>
-          Toggle Bloom
-        </button>
-        <button onClick={() => setEffects(e => ({ ...e, vignette: !e.vignette }))}>
+        <button onClick={() => setEffects((e) => ({ ...e, bloom: !e.bloom }))}>Toggle Bloom</button>
+        <button onClick={() => setEffects((e) => ({ ...e, vignette: !e.vignette }))}>
           Toggle Vignette
         </button>
-        <button onClick={() => setEffects(e => ({ ...e, glitch: !e.glitch }))}>
+        <button onClick={() => setEffects((e) => ({ ...e, glitch: !e.glitch }))}>
           Toggle Glitch
         </button>
       </div>
@@ -578,9 +556,10 @@ function ConditionalPostProcessing() {
 ## Animated Effects
 
 ```tsx
-import { useRef } from 'react'
-import { useFrame } from '@react-three/fiber'
-import { EffectComposer, Bloom, ChromaticAberration } from '@react-three/postprocessing'
+import { useRef } from "react"
+
+import { useFrame } from "@react-three/fiber"
+import { Bloom, ChromaticAberration, EffectComposer } from "@react-three/postprocessing"
 
 function AnimatedEffects() {
   const bloomRef = useRef()
@@ -613,10 +592,9 @@ function AnimatedEffects() {
 ## N8AO (High Quality AO)
 
 ```tsx
-import { EffectComposer } from '@react-three/postprocessing'
-import { N8AO } from '@react-three/postprocessing'
+import { EffectComposer, N8AO } from "@react-three/postprocessing"
 
-<EffectComposer>
+;<EffectComposer>
   <N8AO
     aoRadius={0.5}
     intensity={1}
@@ -625,7 +603,7 @@ import { N8AO } from '@react-three/postprocessing'
     denoiseRadius={12}
     distanceFalloff={1}
     color="black"
-    quality="low"   // low, medium, high, ultra
+    quality="low" // low, medium, high, ultra
     halfRes={false}
   />
 </EffectComposer>
@@ -634,8 +612,9 @@ import { N8AO } from '@react-three/postprocessing'
 ## God Rays
 
 ```tsx
-import { EffectComposer, GodRays } from '@react-three/postprocessing'
-import { useRef } from 'react'
+import { useRef } from "react"
+
+import { EffectComposer, GodRays } from "@react-three/postprocessing"
 
 function Scene() {
   const sunRef = useRef()
@@ -671,12 +650,12 @@ function Scene() {
 ## LUT (Color Lookup Table)
 
 ```tsx
-import { EffectComposer, LUT } from '@react-three/postprocessing'
-import { LUTCubeLoader } from 'postprocessing'
-import { useLoader } from '@react-three/fiber'
+import { useLoader } from "@react-three/fiber"
+import { EffectComposer, LUT } from "@react-three/postprocessing"
+import { LUTCubeLoader } from "postprocessing"
 
 function ColorGradedScene() {
-  const texture = useLoader(LUTCubeLoader, '/luts/cinematic.cube')
+  const texture = useLoader(LUTCubeLoader, "/luts/cinematic.cube")
 
   return (
     <EffectComposer>
@@ -689,44 +668,44 @@ function ColorGradedScene() {
 ## Blend Functions
 
 ```tsx
-import { BlendFunction } from 'postprocessing'
+import { BlendFunction } from "postprocessing"
 
 // Available blend functions:
-BlendFunction.SKIP           // Skip blending
-BlendFunction.ADD            // Additive
-BlendFunction.ALPHA          // Alpha
-BlendFunction.AVERAGE        // Average
-BlendFunction.COLOR          // Color
-BlendFunction.COLOR_BURN     // Color Burn
-BlendFunction.COLOR_DODGE    // Color Dodge
-BlendFunction.DARKEN         // Darken
-BlendFunction.DIFFERENCE     // Difference
-BlendFunction.DIVIDE         // Divide
-BlendFunction.DST            // Destination
-BlendFunction.EXCLUSION      // Exclusion
-BlendFunction.HARD_LIGHT     // Hard Light
-BlendFunction.HARD_MIX       // Hard Mix
-BlendFunction.HUE            // Hue
-BlendFunction.INVERT         // Invert
-BlendFunction.INVERT_RGB     // Invert RGB
-BlendFunction.LIGHTEN        // Lighten
-BlendFunction.LINEAR_BURN    // Linear Burn
-BlendFunction.LINEAR_DODGE   // Linear Dodge
-BlendFunction.LINEAR_LIGHT   // Linear Light
-BlendFunction.LUMINOSITY     // Luminosity
-BlendFunction.MULTIPLY       // Multiply
-BlendFunction.NEGATION       // Negation
-BlendFunction.NORMAL         // Normal
-BlendFunction.OVERLAY        // Overlay
-BlendFunction.PIN_LIGHT      // Pin Light
-BlendFunction.REFLECT        // Reflect
-BlendFunction.SATURATION     // Saturation
-BlendFunction.SCREEN         // Screen
-BlendFunction.SET            // Set
-BlendFunction.SOFT_LIGHT     // Soft Light
-BlendFunction.SRC            // Source
-BlendFunction.SUBTRACT       // Subtract
-BlendFunction.VIVID_LIGHT    // Vivid Light
+BlendFunction.SKIP // Skip blending
+BlendFunction.ADD // Additive
+BlendFunction.ALPHA // Alpha
+BlendFunction.AVERAGE // Average
+BlendFunction.COLOR // Color
+BlendFunction.COLOR_BURN // Color Burn
+BlendFunction.COLOR_DODGE // Color Dodge
+BlendFunction.DARKEN // Darken
+BlendFunction.DIFFERENCE // Difference
+BlendFunction.DIVIDE // Divide
+BlendFunction.DST // Destination
+BlendFunction.EXCLUSION // Exclusion
+BlendFunction.HARD_LIGHT // Hard Light
+BlendFunction.HARD_MIX // Hard Mix
+BlendFunction.HUE // Hue
+BlendFunction.INVERT // Invert
+BlendFunction.INVERT_RGB // Invert RGB
+BlendFunction.LIGHTEN // Lighten
+BlendFunction.LINEAR_BURN // Linear Burn
+BlendFunction.LINEAR_DODGE // Linear Dodge
+BlendFunction.LINEAR_LIGHT // Linear Light
+BlendFunction.LUMINOSITY // Luminosity
+BlendFunction.MULTIPLY // Multiply
+BlendFunction.NEGATION // Negation
+BlendFunction.NORMAL // Normal
+BlendFunction.OVERLAY // Overlay
+BlendFunction.PIN_LIGHT // Pin Light
+BlendFunction.REFLECT // Reflect
+BlendFunction.SATURATION // Saturation
+BlendFunction.SCREEN // Screen
+BlendFunction.SET // Set
+BlendFunction.SOFT_LIGHT // Soft Light
+BlendFunction.SRC // Source
+BlendFunction.SUBTRACT // Subtract
+BlendFunction.VIVID_LIGHT // Vivid Light
 ```
 
 ## Performance Tips

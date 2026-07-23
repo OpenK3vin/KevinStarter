@@ -5,25 +5,30 @@ Comprehensive guide to customizing Tailwind CSS configuration.
 ## Theme Customization
 
 ### Colors
+
 - Extending the default color palette
 - Custom color shades
 - Opacity modifiers
 
 ### Spacing
+
 - Custom spacing values
 - Negative spacing
 
 ### Typography
+
 - Custom fonts
 - Font sizes
 - Line heights
 - Letter spacing
 
 ### Breakpoints
+
 - Custom responsive breakpoints
 - Container sizes
 
 ### Border Radius
+
 - Custom radius values
 
 ## Content Configuration
@@ -35,12 +40,14 @@ Comprehensive guide to customizing Tailwind CSS configuration.
 ## Plugins
 
 ### Official Plugins
+
 - @tailwindcss/forms
 - @tailwindcss/typography
 - @tailwindcss/aspect-ratio
 - @tailwindcss/container-queries
 
 ### Custom Plugins
+
 - Creating custom utilities
 - Adding custom variants
 - Extending base styles

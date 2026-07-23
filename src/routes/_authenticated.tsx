@@ -1,8 +1,9 @@
-import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
-import { getAuthSession } from '@/features/auth/server/authApi'
-import { AppSidebar } from '@/components/app-sidebar'
-import { SiteHeader } from '@/components/site-header'
-import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
+import { Outlet, createFileRoute, redirect } from "@tanstack/react-router"
+
+import { getAuthSession } from "@/features/auth/server/authApi"
+import { AppSidebar } from "@/components/app-sidebar"
+import { SiteHeader } from "@/components/site-header"
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 
 /**
  * Layout guard for authenticated routes.
@@ -14,11 +15,11 @@ import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
  * beforeLoad runs on every navigation — the cookie-cached session keeps
  * this fast (no round-trip to the DB on most requests).
  */
-export const Route = createFileRoute('/_authenticated')({
+export const Route = createFileRoute("/_authenticated")({
   beforeLoad: async () => {
     const session = await getAuthSession()
     if (!session) {
-      throw redirect({ to: '/login' })
+      throw redirect({ to: "/login" })
     }
     // Expose session to child routes via context
     return { session }
@@ -31,8 +32,8 @@ function AuthenticatedLayout() {
     <SidebarProvider
       style={
         {
-          '--sidebar-width': 'calc(var(--spacing) * 60)',
-          '--header-height': 'calc(var(--spacing) * 12)',
+          "--sidebar-width": "calc(var(--spacing) * 60)",
+          "--header-height": "calc(var(--spacing) * 12)",
         } as React.CSSProperties
       }
     >

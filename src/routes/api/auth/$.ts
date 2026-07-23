@@ -1,5 +1,6 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { auth } from '@/lib/auth'
+import { createFileRoute } from "@tanstack/react-router"
+
+import { auth } from "@/lib/auth"
 
 /**
  * Catch-all route that mounts the better-auth request handler.
@@ -9,7 +10,7 @@ import { auth } from '@/lib/auth'
  *
  * Docs: https://www.better-auth.com/docs/integrations/tanstack-start
  */
-export const Route = createFileRoute('/api/auth/$')({
+export const Route = createFileRoute("/api/auth/$")({
   server: {
     handlers: {
       GET: async ({ request }: { request: Request }) => auth.handler(request),

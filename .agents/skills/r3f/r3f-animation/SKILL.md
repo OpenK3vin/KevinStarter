@@ -8,8 +8,9 @@ description: React Three Fiber animation - useFrame, useAnimations, spring physi
 ## Quick Start
 
 ```tsx
-import { Canvas, useFrame } from '@react-three/fiber'
-import { useRef } from 'react'
+import { useRef } from "react"
+
+import { Canvas, useFrame } from "@react-three/fiber"
 
 function RotatingBox() {
   const meshRef = useRef()
@@ -44,8 +45,9 @@ The core animation hook in R3F. Runs every frame.
 ### Basic Usage
 
 ```tsx
-import { useFrame } from '@react-three/fiber'
-import { useRef } from 'react'
+import { useRef } from "react"
+
+import { useFrame } from "@react-three/fiber"
 
 function AnimatedMesh() {
   const meshRef = useRef()
@@ -71,18 +73,18 @@ function AnimatedMesh() {
 ```tsx
 useFrame((state, delta, xrFrame) => {
   const {
-    clock,           // THREE.Clock
-    camera,          // Current camera
-    scene,           // Scene
-    gl,              // WebGLRenderer
-    mouse,           // Normalized mouse position (-1 to 1)
-    pointer,         // Same as mouse
-    viewport,        // Viewport dimensions
-    size,            // Canvas size
-    raycaster,       // Raycaster
-    get,             // Get current state
-    set,             // Set state
-    invalidate,      // Request re-render (when frameloop="demand")
+    clock, // THREE.Clock
+    camera, // Current camera
+    scene, // Scene
+    gl, // WebGLRenderer
+    mouse, // Normalized mouse position (-1 to 1)
+    pointer, // Same as mouse
+    viewport, // Viewport dimensions
+    size, // Canvas size
+    raycaster, // Raycaster
+    get, // Get current state
+    set, // Set state
+    invalidate, // Request re-render (when frameloop="demand")
   } = state
 
   // Time-based animation
@@ -138,12 +140,13 @@ The recommended way to play animations from GLTF/GLB files.
 ### Basic Usage
 
 ```tsx
-import { useGLTF, useAnimations } from '@react-three/drei'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef } from "react"
+
+import { useAnimations, useGLTF } from "@react-three/drei"
 
 function AnimatedModel() {
   const group = useRef()
-  const { scene, animations } = useGLTF('/models/character.glb')
+  const { scene, animations } = useGLTF("/models/character.glb")
   const { actions, names } = useAnimations(animations, group)
 
   useEffect(() => {
@@ -160,11 +163,11 @@ function AnimatedModel() {
 ```tsx
 function Character() {
   const group = useRef()
-  const { scene, animations } = useGLTF('/models/character.glb')
+  const { scene, animations } = useGLTF("/models/character.glb")
   const { actions, mixer } = useAnimations(animations, group)
 
   useEffect(() => {
-    const action = actions['Walk']
+    const action = actions["Walk"]
     if (action) {
       // Playback control
       action.play()
@@ -173,8 +176,8 @@ function Character() {
       action.paused = true
 
       // Speed
-      action.timeScale = 1.5  // 1.5x speed
-      action.timeScale = -1   // Reverse
+      action.timeScale = 1.5 // 1.5x speed
+      action.timeScale = -1 // Reverse
 
       // Loop modes
       action.loop = THREE.LoopOnce
@@ -195,18 +198,19 @@ function Character() {
 ### Crossfade Between Animations
 
 ```tsx
-import { useGLTF, useAnimations } from '@react-three/drei'
-import { useState, useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from "react"
+
+import { useAnimations, useGLTF } from "@react-three/drei"
 
 function Character() {
   const group = useRef()
-  const { scene, animations } = useGLTF('/models/character.glb')
+  const { scene, animations } = useGLTF("/models/character.glb")
   const { actions } = useAnimations(animations, group)
-  const [currentAnim, setCurrentAnim] = useState('Idle')
+  const [currentAnim, setCurrentAnim] = useState("Idle")
 
   useEffect(() => {
     // Fade out all animations
-    Object.values(actions).forEach(action => {
+    Object.values(actions).forEach((action) => {
       action?.fadeOut(0.5)
     })
 
@@ -227,25 +231,25 @@ function Character() {
 ```tsx
 function AnimatedModel() {
   const group = useRef()
-  const { scene, animations } = useGLTF('/models/character.glb')
+  const { scene, animations } = useGLTF("/models/character.glb")
   const { actions, mixer } = useAnimations(animations, group)
 
   useEffect(() => {
     // Listen for animation events
     const onFinished = (e) => {
-      console.log('Animation finished:', e.action.getClip().name)
+      console.log("Animation finished:", e.action.getClip().name)
     }
 
     const onLoop = (e) => {
-      console.log('Animation looped:', e.action.getClip().name)
+      console.log("Animation looped:", e.action.getClip().name)
     }
 
-    mixer.addEventListener('finished', onFinished)
-    mixer.addEventListener('loop', onLoop)
+    mixer.addEventListener("finished", onFinished)
+    mixer.addEventListener("loop", onLoop)
 
     return () => {
-      mixer.removeEventListener('finished', onFinished)
-      mixer.removeEventListener('loop', onLoop)
+      mixer.removeEventListener("finished", onFinished)
+      mixer.removeEventListener("loop", onLoop)
     }
   }, [mixer])
 
@@ -258,32 +262,32 @@ function AnimatedModel() {
 ```tsx
 function CharacterController({ speed = 0 }) {
   const group = useRef()
-  const { scene, animations } = useGLTF('/models/character.glb')
+  const { scene, animations } = useGLTF("/models/character.glb")
   const { actions } = useAnimations(animations, group)
 
   useEffect(() => {
     // Start all animations
-    actions['Idle']?.play()
-    actions['Walk']?.play()
-    actions['Run']?.play()
+    actions["Idle"]?.play()
+    actions["Walk"]?.play()
+    actions["Run"]?.play()
   }, [actions])
 
   // Blend based on speed
   useFrame(() => {
     if (speed < 0.1) {
-      actions['Idle']?.setEffectiveWeight(1)
-      actions['Walk']?.setEffectiveWeight(0)
-      actions['Run']?.setEffectiveWeight(0)
+      actions["Idle"]?.setEffectiveWeight(1)
+      actions["Walk"]?.setEffectiveWeight(0)
+      actions["Run"]?.setEffectiveWeight(0)
     } else if (speed < 5) {
       const t = speed / 5
-      actions['Idle']?.setEffectiveWeight(1 - t)
-      actions['Walk']?.setEffectiveWeight(t)
-      actions['Run']?.setEffectiveWeight(0)
+      actions["Idle"]?.setEffectiveWeight(1 - t)
+      actions["Walk"]?.setEffectiveWeight(t)
+      actions["Run"]?.setEffectiveWeight(0)
     } else {
       const t = Math.min((speed - 5) / 5, 1)
-      actions['Idle']?.setEffectiveWeight(0)
-      actions['Walk']?.setEffectiveWeight(1 - t)
-      actions['Run']?.setEffectiveWeight(t)
+      actions["Idle"]?.setEffectiveWeight(0)
+      actions["Walk"]?.setEffectiveWeight(1 - t)
+      actions["Run"]?.setEffectiveWeight(t)
     }
   })
 
@@ -304,22 +308,19 @@ npm install @react-spring/three
 ### Basic Spring
 
 ```tsx
-import { useSpring, animated } from '@react-spring/three'
+import { animated, useSpring } from "@react-spring/three"
 
 function AnimatedBox() {
   const [active, setActive] = useState(false)
 
   const { scale, color } = useSpring({
     scale: active ? 1.5 : 1,
-    color: active ? '#ff6b6b' : '#4ecdc4',
-    config: { mass: 1, tension: 280, friction: 60 }
+    color: active ? "#ff6b6b" : "#4ecdc4",
+    config: { mass: 1, tension: 280, friction: 60 },
   })
 
   return (
-    <animated.mesh
-      scale={scale}
-      onClick={() => setActive(!active)}
-    >
+    <animated.mesh scale={scale} onClick={() => setActive(!active)}>
       <boxGeometry />
       <animated.meshStandardMaterial color={color} />
     </animated.mesh>
@@ -330,12 +331,12 @@ function AnimatedBox() {
 ### Spring Config Presets
 
 ```tsx
-import { useSpring, animated, config } from '@react-spring/three'
+import { animated, config, useSpring } from "@react-spring/three"
 
 function SpringPresets() {
   const { position } = useSpring({
     position: [0, 2, 0],
-    config: config.wobbly  // Presets: default, gentle, wobbly, stiff, slow, molasses
+    config: config.wobbly, // Presets: default, gentle, wobbly, stiff, slow, molasses
   })
 
   // Or custom config
@@ -348,7 +349,7 @@ function SpringPresets() {
       clamp: false,
       precision: 0.01,
       velocity: 0,
-    }
+    },
   })
 
   return (
@@ -363,13 +364,13 @@ function SpringPresets() {
 ### Multiple Springs
 
 ```tsx
-import { useSprings, animated } from '@react-spring/three'
+import { animated, useSprings } from "@react-spring/three"
 
 function AnimatedBoxes({ count = 5 }) {
   const [springs, api] = useSprings(count, (i) => ({
     position: [i * 2 - count, 0, 0],
     scale: 1,
-    config: { mass: 1, tension: 280, friction: 60 }
+    config: { mass: 1, tension: 280, friction: 60 },
   }))
 
   const handleClick = (index) => {
@@ -396,18 +397,18 @@ function AnimatedBoxes({ count = 5 }) {
 ### Gesture Integration
 
 ```tsx
-import { useSpring, animated } from '@react-spring/three'
-import { useDrag } from '@use-gesture/react'
+import { animated, useSpring } from "@react-spring/three"
+import { useDrag } from "@use-gesture/react"
 
 function DraggableBox() {
   const [spring, api] = useSpring(() => ({
     position: [0, 0, 0],
-    config: { mass: 1, tension: 280, friction: 60 }
+    config: { mass: 1, tension: 280, friction: 60 },
   }))
 
   const bind = useDrag(({ movement: [mx, my], down }) => {
     api.start({
-      position: down ? [mx / 100, -my / 100, 0] : [0, 0, 0]
+      position: down ? [mx / 100, -my / 100, 0] : [0, 0, 0],
     })
   })
 
@@ -423,7 +424,7 @@ function DraggableBox() {
 ### Chain Animations
 
 ```tsx
-import { useSpring, animated, useChain, useSpringRef } from '@react-spring/three'
+import { animated, useChain, useSpring, useSpringRef } from "@react-spring/three"
 
 function ChainedAnimation() {
   const scaleRef = useSpringRef()
@@ -433,14 +434,14 @@ function ChainedAnimation() {
     ref: scaleRef,
     from: { scale: 0 },
     to: { scale: 1 },
-    config: { tension: 200, friction: 20 }
+    config: { tension: 200, friction: 20 },
   })
 
   const { rotation } = useSpring({
     ref: rotationRef,
     from: { rotation: [0, 0, 0] },
     to: { rotation: [0, Math.PI * 2, 0] },
-    config: { tension: 100, friction: 30 }
+    config: { tension: 100, friction: 30 },
   })
 
   // Scale first (0-0.5), then rotation (0.5-1)
@@ -460,12 +461,13 @@ function ChainedAnimation() {
 Blend between different mesh shapes.
 
 ```tsx
-import { useGLTF } from '@react-three/drei'
-import { useFrame } from '@react-three/fiber'
-import { useRef } from 'react'
+import { useRef } from "react"
+
+import { useGLTF } from "@react-three/drei"
+import { useFrame } from "@react-three/fiber"
 
 function MorphingFace() {
-  const { scene, nodes } = useGLTF('/models/face.glb')
+  const { scene, nodes } = useGLTF("/models/face.glb")
   const meshRef = useRef()
 
   useFrame(({ clock }) => {
@@ -474,14 +476,12 @@ function MorphingFace() {
     // Access morph target influences
     if (meshRef.current?.morphTargetInfluences) {
       // Animate smile
-      const smileIndex = meshRef.current.morphTargetDictionary['smile']
+      const smileIndex = meshRef.current.morphTargetDictionary["smile"]
       meshRef.current.morphTargetInfluences[smileIndex] = (Math.sin(t) + 1) / 2
     }
   })
 
-  return (
-    <primitive ref={meshRef} object={nodes.Face} />
-  )
+  return <primitive ref={meshRef} object={nodes.Face} />
 }
 ```
 
@@ -489,7 +489,7 @@ function MorphingFace() {
 
 ```tsx
 function MorphControls({ morphInfluences }) {
-  const { nodes } = useGLTF('/models/face.glb')
+  const { nodes } = useGLTF("/models/face.glb")
   const meshRef = useRef()
 
   useFrame(() => {
@@ -507,7 +507,7 @@ function MorphControls({ morphInfluences }) {
 }
 
 // Usage
-<MorphControls morphInfluences={{ smile: 0.5, blink: 1, angry: 0 }} />
+;<MorphControls morphInfluences={{ smile: 0.5, blink: 1, angry: 0 }} />
 ```
 
 ## Skeletal Animation
@@ -515,12 +515,13 @@ function MorphControls({ morphInfluences }) {
 ### Accessing Bones
 
 ```tsx
-import { useGLTF } from '@react-three/drei'
-import { useFrame } from '@react-three/fiber'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef } from "react"
+
+import { useGLTF } from "@react-three/drei"
+import { useFrame } from "@react-three/fiber"
 
 function SkeletalCharacter() {
-  const { scene } = useGLTF('/models/character.glb')
+  const { scene } = useGLTF("/models/character.glb")
   const headBoneRef = useRef()
 
   useEffect(() => {
@@ -528,7 +529,7 @@ function SkeletalCharacter() {
     scene.traverse((child) => {
       if (child.isSkinnedMesh) {
         const skeleton = child.skeleton
-        const headBone = skeleton.bones.find(b => b.name === 'Head')
+        const headBone = skeleton.bones.find((b) => b.name === "Head")
         headBoneRef.current = headBone
       }
     })
@@ -549,14 +550,14 @@ function SkeletalCharacter() {
 
 ```tsx
 function CharacterWithWeapon() {
-  const { scene } = useGLTF('/models/character.glb')
+  const { scene } = useGLTF("/models/character.glb")
   const weaponRef = useRef()
   const handBoneRef = useRef()
 
   useEffect(() => {
     scene.traverse((child) => {
       if (child.isSkinnedMesh) {
-        const handBone = child.skeleton.bones.find(b => b.name === 'RightHand')
+        const handBone = child.skeleton.bones.find((b) => b.name === "RightHand")
         if (handBone && weaponRef.current) {
           handBone.add(weaponRef.current)
           handBoneRef.current = handBone
@@ -589,9 +590,10 @@ function CharacterWithWeapon() {
 ### Smooth Damping
 
 ```tsx
-import { useFrame } from '@react-three/fiber'
-import { useRef } from 'react'
-import * as THREE from 'three'
+import { useRef } from "react"
+
+import { useFrame } from "@react-three/fiber"
+import * as THREE from "three"
 
 function SmoothFollow({ target }) {
   const meshRef = useRef()
@@ -621,7 +623,7 @@ function SpringMesh({ target = 0 }) {
     position: 0,
     velocity: 0,
     stiffness: 100,
-    damping: 10
+    damping: 10,
   })
 
   useFrame((state, delta) => {
@@ -682,14 +684,14 @@ function OscillatingMesh() {
 ### Float
 
 ```tsx
-import { Float } from '@react-three/drei'
+import { Float } from "@react-three/drei"
 
 function FloatingObject() {
   return (
     <Float
-      speed={1}            // Animation speed
+      speed={1} // Animation speed
       rotationIntensity={1} // Rotation intensity
-      floatIntensity={1}   // Float intensity
+      floatIntensity={1} // Float intensity
       floatingRange={[-0.1, 0.1]} // Range of y-axis float
     >
       <mesh>
@@ -704,15 +706,15 @@ function FloatingObject() {
 ### MeshWobbleMaterial / MeshDistortMaterial
 
 ```tsx
-import { MeshWobbleMaterial, MeshDistortMaterial } from '@react-three/drei'
+import { MeshDistortMaterial, MeshWobbleMaterial } from "@react-three/drei"
 
 function WobblyMesh() {
   return (
     <mesh>
       <torusKnotGeometry args={[1, 0.4, 100, 16]} />
       <MeshWobbleMaterial
-        factor={1}     // Wobble amplitude
-        speed={2}      // Wobble speed
+        factor={1} // Wobble amplitude
+        speed={2} // Wobble speed
         color="hotpink"
       />
     </mesh>
@@ -724,8 +726,8 @@ function DistortedMesh() {
     <mesh>
       <sphereGeometry args={[1, 64, 64]} />
       <MeshDistortMaterial
-        distort={0.5}  // Distortion amount
-        speed={2}      // Animation speed
+        distort={0.5} // Distortion amount
+        speed={2} // Animation speed
         color="cyan"
       />
     </mesh>
@@ -736,9 +738,10 @@ function DistortedMesh() {
 ### Trail
 
 ```tsx
-import { Trail } from '@react-three/drei'
-import { useFrame } from '@react-three/fiber'
-import { useRef } from 'react'
+import { useRef } from "react"
+
+import { Trail } from "@react-three/drei"
+import { useFrame } from "@react-three/fiber"
 
 function TrailingMesh() {
   const meshRef = useRef()
@@ -750,12 +753,7 @@ function TrailingMesh() {
   })
 
   return (
-    <Trail
-      width={2}
-      length={8}
-      color="hotpink"
-      attenuation={(t) => t * t}
-    >
+    <Trail width={2} length={8} color="hotpink" attenuation={(t) => t * t}>
       <mesh ref={meshRef}>
         <sphereGeometry args={[0.2]} />
         <meshStandardMaterial color="white" />
@@ -768,14 +766,14 @@ function TrailingMesh() {
 ## Animation with Zustand State
 
 ```tsx
-import { create } from 'zustand'
-import { useFrame } from '@react-three/fiber'
+import { useFrame } from "@react-three/fiber"
+import { create } from "zustand"
 
 const useStore = create((set) => ({
   isAnimating: false,
   speed: 1,
   toggleAnimation: () => set((state) => ({ isAnimating: !state.isAnimating })),
-  setSpeed: (speed) => set({ speed })
+  setSpeed: (speed) => set({ speed }),
 }))
 
 function AnimatedMesh() {
@@ -824,7 +822,7 @@ Critical patterns for high-performance state management in animations.
 Use `getState()` instead of hooks inside useFrame for zero subscription overhead:
 
 ```tsx
-import { create } from 'zustand'
+import { create } from "zustand"
 
 const useGameStore = create((set) => ({
   playerPosition: [0, 0, 0],
@@ -840,10 +838,7 @@ function Player() {
     const { targetPosition } = useGameStore.getState()
 
     // Lerp towards target
-    meshRef.current.position.lerp(
-      new THREE.Vector3(...targetPosition),
-      delta * 5
-    )
+    meshRef.current.position.lerp(new THREE.Vector3(...targetPosition), delta * 5)
   })
 
   return (
@@ -860,7 +855,7 @@ function Player() {
 Subscribe to state changes without triggering React re-renders:
 
 ```tsx
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef } from "react"
 
 function Enemy() {
   const meshRef = useRef()
@@ -872,7 +867,7 @@ function Enemy() {
       (playerPos) => {
         // Look at player (runs on every state change, no re-render)
         meshRef.current.lookAt(...playerPos)
-      }
+      },
     )
     return unsub
   }, [])
@@ -891,13 +886,13 @@ function Enemy() {
 Subscribe to multiple values efficiently:
 
 ```tsx
-import { shallow } from 'zustand/shallow'
+import { shallow } from "zustand/shallow"
 
 function HUD() {
   // Only re-renders when health OR score actually changes
   const { health, score } = useGameStore(
     (state) => ({ health: state.health, score: state.score }),
-    shallow
+    shallow,
   )
 
   return (
@@ -923,7 +918,7 @@ function BadPattern() {
   const meshRef = useRef()
 
   useFrame((_, delta) => {
-    meshRef.current.rotation.y += delta  // Affected by score re-renders
+    meshRef.current.rotation.y += delta // Affected by score re-renders
   })
 
   return (
@@ -938,8 +933,8 @@ function BadPattern() {
 function GoodPattern() {
   return (
     <>
-      <AnimatedMesh />      {/* Never re-renders from score */}
-      <ScoreDisplay />      {/* Has its own state subscription */}
+      <AnimatedMesh /> {/* Never re-renders from score */}
+      <ScoreDisplay /> {/* Has its own state subscription */}
     </>
   )
 }
@@ -948,7 +943,7 @@ function AnimatedMesh() {
   const meshRef = useRef()
 
   useFrame((_, delta) => {
-    meshRef.current.rotation.y += delta  // Smooth, uninterrupted
+    meshRef.current.rotation.y += delta // Smooth, uninterrupted
   })
 
   return <mesh ref={meshRef}>...</mesh>
@@ -956,7 +951,11 @@ function AnimatedMesh() {
 
 function ScoreDisplay() {
   const score = useGameStore((state) => state.score)
-  return <Html><div>Score: {score}</div></Html>
+  return (
+    <Html>
+      <div>Score: {score}</div>
+    </Html>
+  )
 }
 ```
 
@@ -973,7 +972,7 @@ function ScoreDisplay() {
 function Scene() {
   return (
     <>
-      <StaticMesh />   {/* Never re-renders */}
+      <StaticMesh /> {/* Never re-renders */}
       <AnimatedMesh /> {/* Only this updates */}
     </>
   )

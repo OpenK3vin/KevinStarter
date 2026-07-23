@@ -1,8 +1,11 @@
-import { db } from '@/db'
-import { resourceRoles } from '@/db/schema'
-import { and, eq, inArray } from 'drizzle-orm'
-import { resourceRoleAllows } from './resourcePermissions'
-import type { RbacUser, ResourceAction, ResourceRole } from './types'
+import { and, eq, inArray } from "drizzle-orm"
+
+import { db } from "@/db"
+
+import { resourceRoles } from "@/db/schema"
+
+import { resourceRoleAllows } from "./resourcePermissions"
+import type { RbacUser, ResourceAction, ResourceRole } from "./types"
 
 /**
  * Server-only. The unified authorization check.
@@ -25,7 +28,7 @@ export async function can(
   resourceId: string,
 ): Promise<boolean> {
   // Global admin bypasses all resource-scoped checks
-  if (user.role === 'admin' || user.role === 'super_admin') return true
+  if (user.role === "admin" || user.role === "super_admin") return true
 
   const grant = await db.query.resourceRoles.findFirst({
     where: and(
@@ -60,7 +63,7 @@ export async function batchCan(
   if (resourceIds.length === 0) return new Map()
 
   // Global admin can do everything
-  if (user.role === 'admin' || user.role === 'super_admin') {
+  if (user.role === "admin" || user.role === "super_admin") {
     return new Map(resourceIds.map((id) => [id, true]))
   }
 

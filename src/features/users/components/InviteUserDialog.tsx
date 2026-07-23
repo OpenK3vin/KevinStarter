@@ -1,6 +1,12 @@
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
+import { useState } from "react"
+
+import { IconLoader2, IconUserPlus } from "@tabler/icons-react"
+import { useForm } from "react-hook-form"
+import { toast } from "sonner"
+
+import type { CreateUserInput } from "@/features/users/api/users.api"
+import { useCreateUser } from "@/features/users/api/users.hooks"
+import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
@@ -9,26 +15,22 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+} from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { useCreateUser } from '@/features/users/api/users.hooks'
-import type { CreateUserInput } from '@/features/users/api/users.api'
-import { IconUserPlus, IconLoader2 } from '@tabler/icons-react'
+} from "@/components/ui/select"
 
 const ASSIGNABLE_ROLES = [
-  { value: 'user', label: 'User' },
-  { value: 'editor', label: 'Editor' },
-  { value: 'admin', label: 'Admin' },
-  { value: 'super_admin', label: 'Super Admin' },
+  { value: "user", label: "User" },
+  { value: "editor", label: "Editor" },
+  { value: "admin", label: "Admin" },
+  { value: "super_admin", label: "Super Admin" },
 ]
 
 interface FormValues {
@@ -50,10 +52,10 @@ export function InviteUserDialog() {
     reset,
     formState: { errors },
   } = useForm<FormValues>({
-    defaultValues: { name: '', email: '', password: '', role: 'user' },
+    defaultValues: { name: "", email: "", password: "", role: "user" },
   })
 
-  const selectedRole = watch('role')
+  const selectedRole = watch("role")
 
   async function onSubmit(values: FormValues) {
     try {
@@ -62,79 +64,84 @@ export function InviteUserDialog() {
       reset()
       setOpen(false)
     } catch (err: any) {
-      toast.error(err?.message ?? 'Failed to create user')
+      toast.error(err?.message ?? "Failed to create user")
     }
   }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="gap-2 bg-amber-500 hover:bg-amber-600 text-white font-semibold shadow-lg shadow-amber-500/20 transition-all">
+        <Button className="gap-2 bg-amber-500 font-semibold text-white shadow-lg shadow-amber-500/20 transition-all hover:bg-amber-600">
           <IconUserPlus size={16} />
           Invite User
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-md border border-border/60 bg-card shadow-2xl">
+      <DialogContent className="border border-border/60 bg-card shadow-2xl sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-lg font-semibold tracking-tight">
             Invite New User
           </DialogTitle>
           <DialogDescription className="text-sm text-muted-foreground">
-            Create an account with an initial role. The user can change their
-            password after first login.
+            Create an account with an initial role. The user can change their password after first
+            login.
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4 py-2">
           {/* Name */}
           <div className="grid gap-1.5">
-            <Label htmlFor="invite-name" className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
+            <Label
+              htmlFor="invite-name"
+              className="text-xs font-medium tracking-widest text-muted-foreground uppercase"
+            >
               Full Name
             </Label>
             <Input
               id="invite-name"
               placeholder="John Doe"
-              {...register('name', { required: 'Name is required' })}
+              {...register("name", { required: "Name is required" })}
               className="h-9"
             />
-            {errors.name && (
-              <p className="text-xs text-destructive">{errors.name.message}</p>
-            )}
+            {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
           </div>
 
           {/* Email */}
           <div className="grid gap-1.5">
-            <Label htmlFor="invite-email" className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
+            <Label
+              htmlFor="invite-email"
+              className="text-xs font-medium tracking-widest text-muted-foreground uppercase"
+            >
               Email
             </Label>
             <Input
               id="invite-email"
               type="email"
               placeholder="user@example.com"
-              {...register('email', {
-                required: 'Email is required',
-                pattern: { value: /^\S+@\S+\.\S+$/, message: 'Invalid email' },
+              {...register("email", {
+                required: "Email is required",
+                pattern: { value: /^\S+@\S+\.\S+$/, message: "Invalid email" },
               })}
               className="h-9 font-mono text-sm"
             />
-            {errors.email && (
-              <p className="text-xs text-destructive">{errors.email.message}</p>
-            )}
+            {errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
           </div>
 
           {/* Password */}
           <div className="grid gap-1.5">
-            <Label htmlFor="invite-password" className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
+            <Label
+              htmlFor="invite-password"
+              className="text-xs font-medium tracking-widest text-muted-foreground uppercase"
+            >
               Temporary Password
             </Label>
             <Input
               id="invite-password"
               type="password"
               placeholder="Min. 8 characters"
-              {...register('password', {
-                required: 'Password is required',
-                minLength: { value: 8, message: 'Minimum 8 characters' },
+              {...register("password", {
+                required: "Password is required",
+                minLength: { value: 8, message: "Minimum 8 characters" },
               })}
               className="h-9"
             />
@@ -145,13 +152,13 @@ export function InviteUserDialog() {
 
           {/* Role */}
           <div className="grid gap-1.5">
-            <Label htmlFor="invite-role" className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
+            <Label
+              htmlFor="invite-role"
+              className="text-xs font-medium tracking-widest text-muted-foreground uppercase"
+            >
               Role
             </Label>
-            <Select
-              value={selectedRole}
-              onValueChange={(v) => setValue('role', v)}
-            >
+            <Select value={selectedRole} onValueChange={(v) => setValue("role", v)}>
               <SelectTrigger id="invite-role" className="h-9">
                 <SelectValue placeholder="Select a role" />
               </SelectTrigger>
@@ -169,7 +176,10 @@ export function InviteUserDialog() {
             <Button
               type="button"
               variant="outline"
-              onClick={() => { reset(); setOpen(false) }}
+              onClick={() => {
+                reset()
+                setOpen(false)
+              }}
               disabled={isPending}
             >
               Cancel
@@ -177,10 +187,10 @@ export function InviteUserDialog() {
             <Button
               type="submit"
               disabled={isPending}
-              className="bg-amber-500 hover:bg-amber-600 text-white gap-2"
+              className="gap-2 bg-amber-500 text-white hover:bg-amber-600"
             >
               {isPending && <IconLoader2 size={14} className="animate-spin" />}
-              {isPending ? 'Creating…' : 'Create User'}
+              {isPending ? "Creating…" : "Create User"}
             </Button>
           </DialogFooter>
         </form>

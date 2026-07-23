@@ -8,34 +8,35 @@ Advanced data fetching strategies for Next.js App Router.
 
 ```typescript
 // Revalidate every hour
-const posts = await fetch('https://api.example.com/posts', {
-  next: { revalidate: 3600 }
-}).then(res => res.json());
+const posts = await fetch("https://api.example.com/posts", {
+  next: { revalidate: 3600 },
+}).then((res) => res.json())
 
 // Never cache (always fresh)
-const user = await fetch('https://api.example.com/user', {
-  cache: 'no-store'
-}).then(res => res.json());
+const user = await fetch("https://api.example.com/user", {
+  cache: "no-store",
+}).then((res) => res.json())
 
 // Cache indefinitely (until revalidated)
-const settings = await fetch('https://api.example.com/settings', {
-  cache: 'force-cache'
-}).then(res => res.json());
+const settings = await fetch("https://api.example.com/settings", {
+  cache: "force-cache",
+}).then((res) => res.json())
 ```
 
 ### With Tags for Revalidation
 
 ```typescript
-const posts = await fetch('https://api.example.com/posts', {
-  next: {
-    tags: ['posts'],
-    revalidate: 3600
-  }
-}).then(res => res.json());
-
 // Later, revalidate all requests tagged with 'posts'
-import { revalidateTag } from 'next/cache';
-revalidateTag('posts');
+import { revalidateTag } from "next/cache"
+
+const posts = await fetch("https://api.example.com/posts", {
+  next: {
+    tags: ["posts"],
+    revalidate: 3600,
+  },
+}).then((res) => res.json())
+
+revalidateTag("posts")
 ```
 
 ## Request Memoization
@@ -45,8 +46,8 @@ Next.js automatically memoizes fetch requests with the same URL and options:
 ```typescript
 export default async function Page() {
   // These two fetch calls are automatically deduplicated
-  const post1 = await fetch('https://api.example.com/posts/1');
-  const post2 = await fetch('https://api.example.com/posts/1');
+  const post1 = await fetch("https://api.example.com/posts/1")
+  const post2 = await fetch("https://api.example.com/posts/1")
 
   // Only one network request is made
 }
@@ -57,17 +58,17 @@ export default async function Page() {
 For non-fetch data fetching:
 
 ```typescript
-import { cache } from 'react';
+import { cache } from "react"
 
 const getPost = cache(async (id: string) => {
   return await db.post.findUnique({
-    where: { id }
-  });
-});
+    where: { id },
+  })
+})
 
 // Usage - automatically deduplicated
-const post1 = await getPost('123');
-const post2 = await getPost('123'); // Returns cached result
+const post1 = await getPost("123")
+const post2 = await getPost("123") // Returns cached result
 ```
 
 ## Parallel Data Fetching
@@ -241,18 +242,18 @@ const posts = await db.post.findMany({
     author: {
       select: {
         name: true,
-        avatar: true
-      }
-    }
-  }
-});
+        avatar: true,
+      },
+    },
+  },
+})
 
 // Paginate results
 const posts = await db.post.findMany({
   take: 10,
   skip: page * 10,
-  orderBy: { createdAt: 'desc' }
-});
+  orderBy: { createdAt: "desc" },
+})
 ```
 
 ## GraphQL Queries
@@ -409,12 +410,12 @@ export default async function PostPage({
 ```typescript
 // app/posts/[category]/[slug]/page.tsx
 export async function generateStaticParams() {
-  const posts = await getAllPosts();
+  const posts = await getAllPosts()
 
   return posts.map((post) => ({
     category: post.category,
-    slug: post.slug
-  }));
+    slug: post.slug,
+  }))
 }
 ```
 
@@ -433,22 +434,22 @@ export default async function PostsPage() {
 
 ```typescript
 // app/api/revalidate/route.ts
-import { revalidatePath } from 'next/cache';
-import { NextRequest } from 'next/server';
+import { revalidatePath } from "next/cache"
+import { NextRequest } from "next/server"
 
 export async function POST(request: NextRequest) {
-  const path = request.nextUrl.searchParams.get('path');
+  const path = request.nextUrl.searchParams.get("path")
 
   if (path) {
-    revalidatePath(path);
-    return Response.json({ revalidated: true, now: Date.now() });
+    revalidatePath(path)
+    return Response.json({ revalidated: true, now: Date.now() })
   }
 
   return Response.json({
     revalidated: false,
     now: Date.now(),
-    message: 'Missing path to revalidate'
-  });
+    message: "Missing path to revalidate",
+  })
 }
 ```
 

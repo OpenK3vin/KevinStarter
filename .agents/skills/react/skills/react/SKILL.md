@@ -10,6 +10,7 @@ description: Core React 19 patterns including hooks, Suspense, lazy loading, com
 Essential React 19 patterns for building modern applications with hooks, Suspense, lazy loading, and TypeScript.
 
 **Note**: React 19 (released December 2024) breaking changes:
+
 - `forwardRef` no longer needed - pass `ref` as a prop directly
 - `propTypes` removed (silently ignored)
 - New JSX transform required
@@ -83,17 +84,17 @@ Creating a React component? Follow this:
 
 ```typescript
 // Simple state
-const [count, setCount] = useState<number>(0);
+const [count, setCount] = useState<number>(0)
 
 // Object state
-const [user, setUser] = useState<User | null>(null);
+const [user, setUser] = useState<User | null>(null)
 
 // Array state
-const [items, setItems] = useState<Item[]>([]);
+const [items, setItems] = useState<Item[]>([])
 
 // Functional updates when depending on previous state
-setCount(prev => prev + 1);
-setItems(prev => [...prev, newItem]);
+setCount((prev) => prev + 1)
+setItems((prev) => [...prev, newItem])
 ```
 
 ### useCallback
@@ -101,13 +102,16 @@ setItems(prev => [...prev, newItem]);
 ```typescript
 // Wrap functions passed to child components
 const handleClick = useCallback((id: string) => {
-  console.log('Clicked:', id);
-}, []); // Empty deps if no dependencies
+  console.log("Clicked:", id)
+}, []) // Empty deps if no dependencies
 
 // With dependencies
-const handleUpdate = useCallback((data: FormData) => {
-  apiCall(userId, data);
-}, [userId]); // Re-create when userId changes
+const handleUpdate = useCallback(
+  (data: FormData) => {
+    apiCall(userId, data)
+  },
+  [userId],
+) // Re-create when userId changes
 ```
 
 ### useMemo
@@ -115,13 +119,13 @@ const handleUpdate = useCallback((data: FormData) => {
 ```typescript
 // Expensive computation
 const sortedItems = useMemo(() => {
-  return items.sort((a, b) => a.score - b.score);
-}, [items]);
+  return items.sort((a, b) => a.score - b.score)
+}, [items])
 
 // Derived state
 const totalPrice = useMemo(() => {
-  return cart.reduce((sum, item) => sum + item.price, 0);
-}, [cart]);
+  return cart.reduce((sum, item) => sum + item.price, 0)
+}, [cart])
 ```
 
 ### useEffect
@@ -129,21 +133,21 @@ const totalPrice = useMemo(() => {
 ```typescript
 // Run once on mount
 useEffect(() => {
-  fetchData();
-}, []);
+  fetchData()
+}, [])
 
 // Run when dependency changes
 useEffect(() => {
   if (userId) {
-    loadUserData(userId);
+    loadUserData(userId)
   }
-}, [userId]);
+}, [userId])
 
 // Cleanup
 useEffect(() => {
-  const subscription = subscribe(userId);
-  return () => subscription.unsubscribe();
-}, [userId]);
+  const subscription = subscribe(userId)
+  return () => subscription.unsubscribe()
+}, [userId])
 ```
 
 ---
@@ -247,26 +251,26 @@ import { ErrorBoundary } from 'react-error-boundary';
 ```typescript
 // Basic props
 interface ButtonProps {
-  label: string;
-  onClick: () => void;
-  disabled?: boolean;
+  label: string
+  onClick: () => void
+  disabled?: boolean
 }
 
 // Props with children
 interface CardProps {
-  title: string;
-  children: React.ReactNode;
+  title: string
+  children: React.ReactNode
 }
 
 // Props with specific child types
 interface ListProps {
-  children: React.ReactElement<ItemProps> | React.ReactElement<ItemProps>[];
+  children: React.ReactElement<ItemProps> | React.ReactElement<ItemProps>[]
 }
 
 // Props with event handlers
 interface FormProps {
-  onSubmit: (data: FormData) => void;
-  onChange?: (field: string, value: unknown) => void;
+  onSubmit: (data: FormData) => void
+  onChange?: (field: string, value: unknown) => void
 }
 ```
 
@@ -274,21 +278,21 @@ interface FormProps {
 
 ```typescript
 // useState with type
-const [user, setUser] = useState<User | null>(null);
-const [items, setItems] = useState<Item[]>([]);
+const [user, setUser] = useState<User | null>(null)
+const [items, setItems] = useState<Item[]>([])
 
 // useRef with type
-const inputRef = useRef<HTMLInputElement>(null);
-const timerRef = useRef<number | null>(null);
+const inputRef = useRef<HTMLInputElement>(null)
+const timerRef = useRef<number | null>(null)
 
 // Custom hook with return type
 function useUser(id: string): { user: User | null; loading: boolean } {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<User | null>(null)
+  const [loading, setLoading] = useState(true)
 
   // ... implementation
 
-  return { user, loading };
+  return { user, loading }
 }
 ```
 
@@ -425,13 +429,13 @@ features/posts/
 // ❌ Never do this
 function Component({ condition }) {
   if (condition) {
-    const [state, setState] = useState(0); // Breaks rules of hooks
+    const [state, setState] = useState(0) // Breaks rules of hooks
   }
 }
 
 // ✅ Do this
 function Component({ condition }) {
-  const [state, setState] = useState(0);
+  const [state, setState] = useState(0)
   // Use state conditionally, not the hook
 }
 ```
@@ -441,13 +445,13 @@ function Component({ condition }) {
 ```typescript
 // ❌ Bad: Missing dependency
 useEffect(() => {
-  fetchUser(userId);
-}, []); // userId should be in deps
+  fetchUser(userId)
+}, []) // userId should be in deps
 
 // ✅ Good: All dependencies listed
 useEffect(() => {
-  fetchUser(userId);
-}, [userId]);
+  fetchUser(userId)
+}, [userId])
 ```
 
 ### 3. Mutating State
@@ -455,14 +459,14 @@ useEffect(() => {
 ```typescript
 // ❌ Bad: Mutating state directly
 const handleAdd = () => {
-  items.push(newItem); // Don't mutate
-  setItems(items);
-};
+  items.push(newItem) // Don't mutate
+  setItems(items)
+}
 
 // ✅ Good: Create new array
 const handleAdd = () => {
-  setItems([...items, newItem]);
-};
+  setItems([...items, newItem])
+}
 ```
 
 ---
@@ -470,6 +474,7 @@ const handleAdd = () => {
 ## Additional Resources
 
 For more detailed patterns, see:
+
 - [component-patterns.md](resources/component-patterns.md) - Advanced component patterns
 - [performance.md](resources/performance.md) - Performance optimization techniques
 - [typescript-patterns.md](resources/typescript-patterns.md) - TypeScript best practices

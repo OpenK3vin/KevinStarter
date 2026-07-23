@@ -184,19 +184,19 @@ function AuthProvider({ children }: { children: ReactNode }) {
 
 ```typescript
 // Pick specific props from another component
-type IconProps = Pick<ButtonProps, 'size' | 'color'>;
+type IconProps = Pick<ButtonProps, "size" | "color">
 
 // Omit specific props
-type ButtonWithoutClick = Omit<ButtonProps, 'onClick'>;
+type ButtonWithoutClick = Omit<ButtonProps, "onClick">
 
 // Make all props optional
-type PartialButtonProps = Partial<ButtonProps>;
+type PartialButtonProps = Partial<ButtonProps>
 
 // Make all props required
-type RequiredButtonProps = Required<ButtonProps>;
+type RequiredButtonProps = Required<ButtonProps>
 
 // Extract prop types from a component
-type MyButtonProps = ComponentProps<typeof Button>;
+type MyButtonProps = ComponentProps<typeof Button>
 ```
 
 ## Render Props with TypeScript
@@ -309,22 +309,22 @@ function LoginForm() {
 ```typescript
 // ReactNode (most common)
 interface ContainerProps {
-  children: ReactNode;
+  children: ReactNode
 }
 
 // Render function
 interface RenderChildrenProps {
-  children: (data: Data) => ReactNode;
+  children: (data: Data) => ReactNode
 }
 
 // Specific component type
 interface LayoutProps {
-  children: ReactElement<HeaderProps> | ReactElement<HeaderProps>[];
+  children: ReactElement<HeaderProps> | ReactElement<HeaderProps>[]
 }
 
 // Array of specific elements
 interface TabsProps {
-  children: ReactElement<TabProps>[];
+  children: ReactElement<TabProps>[]
 }
 ```
 

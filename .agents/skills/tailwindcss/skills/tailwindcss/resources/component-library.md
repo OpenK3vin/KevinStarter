@@ -3,6 +3,7 @@
 Common UI component patterns using Tailwind CSS utilities.
 
 ## Buttons
+
 - Primary, secondary, outline variants
 - Sizes (sm, md, lg)
 - States (hover, focus, active, disabled)
@@ -10,6 +11,7 @@ Common UI component patterns using Tailwind CSS utilities.
 - Button groups
 
 ## Forms
+
 - Input fields
 - Textareas
 - Selects
@@ -18,6 +20,7 @@ Common UI component patterns using Tailwind CSS utilities.
 - Form validation states
 
 ## Cards
+
 - Basic cards
 - Image cards
 - Horizontal cards
@@ -25,6 +28,7 @@ Common UI component patterns using Tailwind CSS utilities.
 - Card grids
 
 ## Navigation
+
 - Navbars
 - Sidebars
 - Tabs
@@ -32,6 +36,7 @@ Common UI component patterns using Tailwind CSS utilities.
 - Pagination
 
 ## Modals and Overlays
+
 - Modal dialogs
 - Slide-overs
 - Dropdowns
@@ -39,6 +44,7 @@ Common UI component patterns using Tailwind CSS utilities.
 - Popovers
 
 ## Data Display
+
 - Tables
 - Lists
 - Badges and tags
@@ -46,6 +52,7 @@ Common UI component patterns using Tailwind CSS utilities.
 - Progress bars
 
 ## Feedback
+
 - Alerts
 - Toasts
 - Loading states

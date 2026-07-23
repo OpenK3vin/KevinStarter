@@ -112,6 +112,7 @@ export default async function PostPage({ params }: PageProps) {
 ### Server Components (Default)
 
 Use for:
+
 - Data fetching
 - Accessing backend resources
 - Keeping sensitive info on server
@@ -132,6 +133,7 @@ export default async function PostsPage() {
 ### Client Components
 
 Use for:
+
 - Event listeners (onClick, onChange, etc.)
 - State and lifecycle (useState, useEffect)
 - Browser-only APIs
@@ -303,17 +305,17 @@ export default function PostsLayout({
 
 ```typescript
 // app/api/posts/route.ts
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from "next/server"
 
 export async function GET(request: NextRequest) {
-  const posts = await getPosts();
-  return NextResponse.json({ posts });
+  const posts = await getPosts()
+  return NextResponse.json({ posts })
 }
 
 export async function POST(request: NextRequest) {
-  const body = await request.json();
-  const post = await createPost(body);
-  return NextResponse.json({ post }, { status: 201 });
+  const body = await request.json()
+  const post = await createPost(body)
+  return NextResponse.json({ post }, { status: 201 })
 }
 ```
 
@@ -321,20 +323,14 @@ export async function POST(request: NextRequest) {
 
 ```typescript
 // app/api/posts/[id]/route.ts
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const post = await getPost(params.id);
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+  const post = await getPost(params.id)
 
   if (!post) {
-    return NextResponse.json(
-      { error: 'Post not found' },
-      { status: 404 }
-    );
+    return NextResponse.json({ error: "Post not found" }, { status: 404 })
   }
 
-  return NextResponse.json({ post });
+  return NextResponse.json({ post })
 }
 ```
 
@@ -344,21 +340,21 @@ export async function GET(
 
 ```typescript
 // app/actions/posts.ts
-'use server';
+"use server"
 
-import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
+import { revalidatePath } from "next/cache"
+import { redirect } from "next/navigation"
 
 export async function createPost(formData: FormData) {
-  const title = formData.get('title') as string;
-  const content = formData.get('content') as string;
+  const title = formData.get("title") as string
+  const content = formData.get("content") as string
 
   const post = await db.post.create({
-    data: { title, content }
-  });
+    data: { title, content },
+  })
 
-  revalidatePath('/posts');
-  redirect(`/posts/${post.id}`);
+  revalidatePath("/posts")
+  redirect(`/posts/${post.id}`)
 }
 ```
 
@@ -418,13 +414,13 @@ export function PostActions({ postId }: { postId: string }) {
 ### Router Hooks
 
 ```typescript
-'use client';
+"use client"
 
-import { usePathname, useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from "next/navigation"
 
-const pathname = usePathname(); // /posts/123
-const searchParams = useSearchParams(); // ?q=hello
-const query = searchParams.get('q');
+const pathname = usePathname() // /posts/123
+const searchParams = useSearchParams() // ?q=hello
+const query = searchParams.get("q")
 ```
 
 ## Metadata
@@ -432,18 +428,18 @@ const query = searchParams.get('q');
 ```typescript
 // Static metadata
 export const metadata = {
-  title: 'All Posts',
-  description: 'Browse our collection of blog posts'
-};
+  title: "All Posts",
+  description: "Browse our collection of blog posts",
+}
 
 // Dynamic metadata
 export async function generateMetadata({ params }: PageProps) {
-  const { id } = await params;
-  const post = await getPost(id);
+  const { id } = await params
+  const post = await getPost(id)
   return {
     title: post.title,
-    description: post.excerpt
-  };
+    description: post.excerpt,
+  }
 }
 ```
 
@@ -494,6 +490,7 @@ export default async function PostPage({
 ## Additional Resources
 
 For detailed information, see:
+
 - [Server Actions Guide](resources/server-actions.md)
 - [Data Fetching Patterns](resources/data-fetching.md)
 - [Routing and Navigation](resources/routing.md)

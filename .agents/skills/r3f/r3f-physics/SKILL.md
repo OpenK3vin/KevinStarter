@@ -8,9 +8,10 @@ description: React Three Fiber physics with Rapier - RigidBody, colliders, force
 ## Quick Start
 
 ```tsx
-import { Canvas } from '@react-three/fiber'
-import { Physics, RigidBody, CuboidCollider } from '@react-three/rapier'
-import { Suspense } from 'react'
+import { Suspense } from "react"
+
+import { Canvas } from "@react-three/fiber"
+import { CuboidCollider, Physics, RigidBody } from "@react-three/rapier"
 
 function Scene() {
   return (
@@ -48,18 +49,18 @@ npm install @react-three/rapier
 The root component that creates the physics world.
 
 ```tsx
-import { Physics } from '@react-three/rapier'
+import { Physics } from "@react-three/rapier"
 
-<Canvas>
+;<Canvas>
   <Suspense fallback={null}>
     <Physics
-      gravity={[0, -9.81, 0]}    // Gravity vector
-      debug={false}               // Show collider wireframes
-      timeStep={1/60}             // Fixed timestep (or "vary" for variable)
-      paused={false}              // Pause simulation
-      interpolate={true}          // Smooth rendering between physics steps
-      colliders="cuboid"          // Default collider type for all RigidBodies
-      updateLoop="follow"         // "follow" (sync with frame) or "independent"
+      gravity={[0, -9.81, 0]} // Gravity vector
+      debug={false} // Show collider wireframes
+      timeStep={1 / 60} // Fixed timestep (or "vary" for variable)
+      paused={false} // Pause simulation
+      interpolate={true} // Smooth rendering between physics steps
+      colliders="cuboid" // Default collider type for all RigidBodies
+      updateLoop="follow" // "follow" (sync with frame) or "independent"
     >
       {/* Physics objects */}
     </Physics>
@@ -115,12 +116,12 @@ import { RigidBody } from '@react-three/rapier'
 
 ### RigidBody Types
 
-| Type | Description |
-|------|-------------|
-| `dynamic` | Affected by forces, gravity, collisions (default) |
-| `fixed` | Immovable, infinite mass |
-| `kinematicPosition` | Moved via setNextKinematicTranslation |
-| `kinematicVelocity` | Moved via setNextKinematicRotation |
+| Type                | Description                                       |
+| ------------------- | ------------------------------------------------- |
+| `dynamic`           | Affected by forces, gravity, collisions (default) |
+| `fixed`             | Immovable, infinite mass                          |
+| `kinematicPosition` | Moved via setNextKinematicTranslation             |
+| `kinematicVelocity` | Moved via setNextKinematicRotation                |
 
 ### RigidBody Properties
 
@@ -134,24 +135,24 @@ import { RigidBody } from '@react-three/rapier'
   // Physics
   type="dynamic"
   mass={1}
-  restitution={0.5}           // Bounciness (0-1)
-  friction={0.5}              // Surface friction
-  linearDamping={0}           // Slows linear velocity
-  angularDamping={0}          // Slows angular velocity
-  gravityScale={1}            // Multiplier for gravity
+  restitution={0.5} // Bounciness (0-1)
+  friction={0.5} // Surface friction
+  linearDamping={0} // Slows linear velocity
+  angularDamping={0} // Slows angular velocity
+  gravityScale={1} // Multiplier for gravity
 
   // Collider generation
-  colliders="cuboid"          // "cuboid" | "ball" | "hull" | "trimesh" | false
+  colliders="cuboid" // "cuboid" | "ball" | "hull" | "trimesh" | false
 
   // Constraints
-  lockTranslations={false}    // Prevent all translation
-  lockRotations={false}       // Prevent all rotation
-  enabledTranslations={[true, true, true]}  // Lock specific axes
-  enabledRotations={[true, true, true]}     // Lock specific axes
+  lockTranslations={false} // Prevent all translation
+  lockRotations={false} // Prevent all rotation
+  enabledTranslations={[true, true, true]} // Lock specific axes
+  enabledRotations={[true, true, true]} // Lock specific axes
 
   // Sleeping
   canSleep={true}
-  ccd={false}                 // Continuous collision detection (fast objects)
+  ccd={false} // Continuous collision detection (fast objects)
 
   // Naming (for collision events)
   name="player"
@@ -186,11 +187,11 @@ RigidBody auto-generates colliders from child meshes:
 
 ### Collider Types
 
-| Type | Description | Best For |
-|------|-------------|----------|
-| `cuboid` | Box shape | Boxes, crates |
-| `ball` | Sphere shape | Balls, spherical objects |
-| `hull` | Convex hull | Complex convex shapes |
+| Type      | Description   | Best For                        |
+| --------- | ------------- | ------------------------------- |
+| `cuboid`  | Box shape     | Boxes, crates                   |
+| `ball`    | Sphere shape  | Balls, spherical objects        |
+| `hull`    | Convex hull   | Complex convex shapes           |
 | `trimesh` | Triangle mesh | Concave/complex static geometry |
 
 ### Manual Colliders
@@ -258,8 +259,9 @@ import { MeshCollider } from '@react-three/rapier'
 ### Using Refs
 
 ```tsx
-import { RigidBody, RapierRigidBody } from '@react-three/rapier'
-import { useRef, useEffect } from 'react'
+import { useEffect, useRef } from "react"
+
+import { RapierRigidBody, RigidBody } from "@react-three/rapier"
 
 function ForcefulBox() {
   const rigidBody = useRef<RapierRigidBody>(null)
@@ -292,7 +294,7 @@ function ForcefulBox() {
 ### In useFrame
 
 ```tsx
-import { useFrame } from '@react-three/fiber'
+import { useFrame } from "@react-three/fiber"
 
 function ContinuousForce() {
   const rigidBody = useRef<RapierRigidBody>(null)
@@ -318,7 +320,7 @@ function ContinuousForce() {
 ### Getting/Setting Position
 
 ```tsx
-import { vec3, quat, euler } from '@react-three/rapier'
+import { euler, quat, vec3 } from "@react-three/rapier"
 
 function PositionControl() {
   const rigidBody = useRef<RapierRigidBody>(null)
@@ -358,17 +360,17 @@ function PositionControl() {
 <RigidBody
   name="player"
   onCollisionEnter={({ manifold, target, other }) => {
-    console.log('Collision with', other.rigidBodyObject?.name)
-    console.log('Contact point', manifold.solverContactPoint(0))
+    console.log("Collision with", other.rigidBodyObject?.name)
+    console.log("Contact point", manifold.solverContactPoint(0))
   }}
   onCollisionExit={({ target, other }) => {
-    console.log('Collision ended with', other.rigidBodyObject?.name)
+    console.log("Collision ended with", other.rigidBodyObject?.name)
   }}
   onContactForce={({ totalForce }) => {
-    console.log('Contact force:', totalForce)
+    console.log("Contact force:", totalForce)
   }}
-  onSleep={() => console.log('Body went to sleep')}
-  onWake={() => console.log('Body woke up')}
+  onSleep={() => console.log("Body went to sleep")}
+  onWake={() => console.log("Body woke up")}
 >
   <mesh>
     <boxGeometry />
@@ -382,8 +384,8 @@ function PositionControl() {
 ```tsx
 <CuboidCollider
   args={[1, 1, 1]}
-  onCollisionEnter={(payload) => console.log('Collider hit')}
-  onCollisionExit={(payload) => console.log('Collider exit')}
+  onCollisionEnter={(payload) => console.log("Collider hit")}
+  onCollisionExit={(payload) => console.log("Collider exit")}
 />
 ```
 
@@ -450,26 +452,32 @@ Connect rigid bodies together.
 Bodies don't move relative to each other:
 
 ```tsx
-import { useFixedJoint, RapierRigidBody } from '@react-three/rapier'
+import { RapierRigidBody, useFixedJoint } from "@react-three/rapier"
 
 function FixedJointExample() {
   const bodyA = useRef<RapierRigidBody>(null)
   const bodyB = useRef<RapierRigidBody>(null)
 
   useFixedJoint(bodyA, bodyB, [
-    [0, 0, 0],      // Position in bodyA's local space
-    [0, 0, 0, 1],   // Orientation in bodyA's local space (quaternion)
-    [0, -1, 0],     // Position in bodyB's local space
-    [0, 0, 0, 1],   // Orientation in bodyB's local space
+    [0, 0, 0], // Position in bodyA's local space
+    [0, 0, 0, 1], // Orientation in bodyA's local space (quaternion)
+    [0, -1, 0], // Position in bodyB's local space
+    [0, 0, 0, 1], // Orientation in bodyB's local space
   ])
 
   return (
     <>
       <RigidBody ref={bodyA} position={[0, 5, 0]}>
-        <mesh><boxGeometry /><meshStandardMaterial color="red" /></mesh>
+        <mesh>
+          <boxGeometry />
+          <meshStandardMaterial color="red" />
+        </mesh>
       </RigidBody>
       <RigidBody ref={bodyB} position={[0, 4, 0]}>
-        <mesh><boxGeometry /><meshStandardMaterial color="blue" /></mesh>
+        <mesh>
+          <boxGeometry />
+          <meshStandardMaterial color="blue" />
+        </mesh>
       </RigidBody>
     </>
   )
@@ -481,25 +489,29 @@ function FixedJointExample() {
 Rotation around one axis:
 
 ```tsx
-import { useRevoluteJoint } from '@react-three/rapier'
+import { useRevoluteJoint } from "@react-three/rapier"
 
 function HingeDoor() {
   const frame = useRef<RapierRigidBody>(null)
   const door = useRef<RapierRigidBody>(null)
 
   useRevoluteJoint(frame, door, [
-    [0.5, 0, 0],    // Joint position in frame's local space
-    [-0.5, 0, 0],   // Joint position in door's local space
-    [0, 1, 0],      // Rotation axis
+    [0.5, 0, 0], // Joint position in frame's local space
+    [-0.5, 0, 0], // Joint position in door's local space
+    [0, 1, 0], // Rotation axis
   ])
 
   return (
     <>
       <RigidBody ref={frame} type="fixed">
-        <mesh><boxGeometry args={[0.1, 2, 0.1]} /></mesh>
+        <mesh>
+          <boxGeometry args={[0.1, 2, 0.1]} />
+        </mesh>
       </RigidBody>
       <RigidBody ref={door}>
-        <mesh><boxGeometry args={[1, 2, 0.1]} /></mesh>
+        <mesh>
+          <boxGeometry args={[1, 2, 0.1]} />
+        </mesh>
       </RigidBody>
     </>
   )
@@ -511,24 +523,28 @@ function HingeDoor() {
 Rotation in all directions:
 
 ```tsx
-import { useSphericalJoint } from '@react-three/rapier'
+import { useSphericalJoint } from "@react-three/rapier"
 
 function BallJoint() {
   const bodyA = useRef<RapierRigidBody>(null)
   const bodyB = useRef<RapierRigidBody>(null)
 
   useSphericalJoint(bodyA, bodyB, [
-    [0, -0.5, 0],   // Position in bodyA's local space
-    [0, 0.5, 0],    // Position in bodyB's local space
+    [0, -0.5, 0], // Position in bodyA's local space
+    [0, 0.5, 0], // Position in bodyB's local space
   ])
 
   return (
     <>
       <RigidBody ref={bodyA} type="fixed" position={[0, 3, 0]}>
-        <mesh><sphereGeometry args={[0.2]} /></mesh>
+        <mesh>
+          <sphereGeometry args={[0.2]} />
+        </mesh>
       </RigidBody>
       <RigidBody ref={bodyB} position={[0, 2, 0]}>
-        <mesh><boxGeometry /></mesh>
+        <mesh>
+          <boxGeometry />
+        </mesh>
       </RigidBody>
     </>
   )
@@ -540,25 +556,29 @@ function BallJoint() {
 Translation along one axis:
 
 ```tsx
-import { usePrismaticJoint } from '@react-three/rapier'
+import { usePrismaticJoint } from "@react-three/rapier"
 
 function Slider() {
   const track = useRef<RapierRigidBody>(null)
   const slider = useRef<RapierRigidBody>(null)
 
   usePrismaticJoint(track, slider, [
-    [0, 0, 0],      // Position in track's local space
-    [0, 0, 0],      // Position in slider's local space
-    [1, 0, 0],      // Axis of translation
+    [0, 0, 0], // Position in track's local space
+    [0, 0, 0], // Position in slider's local space
+    [1, 0, 0], // Axis of translation
   ])
 
   return (
     <>
       <RigidBody ref={track} type="fixed">
-        <mesh><boxGeometry args={[5, 0.1, 0.1]} /></mesh>
+        <mesh>
+          <boxGeometry args={[5, 0.1, 0.1]} />
+        </mesh>
       </RigidBody>
       <RigidBody ref={slider}>
-        <mesh><boxGeometry args={[0.5, 0.5, 0.5]} /></mesh>
+        <mesh>
+          <boxGeometry args={[0.5, 0.5, 0.5]} />
+        </mesh>
       </RigidBody>
     </>
   )
@@ -570,27 +590,31 @@ function Slider() {
 Elastic connection:
 
 ```tsx
-import { useSpringJoint } from '@react-three/rapier'
+import { useSpringJoint } from "@react-three/rapier"
 
 function SpringConnection() {
   const anchor = useRef<RapierRigidBody>(null)
   const ball = useRef<RapierRigidBody>(null)
 
   useSpringJoint(anchor, ball, [
-    [0, 0, 0],      // Position in anchor's local space
-    [0, 0, 0],      // Position in ball's local space
-    2,              // Rest length
-    1000,           // Stiffness
-    10,             // Damping
+    [0, 0, 0], // Position in anchor's local space
+    [0, 0, 0], // Position in ball's local space
+    2, // Rest length
+    1000, // Stiffness
+    10, // Damping
   ])
 
   return (
     <>
       <RigidBody ref={anchor} type="fixed" position={[0, 5, 0]}>
-        <mesh><sphereGeometry args={[0.1]} /></mesh>
+        <mesh>
+          <sphereGeometry args={[0.1]} />
+        </mesh>
       </RigidBody>
       <RigidBody ref={ball} position={[0, 3, 0]}>
-        <mesh><sphereGeometry args={[0.5]} /></mesh>
+        <mesh>
+          <sphereGeometry args={[0.5]} />
+        </mesh>
       </RigidBody>
     </>
   )
@@ -602,25 +626,29 @@ function SpringConnection() {
 Maximum distance constraint:
 
 ```tsx
-import { useRopeJoint } from '@react-three/rapier'
+import { useRopeJoint } from "@react-three/rapier"
 
 function RopeConnection() {
   const anchor = useRef<RapierRigidBody>(null)
   const weight = useRef<RapierRigidBody>(null)
 
   useRopeJoint(anchor, weight, [
-    [0, 0, 0],      // Position in anchor's local space
-    [0, 0, 0],      // Position in weight's local space
-    3,              // Max distance (rope length)
+    [0, 0, 0], // Position in anchor's local space
+    [0, 0, 0], // Position in weight's local space
+    3, // Max distance (rope length)
   ])
 
   return (
     <>
       <RigidBody ref={anchor} type="fixed" position={[0, 5, 0]}>
-        <mesh><sphereGeometry args={[0.1]} /></mesh>
+        <mesh>
+          <sphereGeometry args={[0.1]} />
+        </mesh>
       </RigidBody>
       <RigidBody ref={weight} position={[0, 2, 0]}>
-        <mesh><sphereGeometry args={[0.5]} /></mesh>
+        <mesh>
+          <sphereGeometry args={[0.5]} />
+        </mesh>
       </RigidBody>
     </>
   )
@@ -630,14 +658,14 @@ function RopeConnection() {
 ### Motorized Joints
 
 ```tsx
-import { useRevoluteJoint } from '@react-three/rapier'
-import { useFrame } from '@react-three/fiber'
+import { useFrame } from "@react-three/fiber"
+import { useRevoluteJoint } from "@react-three/rapier"
 
 function MotorizedWheel({ bodyA, bodyB }) {
   const joint = useRevoluteJoint(bodyA, bodyB, [
     [0, 0, 0],
     [0, 0, 0],
-    [0, 0, 1],  // Rotation axis
+    [0, 0, 1], // Rotation axis
   ])
 
   useFrame(() => {
@@ -656,8 +684,9 @@ function MotorizedWheel({ bodyA, bodyB }) {
 Efficient physics for many identical objects:
 
 ```tsx
-import { InstancedRigidBodies, RapierRigidBody } from '@react-three/rapier'
-import { useRef, useMemo } from 'react'
+import { useMemo, useRef } from "react"
+
+import { InstancedRigidBodies, RapierRigidBody } from "@react-three/rapier"
 
 function InstancedBalls() {
   const COUNT = 100
@@ -676,11 +705,7 @@ function InstancedBalls() {
   }, [])
 
   return (
-    <InstancedRigidBodies
-      ref={rigidBodies}
-      instances={instances}
-      colliders="ball"
-    >
+    <InstancedRigidBodies ref={rigidBodies} instances={instances} colliders="ball">
       <instancedMesh args={[undefined, undefined, COUNT]}>
         <sphereGeometry args={[0.5]} />
         <meshStandardMaterial color="orange" />
@@ -693,8 +718,9 @@ function InstancedBalls() {
 ## Accessing the World
 
 ```tsx
-import { useRapier } from '@react-three/rapier'
-import { useEffect } from 'react'
+import { useEffect } from "react"
+
+import { useRapier } from "@react-three/rapier"
 
 function WorldAccess() {
   const { world, rapier } = useRapier()
@@ -720,7 +746,7 @@ function ManualStep() {
   const { step } = useRapier()
 
   const advancePhysics = () => {
-    step(1 / 60)  // Advance by one frame
+    step(1 / 60) // Advance by one frame
   }
 
   return <button onClick={advancePhysics}>Step</button>
@@ -806,15 +832,9 @@ import { Attractor } from '@react-three/rapier-addons'
 
 ```tsx
 // Performance-optimized setup
-<Physics
-  timeStep={1/60}
-  colliders="cuboid"
-  gravity={[0, -9.81, 0]}
->
+<Physics timeStep={1 / 60} colliders="cuboid" gravity={[0, -9.81, 0]}>
   {/* Use collision groups to limit checks */}
-  <RigidBody collisionGroups={interactionGroups(0, [0, 1])}>
-    ...
-  </RigidBody>
+  <RigidBody collisionGroups={interactionGroups(0, [0, 1])}>...</RigidBody>
 </Physics>
 ```
 

@@ -1,3 +1,5 @@
+import { useRouter } from "@tanstack/react-router"
+
 import {
   IconCreditCard,
   IconDotsVertical,
@@ -6,11 +8,8 @@ import {
   IconUserCircle,
 } from "@tabler/icons-react"
 
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar"
+import { authClient } from "@/lib/auth-client"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,8 +25,6 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
-import { authClient } from "@/lib/auth-client"
-import { useRouter } from "@tanstack/react-router"
 
 export function NavUser() {
   const { isMobile } = useSidebar()
@@ -39,14 +36,15 @@ export function NavUser() {
     email: "",
     image: "",
   }
-  
+
   // Create a nice fallback from the user's name
-  const initials = user.name
-    .split(' ')
-    .map(n => n[0])
-    .slice(0, 2)
-    .join('')
-    .toUpperCase() || 'U'
+  const initials =
+    user.name
+      .split(" ")
+      .map((n) => n[0])
+      .slice(0, 2)
+      .join("")
+      .toUpperCase() || "U"
 
   const handleLogout = async () => {
     await authClient.signOut({
@@ -73,9 +71,7 @@ export function NavUser() {
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">{user.name}</span>
-                <span className="truncate text-xs text-muted-foreground">
-                  {user.email}
-                </span>
+                <span className="truncate text-xs text-muted-foreground">{user.email}</span>
               </div>
               <IconDotsVertical className="ml-auto size-4" />
             </SidebarMenuButton>
@@ -94,9 +90,7 @@ export function NavUser() {
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">{user.name}</span>
-                  <span className="truncate text-xs text-muted-foreground">
-                    {user.email}
-                  </span>
+                  <span className="truncate text-xs text-muted-foreground">{user.email}</span>
                 </div>
               </div>
             </DropdownMenuLabel>

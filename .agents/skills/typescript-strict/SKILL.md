@@ -20,11 +20,11 @@ description: TypeScript strict mode patterns including schema-first development,
 
 ```typescript
 export type User = {
-  readonly id: string;
-  readonly email: string;
-  readonly name: string;
-  readonly roles: ReadonlyArray<string>;
-};
+  readonly id: string
+  readonly email: string
+  readonly name: string
+  readonly roles: ReadonlyArray<string>
+}
 ```
 
 **Why `type`?** Better for unions, intersections, mapped types. `readonly` signals immutability. More flexible composition with utility types.
@@ -33,8 +33,8 @@ export type User = {
 
 ```typescript
 export interface UserRepository {
-  findById(id: string): Promise<User | undefined>;
-  save(user: User): Promise<void>;
+  findById(id: string): Promise<User | undefined>
+  save(user: User): Promise<void>
 }
 ```
 
@@ -49,8 +49,8 @@ Define schemas once, import everywhere. Never duplicate the same validation logi
 export const CreateUserRequestSchema = z.object({
   email: z.string().email(),
   name: z.string().min(1),
-});
-export type CreateUserRequest = z.infer<typeof CreateUserRequestSchema>;
+})
+export type CreateUserRequest = z.infer<typeof CreateUserRequestSchema>
 
 // Import and use wherever needed
 ```
@@ -83,6 +83,7 @@ export type CreateUserRequest = z.infer<typeof CreateUserRequestSchema>;
 ### What Each Setting Does
 
 **Core strict flags:**
+
 - **`strict: true`** - Enables all strict type checking options
 - **`noImplicitAny`** - Error on expressions/declarations with implied `any` type
 - **`strictNullChecks`** - `null` and `undefined` have their own types (not assignable to everything)
@@ -92,6 +93,7 @@ export type CreateUserRequest = z.infer<typeof CreateUserRequestSchema>;
 - **`noFallthroughCasesInSwitch`** - Error on fallthrough cases in switch statements
 
 **Additional safety flags (CRITICAL):**
+
 - **`noUncheckedIndexedAccess`** - Array/object access returns `T | undefined` (prevents runtime errors from assuming elements exist)
 - **`exactOptionalPropertyTypes`** - Distinguishes `property?: T` from `property: T | undefined` (more precise types)
 - **`noPropertyAccessFromIndexSignature`** - Requires bracket notation for index signature properties (forces awareness of dynamic access)
@@ -116,6 +118,7 @@ The `noUnusedParameters` rule can reveal architectural problems:
 For detailed patterns on immutability (`readonly`, `ReadonlyArray`), pure functions, composition, Result types, array methods, and factory functions, see the `functional` skill. These are the canonical patterns used across the codebase.
 
 Key TypeScript-specific notes:
+
 - Use `readonly` on all `type` properties and `ReadonlyArray<T>` for arrays
 - The compiler enforces immutability when `readonly` is used — leverage this
 - Factory functions (not classes) for object creation, supporting dependency injection
@@ -136,11 +139,11 @@ Key TypeScript-specific notes:
 const UserSchema = z.object({
   id: z.string().uuid(),
   email: z.string().email(),
-});
-type User = z.infer<typeof UserSchema>;
+})
+type User = z.infer<typeof UserSchema>
 
 // Validate at boundary
-const user = UserSchema.parse(apiResponse);
+const user = UserSchema.parse(apiResponse)
 ```
 
 ### When Schemas AREN'T Required
@@ -153,13 +156,11 @@ const user = UserSchema.parse(apiResponse);
 
 ```typescript
 // ✅ CORRECT - No schema needed
-type Result<T, E> =
-  | { success: true; data: T }
-  | { success: false; error: E };
+type Result<T, E> = { success: true; data: T } | { success: false; error: E }
 
 // ✅ CORRECT - Interface, no validation
 interface UserService {
-  createUser(user: User): void;
+  createUser(user: User): void
 }
 ```
 
@@ -170,21 +171,21 @@ interface UserService {
 For type-safe primitives:
 
 ```typescript
-type UserId = string & { readonly brand: unique symbol };
-type PaymentAmount = number & { readonly brand: unique symbol };
+type UserId = string & { readonly brand: unique symbol }
+type PaymentAmount = number & { readonly brand: unique symbol }
 
 // Type-safe at compile time
 const processPayment = (userId: UserId, amount: PaymentAmount) => {
   // Implementation
-};
+}
 
 // ❌ Can't pass raw string/number
-processPayment('user-123', 100); // Error
+processPayment("user-123", 100) // Error
 
 // ✅ Must use branded type
-const userId = 'user-123' as UserId;
-const amount = 100 as PaymentAmount;
-processPayment(userId, amount); // OK
+const userId = "user-123" as UserId
+const amount = 100 as PaymentAmount
+processPayment(userId, amount) // OK
 ```
 
 ---

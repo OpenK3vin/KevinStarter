@@ -10,6 +10,7 @@ description: TanStack Query v5 data fetching patterns including useSuspenseQuery
 Modern data fetching with TanStack Query v5 (latest: 5.90.5, November 2025), emphasizing Suspense-based queries, cache-first strategies, and centralized API services.
 
 **Note**: v5 (released October 2023) has breaking changes from v4:
+
 - `isLoading` → `isPending` for status
 - `cacheTime` → `gcTime` (garbage collection time)
 - React 18.0+ required
@@ -58,6 +59,7 @@ function PostList() {
 ```
 
 **Benefits:**
+
 - No `isLoading` checks needed
 - Integrates with Suspense boundaries
 - Cleaner component code
@@ -135,6 +137,7 @@ function Component() {
 ```
 
 **When to use `useQuery` vs `useSuspenseQuery`:**
+
 - Use `useSuspenseQuery` by default (preferred)
 - Use `useQuery` only when you need component-level loading states
 - Most cases should use `useSuspenseQuery` + Suspense boundaries
@@ -181,29 +184,26 @@ const mutation = useMutation({
   mutationFn: postsApi.update,
   onMutate: async (updatedPost) => {
     // Cancel outgoing refetches
-    await queryClient.cancelQueries({ queryKey: ['posts', updatedPost.id] });
+    await queryClient.cancelQueries({ queryKey: ["posts", updatedPost.id] })
 
     // Snapshot previous value
-    const previousPost = queryClient.getQueryData(['posts', updatedPost.id]);
+    const previousPost = queryClient.getQueryData(["posts", updatedPost.id])
 
     // Optimistically update
-    queryClient.setQueryData(['posts', updatedPost.id], updatedPost);
+    queryClient.setQueryData(["posts", updatedPost.id], updatedPost)
 
     // Return context with snapshot
-    return { previousPost };
+    return { previousPost }
   },
   onError: (err, updatedPost, context) => {
     // Rollback on error
-    queryClient.setQueryData(
-      ['posts', updatedPost.id],
-      context.previousPost
-    );
+    queryClient.setQueryData(["posts", updatedPost.id], context.previousPost)
   },
   onSettled: (data, error, variables) => {
     // Refetch after mutation
-    queryClient.invalidateQueries({ queryKey: ['posts', variables.id] });
+    queryClient.invalidateQueries({ queryKey: ["posts", variables.id] })
   },
-});
+})
 ```
 
 ---
@@ -213,31 +213,28 @@ const mutation = useMutation({
 ### Invalidation
 
 ```typescript
-import { useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from "@tanstack/react-query"
 
-const queryClient = useQueryClient();
+const queryClient = useQueryClient()
 
 // Invalidate all posts queries
-queryClient.invalidateQueries({ queryKey: ['posts'] });
+queryClient.invalidateQueries({ queryKey: ["posts"] })
 
 // Invalidate specific post
-queryClient.invalidateQueries({ queryKey: ['posts', postId] });
+queryClient.invalidateQueries({ queryKey: ["posts", postId] })
 
 // Invalidate all queries
-queryClient.invalidateQueries();
+queryClient.invalidateQueries()
 ```
 
 ### Manual Updates
 
 ```typescript
 // Update cache directly
-queryClient.setQueryData(['posts', postId], newPost);
+queryClient.setQueryData(["posts", postId], newPost)
 
 // Update with function
-queryClient.setQueryData(['posts'], (oldPosts) => [
-  ...oldPosts,
-  newPost,
-]);
+queryClient.setQueryData(["posts"], (oldPosts) => [...oldPosts, newPost])
 ```
 
 ### Prefetching
@@ -273,56 +270,57 @@ const prefetchPost = (postId: string) => {
 
 ```typescript
 // features/posts/api/postsApi.ts
-import { apiClient } from '@/lib/apiClient';
-import type { Post, CreatePostDto, UpdatePostDto } from '~/types/post';
+import type { CreatePostDto, Post, UpdatePostDto } from "~/types/post"
+
+import { apiClient } from "@/lib/apiClient"
 
 export const postsApi = {
   getAll: async (): Promise<Post[]> => {
-    const response = await apiClient.get('/posts');
-    return response.data;
+    const response = await apiClient.get("/posts")
+    return response.data
   },
 
   get: async (id: string): Promise<Post> => {
-    const response = await apiClient.get(`/posts/${id}`);
-    return response.data;
+    const response = await apiClient.get(`/posts/${id}`)
+    return response.data
   },
 
   create: async (data: CreatePostDto): Promise<Post> => {
-    const response = await apiClient.post('/posts', data);
-    return response.data;
+    const response = await apiClient.post("/posts", data)
+    return response.data
   },
 
   update: async (id: string, data: UpdatePostDto): Promise<Post> => {
-    const response = await apiClient.put(`/posts/${id}`, data);
-    return response.data;
+    const response = await apiClient.put(`/posts/${id}`, data)
+    return response.data
   },
 
   delete: async (id: string): Promise<void> => {
-    await apiClient.delete(`/posts/${id}`);
+    await apiClient.delete(`/posts/${id}`)
   },
 
   getByUser: async (userId: string): Promise<Post[]> => {
-    const response = await apiClient.get(`/users/${userId}/posts`);
-    return response.data;
+    const response = await apiClient.get(`/users/${userId}/posts`)
+    return response.data
   },
-};
+}
 ```
 
 ### Usage in Components
 
 ```typescript
-import { postsApi } from '~/features/posts/api/postsApi';
+import { postsApi } from "~/features/posts/api/postsApi"
 
 // In query
 const { data } = useSuspenseQuery({
-  queryKey: ['posts'],
+  queryKey: ["posts"],
   queryFn: postsApi.getAll,
-});
+})
 
 // In mutation
 const mutation = useMutation({
   mutationFn: postsApi.create,
-});
+})
 ```
 
 ---
@@ -333,16 +331,24 @@ const mutation = useMutation({
 
 ```typescript
 // List queries
-['posts']                          // All posts
-['posts', { status: 'published' }] // Filtered posts
-
-// Detail queries
-['posts', postId]                  // Single post
-['posts', postId, 'comments']      // Post comments
-
-// Nested resources
-['users', userId, 'posts']         // User's posts
-['users', userId, 'posts', postId] // Specific user post
+;[
+  "posts",
+] // All posts
+[
+  ("posts", { status: "published" })
+] // Filtered posts
+[
+  // Detail queries
+  ("posts", postId)
+] // Single post
+[
+  ("posts", postId, "comments")
+] // Post comments
+[
+  // Nested resources
+  ("users", userId, "posts")
+] // User's posts
+[("users", userId, "posts", postId)] // Specific user post
 ```
 
 ### Key Factories
@@ -350,22 +356,22 @@ const mutation = useMutation({
 ```typescript
 // features/posts/api/postKeys.ts
 export const postKeys = {
-  all: ['posts'] as const,
-  lists: () => [...postKeys.all, 'list'] as const,
+  all: ["posts"] as const,
+  lists: () => [...postKeys.all, "list"] as const,
   list: (filters: string) => [...postKeys.lists(), { filters }] as const,
-  details: () => [...postKeys.all, 'detail'] as const,
+  details: () => [...postKeys.all, "detail"] as const,
   detail: (id: string) => [...postKeys.details(), id] as const,
-  comments: (id: string) => [...postKeys.detail(id), 'comments'] as const,
-};
+  comments: (id: string) => [...postKeys.detail(id), "comments"] as const,
+}
 
 // Usage
 const { data } = useSuspenseQuery({
   queryKey: postKeys.detail(postId),
   queryFn: () => postsApi.get(postId),
-});
+})
 
 // Invalidate all post lists
-queryClient.invalidateQueries({ queryKey: postKeys.lists() });
+queryClient.invalidateQueries({ queryKey: postKeys.lists() })
 ```
 
 ---
@@ -399,12 +405,12 @@ function DataComponent() {
 
 ```typescript
 const { data } = useQuery({
-  queryKey: ['posts'],
+  queryKey: ["posts"],
   queryFn: postsApi.getAll,
-  retry: 3,              // Retry 3 times
-  retryDelay: 1000,      // Wait 1s between retries
+  retry: 3, // Retry 3 times
+  retryDelay: 1000, // Wait 1s between retries
   gcTime: 5 * 60 * 1000, // Garbage collection time: 5 minutes (v5: was 'cacheTime')
-});
+})
 ```
 
 ---
@@ -439,13 +445,13 @@ function DataComponent() {
 const { data } = useSuspenseQuery({
   queryKey: postKeys.detail(id),
   queryFn: () => postsApi.get(id),
-});
+})
 
 // ❌ Avoid: Inconsistent keys
 const { data } = useSuspenseQuery({
-  queryKey: ['post', id], // Different format
+  queryKey: ["post", id], // Different format
   queryFn: () => postsApi.get(id),
-});
+})
 ```
 
 ### 3. Centralized API Services
@@ -453,18 +459,18 @@ const { data } = useSuspenseQuery({
 ```typescript
 // ✅ Good: API service
 const { data } = useSuspenseQuery({
-  queryKey: ['posts'],
+  queryKey: ["posts"],
   queryFn: postsApi.getAll,
-});
+})
 
 // ❌ Avoid: Inline fetching
 const { data } = useSuspenseQuery({
-  queryKey: ['posts'],
+  queryKey: ["posts"],
   queryFn: async () => {
-    const res = await fetch('/api/posts');
-    return res.json();
+    const res = await fetch("/api/posts")
+    return res.json()
   },
-});
+})
 ```
 
 ---
@@ -472,6 +478,7 @@ const { data } = useSuspenseQuery({
 ## Additional Resources
 
 For more patterns, see:
+
 - [data-fetching.md](resources/data-fetching.md) - Advanced patterns
 - [cache-strategies.md](resources/cache-strategies.md) - Cache management
 - [mutation-patterns.md](resources/mutation-patterns.md) - Complex mutations

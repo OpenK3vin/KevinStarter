@@ -4,11 +4,11 @@
 
 ```typescript
 const { data } = useQuery({
-  queryKey: ['posts'],
+  queryKey: ["posts"],
   queryFn: fetchPosts,
-  staleTime: 5 * 60 * 1000,  // Consider fresh for 5 minutes
-  gcTime: 10 * 60 * 1000,   // Keep in cache for 10 minutes (formerly cacheTime)
-});
+  staleTime: 5 * 60 * 1000, // Consider fresh for 5 minutes
+  gcTime: 10 * 60 * 1000, // Keep in cache for 10 minutes (formerly cacheTime)
+})
 ```
 
 ## Cache Invalidation
@@ -16,19 +16,19 @@ const { data } = useQuery({
 ### Invalidate Specific Queries
 
 ```typescript
-const queryClient = useQueryClient();
+const queryClient = useQueryClient()
 
 // Invalidate all post queries
-queryClient.invalidateQueries({ queryKey: ['posts'] });
+queryClient.invalidateQueries({ queryKey: ["posts"] })
 
 // Invalidate specific post
-queryClient.invalidateQueries({ queryKey: ['post', postId] });
+queryClient.invalidateQueries({ queryKey: ["post", postId] })
 
 // Invalidate with exact match
 queryClient.invalidateQueries({
-  queryKey: ['posts'],
-  exact: true  // Only ['posts'], not ['posts', 'list']
-});
+  queryKey: ["posts"],
+  exact: true, // Only ['posts'], not ['posts', 'list']
+})
 ```
 
 ### Invalidate on Mutation
@@ -38,9 +38,9 @@ const { mutate } = useMutation({
   mutationFn: createPost,
   onSuccess: () => {
     // Invalidate and refetch
-    queryClient.invalidateQueries({ queryKey: ['posts'] });
-  }
-});
+    queryClient.invalidateQueries({ queryKey: ["posts"] })
+  },
+})
 ```
 
 ## Manual Cache Updates
@@ -49,27 +49,27 @@ const { mutate } = useMutation({
 
 ```typescript
 // Update cache directly
-queryClient.setQueryData(['post', postId], (oldData) => ({
+queryClient.setQueryData(["post", postId], (oldData) => ({
   ...oldData,
-  title: 'New Title'
-}));
+  title: "New Title",
+}))
 
 // Set new data
-queryClient.setQueryData(['post', postId], newPost);
+queryClient.setQueryData(["post", postId], newPost)
 ```
 
 ### Get Query Data
 
 ```typescript
 // Read from cache
-const cachedPost = queryClient.getQueryData(['post', postId]);
+const cachedPost = queryClient.getQueryData(["post", postId])
 
 // Use in initialData
 const { data } = useQuery({
-  queryKey: ['post', postId],
+  queryKey: ["post", postId],
   queryFn: () => fetchPost(postId),
-  initialData: () => queryClient.getQueryData(['posts'])?.find(p => p.id === postId)
-});
+  initialData: () => queryClient.getQueryData(["posts"])?.find((p) => p.id === postId),
+})
 ```
 
 ## Refetch Strategies
@@ -78,31 +78,31 @@ const { data } = useQuery({
 
 ```typescript
 const { data } = useQuery({
-  queryKey: ['posts'],
+  queryKey: ["posts"],
   queryFn: fetchPosts,
-  refetchOnWindowFocus: true  // Refetch when tab regains focus
-});
+  refetchOnWindowFocus: true, // Refetch when tab regains focus
+})
 ```
 
 ### Refetch on Reconnect
 
 ```typescript
 const { data } = useQuery({
-  queryKey: ['posts'],
+  queryKey: ["posts"],
   queryFn: fetchPosts,
-  refetchOnReconnect: true  // Refetch when internet reconnects
-});
+  refetchOnReconnect: true, // Refetch when internet reconnects
+})
 ```
 
 ### Refetch Intervals
 
 ```typescript
 const { data } = useQuery({
-  queryKey: ['live-data'],
+  queryKey: ["live-data"],
   queryFn: fetchLiveData,
-  refetchInterval: 5000,  // Refetch every 5 seconds
-  refetchIntervalInBackground: false  // Pause when tab not active
-});
+  refetchInterval: 5000, // Refetch every 5 seconds
+  refetchIntervalInBackground: false, // Pause when tab not active
+})
 ```
 
 ## Cache Persistence
@@ -142,16 +142,16 @@ const persister = createSyncStoragePersister({
 // Both components will share the same request
 function Component1() {
   const { data } = useQuery({
-    queryKey: ['posts'],
-    queryFn: fetchPosts
-  });
+    queryKey: ["posts"],
+    queryFn: fetchPosts,
+  })
 }
 
 function Component2() {
   const { data } = useQuery({
-    queryKey: ['posts'],  // Same key = same request
-    queryFn: fetchPosts
-  });
+    queryKey: ["posts"], // Same key = same request
+    queryFn: fetchPosts,
+  })
 }
 ```
 
@@ -160,24 +160,24 @@ function Component2() {
 ### Prefetch Queries
 
 ```typescript
-const queryClient = useQueryClient();
+const queryClient = useQueryClient()
 
 // Prefetch before navigation
 const handleMouseEnter = () => {
   queryClient.prefetchQuery({
-    queryKey: ['post', postId],
-    queryFn: () => fetchPost(postId)
-  });
-};
+    queryKey: ["post", postId],
+    queryFn: () => fetchPost(postId),
+  })
+}
 
 // Prefetch in loader
 router.beforeEach(async (to, from, next) => {
   await queryClient.prefetchQuery({
-    queryKey: ['user', to.params.userId],
-    queryFn: () => fetchUser(to.params.userId)
-  });
-  next();
-});
+    queryKey: ["user", to.params.userId],
+    queryFn: () => fetchUser(to.params.userId),
+  })
+  next()
+})
 ```
 
 ### Ensure Query Data
@@ -185,9 +185,9 @@ router.beforeEach(async (to, from, next) => {
 ```typescript
 // Fetch if not in cache, otherwise use cached
 await queryClient.ensureQueryData({
-  queryKey: ['post', postId],
-  queryFn: () => fetchPost(postId)
-});
+  queryKey: ["post", postId],
+  queryFn: () => fetchPost(postId),
+})
 ```
 
 ## Selective Cache Updates
@@ -195,29 +195,27 @@ await queryClient.ensureQueryData({
 ### Update Nested Data
 
 ```typescript
-queryClient.setQueryData(['posts'], (oldPosts) => {
-  return oldPosts.map(post =>
-    post.id === updatedPost.id ? updatedPost : post
-  );
-});
+queryClient.setQueryData(["posts"], (oldPosts) => {
+  return oldPosts.map((post) => (post.id === updatedPost.id ? updatedPost : post))
+})
 ```
 
 ### Add to List Cache
 
 ```typescript
 // After creating a post
-queryClient.setQueryData(['posts'], (oldPosts = []) => {
-  return [newPost, ...oldPosts];
-});
+queryClient.setQueryData(["posts"], (oldPosts = []) => {
+  return [newPost, ...oldPosts]
+})
 ```
 
 ### Remove from List Cache
 
 ```typescript
 // After deleting a post
-queryClient.setQueryData(['posts'], (oldPosts) => {
-  return oldPosts.filter(post => post.id !== deletedPostId);
-});
+queryClient.setQueryData(["posts"], (oldPosts) => {
+  return oldPosts.filter((post) => post.id !== deletedPostId)
+})
 ```
 
 ## Cache Debugging
@@ -236,11 +234,11 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 ### Query Cache Events
 
 ```typescript
-const queryCache = queryClient.getQueryCache();
+const queryCache = queryClient.getQueryCache()
 
 queryCache.subscribe((event) => {
-  console.log('Query cache event:', event.type, event.query.queryKey);
-});
+  console.log("Query cache event:", event.type, event.query.queryKey)
+})
 ```
 
 ## Best Practices

@@ -1,4 +1,4 @@
-import type { ResourceRole, ResourceAction } from './types'
+import type { ResourceAction, ResourceRole } from "./types"
 
 /**
  * Maps each resource-role to the set of actions it may perform.
@@ -10,8 +10,8 @@ import type { ResourceRole, ResourceAction } from './types'
  * Keep these in sync with GlobalRole permissions in src/lib/permissions.ts.
  */
 export const RESOURCE_ROLE_PERMISSIONS: Record<ResourceRole, ResourceAction[]> = {
-  editor: ['read', 'create', 'update', 'delete'],
-  viewer: ['read'],
+  editor: ["read", "create", "update", "delete"],
+  viewer: ["read"],
 }
 
 /**

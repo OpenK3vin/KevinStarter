@@ -7,12 +7,12 @@ Comprehensive patterns for Next.js Server Actions.
 Server Actions are asynchronous functions that run on the server. They can be called from Client or Server Components.
 
 ```typescript
-'use server';
+"use server"
 
 export async function createPost(formData: FormData) {
   // Runs on server
-  const title = formData.get('title') as string;
-  await db.post.create({ data: { title } });
+  const title = formData.get("title") as string
+  await db.post.create({ data: { title } })
 }
 ```
 
@@ -22,43 +22,44 @@ export async function createPost(formData: FormData) {
 
 ```typescript
 // app/actions/posts.ts
-'use server';
+"use server"
 
-import { z } from 'zod';
-import { revalidatePath } from 'next/cache';
+import { z } from "zod"
+
+import { revalidatePath } from "next/cache"
 
 const postSchema = z.object({
   title: z.string().min(1),
-  content: z.string().min(10)
-});
+  content: z.string().min(10),
+})
 
 export async function createPost(formData: FormData) {
   const validatedFields = postSchema.safeParse({
-    title: formData.get('title'),
-    content: formData.get('content')
-  });
+    title: formData.get("title"),
+    content: formData.get("content"),
+  })
 
   if (!validatedFields.success) {
     return {
       errors: validatedFields.error.flatten().fieldErrors,
-      message: 'Validation failed'
-    };
+      message: "Validation failed",
+    }
   }
 
-  const { title, content } = validatedFields.data;
+  const { title, content } = validatedFields.data
 
   try {
     await db.post.create({
-      data: { title, content, published: false }
-    });
+      data: { title, content, published: false },
+    })
   } catch (error) {
     return {
-      message: 'Database Error: Failed to create post'
-    };
+      message: "Database Error: Failed to create post",
+    }
   }
 
-  revalidatePath('/posts');
-  redirect('/posts');
+  revalidatePath("/posts")
+  redirect("/posts")
 }
 ```
 
@@ -91,34 +92,31 @@ export default function NewPostPage() {
 
 ```typescript
 // app/actions/posts.ts
-'use server';
+"use server"
 
 export type FormState = {
   errors?: {
-    title?: string[];
-    content?: string[];
-  };
-  message?: string;
-};
+    title?: string[]
+    content?: string[]
+  }
+  message?: string
+}
 
-export async function createPost(
-  prevState: FormState,
-  formData: FormData
-): Promise<FormState> {
+export async function createPost(prevState: FormState, formData: FormData): Promise<FormState> {
   const validatedFields = postSchema.safeParse({
-    title: formData.get('title'),
-    content: formData.get('content')
-  });
+    title: formData.get("title"),
+    content: formData.get("content"),
+  })
 
   if (!validatedFields.success) {
     return {
       errors: validatedFields.error.flatten().fieldErrors,
-      message: 'Missing fields'
-    };
+      message: "Missing fields",
+    }
   }
 
   // Create post...
-  return { message: 'Post created successfully' };
+  return { message: "Post created successfully" }
 }
 ```
 
@@ -191,24 +189,24 @@ export function CreatePostForm() {
 
 ```typescript
 // app/actions/posts.ts
-'use server';
+"use server"
 
 export async function deletePost(postId: string) {
   await db.post.delete({
-    where: { id: postId }
-  });
+    where: { id: postId },
+  })
 
-  revalidatePath('/posts');
+  revalidatePath("/posts")
 }
 
 export async function publishPost(postId: string) {
   await db.post.update({
     where: { id: postId },
-    data: { published: true, publishedAt: new Date() }
-  });
+    data: { published: true, publishedAt: new Date() },
+  })
 
-  revalidatePath('/posts');
-  revalidatePath(`/posts/${postId}`);
+  revalidatePath("/posts")
+  revalidatePath(`/posts/${postId}`)
 }
 ```
 
@@ -247,56 +245,57 @@ export function PostActions({ postId }: { postId: string }) {
 ### Checking User Session
 
 ```typescript
-'use server';
+"use server"
 
-import { auth } from '@/lib/auth';
-import { redirect } from 'next/navigation';
+import { redirect } from "next/navigation"
+
+import { auth } from "@/lib/auth"
 
 export async function createPost(formData: FormData) {
-  const session = await auth();
+  const session = await auth()
 
   if (!session?.user) {
-    redirect('/login');
+    redirect("/login")
   }
 
   const post = await db.post.create({
     data: {
-      title: formData.get('title') as string,
-      content: formData.get('content') as string,
-      authorId: session.user.id
-    }
-  });
+      title: formData.get("title") as string,
+      content: formData.get("content") as string,
+      authorId: session.user.id,
+    },
+  })
 
-  revalidatePath('/posts');
-  return { success: true, postId: post.id };
+  revalidatePath("/posts")
+  return { success: true, postId: post.id }
 }
 ```
 
 ### Role-Based Actions
 
 ```typescript
-'use server';
+"use server"
 
 export async function deletePost(postId: string) {
-  const session = await auth();
+  const session = await auth()
 
   if (!session?.user) {
-    throw new Error('Not authenticated');
+    throw new Error("Not authenticated")
   }
 
   const post = await db.post.findUnique({
-    where: { id: postId }
-  });
+    where: { id: postId },
+  })
 
-  if (post.authorId !== session.user.id && session.user.role !== 'ADMIN') {
-    throw new Error('Not authorized');
+  if (post.authorId !== session.user.id && session.user.role !== "ADMIN") {
+    throw new Error("Not authorized")
   }
 
   await db.post.delete({
-    where: { id: postId }
-  });
+    where: { id: postId },
+  })
 
-  revalidatePath('/posts');
+  revalidatePath("/posts")
 }
 ```
 
@@ -305,25 +304,25 @@ export async function deletePost(postId: string) {
 ### Try-Catch Pattern
 
 ```typescript
-'use server';
+"use server"
 
 export async function createPost(formData: FormData) {
   try {
     const post = await db.post.create({
       data: {
-        title: formData.get('title') as string,
-        content: formData.get('content') as string
-      }
-    });
+        title: formData.get("title") as string,
+        content: formData.get("content") as string,
+      },
+    })
 
-    revalidatePath('/posts');
-    return { success: true, post };
+    revalidatePath("/posts")
+    return { success: true, post }
   } catch (error) {
-    console.error('Failed to create post:', error);
+    console.error("Failed to create post:", error)
     return {
       success: false,
-      error: 'Failed to create post. Please try again.'
-    };
+      error: "Failed to create post. Please try again.",
+    }
   }
 }
 ```
@@ -333,33 +332,33 @@ export async function createPost(formData: FormData) {
 ```typescript
 class PostNotFoundError extends Error {
   constructor(postId: string) {
-    super(`Post ${postId} not found`);
-    this.name = 'PostNotFoundError';
+    super(`Post ${postId} not found`)
+    this.name = "PostNotFoundError"
   }
 }
 
 class UnauthorizedError extends Error {
   constructor() {
-    super('You are not authorized to perform this action');
-    this.name = 'UnauthorizedError';
+    super("You are not authorized to perform this action")
+    this.name = "UnauthorizedError"
   }
 }
 
 export async function updatePost(postId: string, data: PostUpdate) {
-  const session = await auth();
-  if (!session) throw new UnauthorizedError();
+  const session = await auth()
+  if (!session) throw new UnauthorizedError()
 
-  const post = await db.post.findUnique({ where: { id: postId } });
-  if (!post) throw new PostNotFoundError(postId);
+  const post = await db.post.findUnique({ where: { id: postId } })
+  if (!post) throw new PostNotFoundError(postId)
 
   if (post.authorId !== session.user.id) {
-    throw new UnauthorizedError();
+    throw new UnauthorizedError()
   }
 
   return await db.post.update({
     where: { id: postId },
-    data
-  });
+    data,
+  })
 }
 ```
 
@@ -405,60 +404,60 @@ export function LikeButton({ postId, initialLikes }: Props) {
 ### Handling File Uploads
 
 ```typescript
-'use server';
+"use server"
 
-import { writeFile } from 'fs/promises';
-import { join } from 'path';
+import { writeFile } from "fs/promises"
+import { join } from "path"
 
 export async function uploadImage(formData: FormData) {
-  const file = formData.get('image') as File;
+  const file = formData.get("image") as File
 
   if (!file) {
-    return { error: 'No file uploaded' };
+    return { error: "No file uploaded" }
   }
 
-  const bytes = await file.arrayBuffer();
-  const buffer = Buffer.from(bytes);
+  const bytes = await file.arrayBuffer()
+  const buffer = Buffer.from(bytes)
 
   // Save to public directory
-  const path = join(process.cwd(), 'public/uploads', file.name);
-  await writeFile(path, buffer);
+  const path = join(process.cwd(), "public/uploads", file.name)
+  await writeFile(path, buffer)
 
-  return { success: true, path: `/uploads/${file.name}` };
+  return { success: true, path: `/uploads/${file.name}` }
 }
 ```
 
 ### With Image Upload
 
 ```typescript
-'use server';
+"use server"
 
-import { put } from '@vercel/blob';
+import { put } from "@vercel/blob"
 
 export async function createPostWithImage(formData: FormData) {
-  const file = formData.get('coverImage') as File;
-  const title = formData.get('title') as string;
-  const content = formData.get('content') as string;
+  const file = formData.get("coverImage") as File
+  const title = formData.get("title") as string
+  const content = formData.get("content") as string
 
-  let imageUrl = '';
+  let imageUrl = ""
 
   if (file && file.size > 0) {
     const blob = await put(file.name, file, {
-      access: 'public'
-    });
-    imageUrl = blob.url;
+      access: "public",
+    })
+    imageUrl = blob.url
   }
 
   const post = await db.post.create({
     data: {
       title,
       content,
-      coverImage: imageUrl
-    }
-  });
+      coverImage: imageUrl,
+    },
+  })
 
-  revalidatePath('/posts');
-  redirect(`/posts/${post.id}`);
+  revalidatePath("/posts")
+  redirect(`/posts/${post.id}`)
 }
 ```
 
@@ -467,30 +466,30 @@ export async function createPostWithImage(formData: FormData) {
 ### Path Revalidation
 
 ```typescript
-import { revalidatePath } from 'next/cache';
+import { revalidatePath } from "next/cache"
 
 // Revalidate specific page
-revalidatePath('/posts');
+revalidatePath("/posts")
 
 // Revalidate dynamic route
-revalidatePath(`/posts/${postId}`);
+revalidatePath(`/posts/${postId}`)
 
 // Revalidate layout
-revalidatePath('/posts', 'layout');
+revalidatePath("/posts", "layout")
 ```
 
 ### Tag Revalidation
 
 ```typescript
-import { revalidateTag } from 'next/cache';
+import { revalidateTag } from "next/cache"
 
 // In fetch
-fetch('https://api.example.com/posts', {
-  next: { tags: ['posts'] }
-});
+fetch("https://api.example.com/posts", {
+  next: { tags: ["posts"] },
+})
 
 // Revalidate
-revalidateTag('posts');
+revalidateTag("posts")
 ```
 
 ## Best Practices

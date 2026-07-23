@@ -7,6 +7,7 @@ Core React 18+ patterns including hooks, Suspense, lazy loading, and TypeScript.
 **Skill:** `react`
 
 Covers:
+
 - React hooks (useState, useEffect, useCallback, useMemo)
 - Suspense and lazy loading patterns
 - Component structure and TypeScript patterns
@@ -29,11 +30,13 @@ This kit is automatically detected if your project has React in `package.json`:
 ## Installation
 
 Auto-detected projects:
+
 ```bash
 npx claude-code-setup --yes
 ```
 
 Explicit installation:
+
 ```bash
 npx claude-code-setup --kit react
 ```
@@ -43,6 +46,7 @@ npx claude-code-setup --kit react
 **None** - React kit is standalone.
 
 Works well with:
+
 - `mui` - Material-UI components
 - `tanstack-query` - Data fetching
 - `tanstack-router` - Routing

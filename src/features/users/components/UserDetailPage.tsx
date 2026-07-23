@@ -1,26 +1,29 @@
-import { useState } from 'react'
-import { Link } from '@tanstack/react-router'
-import { useQuery } from '@tanstack/react-query'
-import { toast } from 'sonner'
+import { useState } from "react"
+import { useQuery } from "@tanstack/react-query"
+import { Link } from "@tanstack/react-router"
+
 import {
-  useUser,
-  useUpdateUserRole,
-  useBanUser,
-  useUnbanUser,
-  useUserResources,
+  IconArrowLeft,
+  IconBan,
+  IconFolder,
+  IconLoader2,
+  IconPlus,
+  IconShieldCheck,
+  IconTrash,
+  IconUserCheck,
+} from "@tabler/icons-react"
+import { toast } from "sonner"
+
+import { getProjects } from "@/features/projects/server/projectApi"
+import {
   useAssignResourceRole,
+  useBanUser,
   useRevokeResourceRole,
-} from '@/features/users/api/users.hooks'
-import { getProjects } from '@/features/projects/server/projectApi'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
+  useUnbanUser,
+  useUpdateUserRole,
+  useUser,
+  useUserResources,
+} from "@/features/users/api/users.hooks"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -30,17 +33,16 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
+} from "@/components/ui/alert-dialog"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import {
-  IconArrowLeft,
-  IconLoader2,
-  IconTrash,
-  IconBan,
-  IconUserCheck,
-  IconShieldCheck,
-  IconFolder,
-  IconPlus,
-} from '@tabler/icons-react'
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -48,44 +50,48 @@ import {
 
 const ROLE_CONFIG: Record<string, { label: string; className: string }> = {
   super_admin: {
-    label: 'Super Admin',
-    className: 'bg-amber-500/15 text-amber-600 border-amber-500/30 dark:text-amber-400',
+    label: "Super Admin",
+    className: "bg-amber-500/15 text-amber-600 border-amber-500/30 dark:text-amber-400",
   },
   admin: {
-    label: 'Admin',
-    className: 'bg-blue-500/15 text-blue-600 border-blue-500/30 dark:text-blue-400',
+    label: "Admin",
+    className: "bg-blue-500/15 text-blue-600 border-blue-500/30 dark:text-blue-400",
   },
   editor: {
-    label: 'Editor',
-    className: 'bg-emerald-500/15 text-emerald-600 border-emerald-500/30 dark:text-emerald-400',
+    label: "Editor",
+    className: "bg-emerald-500/15 text-emerald-600 border-emerald-500/30 dark:text-emerald-400",
   },
   user: {
-    label: 'User',
-    className: 'bg-slate-500/15 text-slate-600 border-slate-500/30 dark:text-slate-400',
+    label: "User",
+    className: "bg-slate-500/15 text-slate-600 border-slate-500/30 dark:text-slate-400",
   },
 }
 
 const GLOBAL_ROLES = [
-  { value: 'user', label: 'User' },
-  { value: 'editor', label: 'Editor' },
-  { value: 'admin', label: 'Admin' },
-  { value: 'super_admin', label: 'Super Admin' },
+  { value: "user", label: "User" },
+  { value: "editor", label: "Editor" },
+  { value: "admin", label: "Admin" },
+  { value: "super_admin", label: "Super Admin" },
 ]
 
 // ---------------------------------------------------------------------------
 // Section shell
 // ---------------------------------------------------------------------------
 
-function Section({ title, description, children }: {
+function Section({
+  title,
+  description,
+  children,
+}: {
   title: string
   description?: string
   children: React.ReactNode
 }) {
   return (
-    <div className="rounded-xl border border-border/60 bg-card overflow-hidden shadow-sm">
-      <div className="px-6 py-4 border-b border-border/40 bg-muted/20">
+    <div className="overflow-hidden rounded-xl border border-border/60 bg-card shadow-sm">
+      <div className="border-b border-border/40 bg-muted/20 px-6 py-4">
         <h2 className="text-sm font-semibold">{title}</h2>
-        {description && <p className="text-xs text-muted-foreground mt-0.5">{description}</p>}
+        {description && <p className="mt-0.5 text-xs text-muted-foreground">{description}</p>}
       </div>
       <div className="p-6">{children}</div>
     </div>
@@ -105,22 +111,25 @@ function GlobalRolePanel({ userId, currentRole }: { userId: string; currentRole:
   async function handleSave() {
     try {
       await updateRole({ userId, role })
-      toast.success('Global role updated')
+      toast.success("Global role updated")
     } catch (err: any) {
-      toast.error(err?.message ?? 'Failed to update role')
+      toast.error(err?.message ?? "Failed to update role")
     }
   }
 
   return (
-    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+    <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
       <div className="flex-1">
         <p className="text-sm font-medium">Global Platform Role</p>
-        <p className="text-xs text-muted-foreground mt-0.5">
+        <p className="mt-0.5 text-xs text-muted-foreground">
           Applies across the whole platform. Resource-level access is configured separately below.
         </p>
       </div>
-      <div className="flex items-center gap-2 shrink-0">
-        <Badge variant="outline" className={`text-[11px] font-semibold px-2 py-0.5 ${cfg.className}`}>
+      <div className="flex shrink-0 items-center gap-2">
+        <Badge
+          variant="outline"
+          className={`px-2 py-0.5 text-[11px] font-semibold ${cfg.className}`}
+        >
           {cfg.label}
         </Badge>
         <Select value={role} onValueChange={setRole}>
@@ -129,7 +138,9 @@ function GlobalRolePanel({ userId, currentRole }: { userId: string; currentRole:
           </SelectTrigger>
           <SelectContent>
             {GLOBAL_ROLES.map((r) => (
-              <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
+              <SelectItem key={r.value} value={r.value}>
+                {r.label}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -139,7 +150,7 @@ function GlobalRolePanel({ userId, currentRole }: { userId: string; currentRole:
           onClick={handleSave}
           disabled={isPending || role === currentRole}
         >
-          {isPending ? <IconLoader2 size={12} className="animate-spin mr-1" /> : null}
+          {isPending ? <IconLoader2 size={12} className="mr-1 animate-spin" /> : null}
           Save
         </Button>
       </div>
@@ -154,35 +165,42 @@ function GlobalRolePanel({ userId, currentRole }: { userId: string; currentRole:
 function ResourceAssignmentsPanel({ userId }: { userId: string }) {
   const { data: assignments = [], isLoading } = useUserResources(userId)
   const { data: projects = [], isLoading: loadingProjects } = useQuery({
-    queryKey: ['projects'],
+    queryKey: ["projects"],
     queryFn: () => getProjects(),
   })
   const { mutateAsync: assign, isPending: assigning } = useAssignResourceRole(userId)
   const { mutateAsync: revoke } = useRevokeResourceRole(userId)
 
-  const [newProjectId, setNewProjectId] = useState('')
-  const [newRole, setNewRole] = useState<'editor' | 'viewer'>('viewer')
+  const [newProjectId, setNewProjectId] = useState("")
+  const [newRole, setNewRole] = useState<"editor" | "viewer">("viewer")
   const [revoking, setRevoking] = useState<string | null>(null)
   const [saving, setSaving] = useState<string | null>(null)
 
   async function handleAssign() {
-    if (!newProjectId) { toast.error('Select a project'); return }
+    if (!newProjectId) {
+      toast.error("Select a project")
+      return
+    }
     try {
-      await assign({ resourceType: 'project', resourceId: newProjectId, role: newRole })
-      toast.success('Access granted')
-      setNewProjectId('')
+      await assign({ resourceType: "project", resourceId: newProjectId, role: newRole })
+      toast.success("Access granted")
+      setNewProjectId("")
     } catch (err: any) {
-      toast.error(err?.message ?? 'Failed to assign')
+      toast.error(err?.message ?? "Failed to assign")
     }
   }
 
-  async function handleRoleChange(resourceId: string, resourceType: string, nextRole: 'editor' | 'viewer') {
+  async function handleRoleChange(
+    resourceId: string,
+    resourceType: string,
+    nextRole: "editor" | "viewer",
+  ) {
     setSaving(resourceId)
     try {
-      await assign({ resourceType: resourceType as 'project', resourceId, role: nextRole })
-      toast.success('Role updated')
+      await assign({ resourceType: resourceType as "project", resourceId, role: nextRole })
+      toast.success("Role updated")
     } catch (err: any) {
-      toast.error(err?.message ?? 'Failed to update role')
+      toast.error(err?.message ?? "Failed to update role")
     } finally {
       setSaving(null)
     }
@@ -192,46 +210,64 @@ function ResourceAssignmentsPanel({ userId }: { userId: string }) {
     setRevoking(id)
     try {
       await revoke(id)
-      toast.success('Access revoked')
+      toast.success("Access revoked")
     } catch (err: any) {
-      toast.error(err?.message ?? 'Failed to revoke')
+      toast.error(err?.message ?? "Failed to revoke")
     } finally {
       setRevoking(null)
     }
   }
 
-  const projectAssignments = assignments.filter(a => a.resourceType === 'project')
-  const otherAssignments = assignments.filter(a => a.resourceType !== 'project')
+  const projectAssignments = assignments.filter((a) => a.resourceType === "project")
+  const otherAssignments = assignments.filter((a) => a.resourceType !== "project")
 
   return (
     <div className="flex flex-col gap-6">
       {/* Add new */}
-      <div className="flex flex-wrap items-end gap-2 p-4 rounded-lg bg-muted/30 border border-border/50">
-        <div className="flex flex-col gap-1 flex-1 min-w-40">
-          <label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Project</label>
+      <div className="flex flex-wrap items-end gap-2 rounded-lg border border-border/50 bg-muted/30 p-4">
+        <div className="flex min-w-40 flex-1 flex-col gap-1">
+          <label className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
+            Project
+          </label>
           <Select value={newProjectId} onValueChange={setNewProjectId}>
             <SelectTrigger className="h-8 text-sm">
               <SelectValue placeholder="Select project…" />
             </SelectTrigger>
             <SelectContent>
-              {loadingProjects
-                ? <SelectItem value="" disabled>Loading…</SelectItem>
-                : projects.map(p => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)
-              }
+              {loadingProjects ? (
+                <SelectItem value="" disabled>
+                  Loading…
+                </SelectItem>
+              ) : (
+                projects.map((p) => (
+                  <SelectItem key={p.id} value={p.id}>
+                    {p.name}
+                  </SelectItem>
+                ))
+              )}
             </SelectContent>
           </Select>
         </div>
         <div className="flex flex-col gap-1">
-          <label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Role</label>
-          <Select value={newRole} onValueChange={(v: 'editor' | 'viewer') => setNewRole(v)}>
-            <SelectTrigger className="h-8 w-28 text-sm"><SelectValue /></SelectTrigger>
+          <label className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
+            Role
+          </label>
+          <Select value={newRole} onValueChange={(v: "editor" | "viewer") => setNewRole(v)}>
+            <SelectTrigger className="h-8 w-28 text-sm">
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="editor">Editor</SelectItem>
               <SelectItem value="viewer">Viewer</SelectItem>
             </SelectContent>
           </Select>
         </div>
-        <Button size="sm" className="h-8 gap-1.5" onClick={handleAssign} disabled={assigning || !newProjectId}>
+        <Button
+          size="sm"
+          className="h-8 gap-1.5"
+          onClick={handleAssign}
+          disabled={assigning || !newProjectId}
+        >
           {assigning ? <IconLoader2 size={13} className="animate-spin" /> : <IconPlus size={13} />}
           Grant Access
         </Button>
@@ -239,45 +275,60 @@ function ResourceAssignmentsPanel({ userId }: { userId: string }) {
 
       {/* Existing assignments */}
       {isLoading ? (
-        <div className="flex items-center justify-center py-8 gap-2 text-muted-foreground">
+        <div className="flex items-center justify-center gap-2 py-8 text-muted-foreground">
           <IconLoader2 size={16} className="animate-spin" /> Loading…
         </div>
       ) : assignments.length === 0 ? (
-        <div className="py-10 text-center text-sm text-muted-foreground border border-dashed border-border/50 rounded-lg">
+        <div className="rounded-lg border border-dashed border-border/50 py-10 text-center text-sm text-muted-foreground">
           No resource assignments yet.
         </div>
       ) : (
-        <div className="rounded-lg border border-border/50 overflow-hidden">
+        <div className="overflow-hidden rounded-lg border border-border/50">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-muted/40 border-b border-border/50">
-                <th className="text-left font-medium text-xs uppercase tracking-wider text-muted-foreground px-4 py-2.5">Type</th>
-                <th className="text-left font-medium text-xs uppercase tracking-wider text-muted-foreground px-4 py-2.5">Resource</th>
-                <th className="text-left font-medium text-xs uppercase tracking-wider text-muted-foreground px-4 py-2.5">Role</th>
-                <th className="text-left font-medium text-xs uppercase tracking-wider text-muted-foreground px-4 py-2.5">Granted</th>
+              <tr className="border-b border-border/50 bg-muted/40">
+                <th className="px-4 py-2.5 text-left text-xs font-medium tracking-wider text-muted-foreground uppercase">
+                  Type
+                </th>
+                <th className="px-4 py-2.5 text-left text-xs font-medium tracking-wider text-muted-foreground uppercase">
+                  Resource
+                </th>
+                <th className="px-4 py-2.5 text-left text-xs font-medium tracking-wider text-muted-foreground uppercase">
+                  Role
+                </th>
+                <th className="px-4 py-2.5 text-left text-xs font-medium tracking-wider text-muted-foreground uppercase">
+                  Granted
+                </th>
                 <th className="px-4 py-2.5"></th>
               </tr>
             </thead>
             <tbody>
               {[...projectAssignments, ...otherAssignments].map((a) => (
-                <tr key={a.id} className="border-b border-border/30 last:border-0 hover:bg-muted/20 transition-colors">
+                <tr
+                  key={a.id}
+                  className="border-b border-border/30 transition-colors last:border-0 hover:bg-muted/20"
+                >
                   <td className="px-4 py-3">
-                    <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    <span className="inline-flex items-center gap-1.5 text-xs font-semibold tracking-wider text-muted-foreground uppercase">
                       <IconFolder size={12} />
                       {a.resourceType}
                     </span>
                   </td>
                   <td className="px-4 py-3 font-medium">
                     {a.projectName ?? (
-                      <span className="font-mono text-xs text-muted-foreground">{a.resourceId.slice(0, 12)}…</span>
+                      <span className="font-mono text-xs text-muted-foreground">
+                        {a.resourceId.slice(0, 12)}…
+                      </span>
                     )}
                   </td>
                   <td className="px-4 py-3">
-                    {a.resourceType === 'project' ? (
+                    {a.resourceType === "project" ? (
                       <div className="flex items-center gap-1.5">
                         <Select
                           value={a.role}
-                          onValueChange={(v) => handleRoleChange(a.resourceId, a.resourceType, v as 'editor' | 'viewer')}
+                          onValueChange={(v) =>
+                            handleRoleChange(a.resourceId, a.resourceType, v as "editor" | "viewer")
+                          }
                           disabled={saving === a.resourceId}
                         >
                           <SelectTrigger className="h-7 w-[100px] text-xs">
@@ -288,13 +339,15 @@ function ResourceAssignmentsPanel({ userId }: { userId: string }) {
                             <SelectItem value="viewer">Viewer</SelectItem>
                           </SelectContent>
                         </Select>
-                        {saving === a.resourceId && <IconLoader2 size={12} className="animate-spin text-muted-foreground" />}
+                        {saving === a.resourceId && (
+                          <IconLoader2 size={12} className="animate-spin text-muted-foreground" />
+                        )}
                       </div>
                     ) : (
-                      <span className="capitalize text-muted-foreground">{a.role}</span>
+                      <span className="text-muted-foreground capitalize">{a.role}</span>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-xs text-muted-foreground tabular-nums whitespace-nowrap">
+                  <td className="px-4 py-3 text-xs whitespace-nowrap text-muted-foreground tabular-nums">
                     —
                   </td>
                   <td className="px-4 py-3 text-right">
@@ -306,9 +359,11 @@ function ResourceAssignmentsPanel({ userId }: { userId: string }) {
                       disabled={revoking === a.id}
                       title="Revoke access"
                     >
-                      {revoking === a.id
-                        ? <IconLoader2 size={13} className="animate-spin" />
-                        : <IconTrash size={13} />}
+                      {revoking === a.id ? (
+                        <IconLoader2 size={13} className="animate-spin" />
+                      ) : (
+                        <IconTrash size={13} />
+                      )}
                     </Button>
                   </td>
                 </tr>
@@ -325,7 +380,11 @@ function ResourceAssignmentsPanel({ userId }: { userId: string }) {
 // Danger Zone
 // ---------------------------------------------------------------------------
 
-function DangerZone({ userId, userName, isBanned }: {
+function DangerZone({
+  userId,
+  userName,
+  isBanned,
+}: {
   userId: string
   userName: string
   isBanned: boolean | null
@@ -340,7 +399,7 @@ function DangerZone({ userId, userName, isBanned }: {
       toast.success(`${userName} has been banned`)
       setConfirmBan(false)
     } catch (err: any) {
-      toast.error(err?.message ?? 'Failed to ban user')
+      toast.error(err?.message ?? "Failed to ban user")
     }
   }
 
@@ -349,21 +408,21 @@ function DangerZone({ userId, userName, isBanned }: {
       await doUnban(userId)
       toast.success(`${userName} has been unbanned`)
     } catch (err: any) {
-      toast.error(err?.message ?? 'Failed to unban user')
+      toast.error(err?.message ?? "Failed to unban user")
     }
   }
 
   return (
     <>
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <div>
           <p className="text-sm font-medium text-destructive">
-            {isBanned ? 'Unban User' : 'Ban User'}
+            {isBanned ? "Unban User" : "Ban User"}
           </p>
-          <p className="text-xs text-muted-foreground mt-0.5">
+          <p className="mt-0.5 text-xs text-muted-foreground">
             {isBanned
-              ? 'Restore access so this user can sign in again.'
-              : 'Prevent this user from signing in. Reversible at any time.'}
+              ? "Restore access so this user can sign in again."
+              : "Prevent this user from signing in. Reversible at any time."}
           </p>
         </div>
         {isBanned ? (
@@ -374,7 +433,11 @@ function DangerZone({ userId, userName, isBanned }: {
             onClick={handleUnban}
             disabled={unbanning}
           >
-            {unbanning ? <IconLoader2 size={13} className="animate-spin" /> : <IconUserCheck size={13} />}
+            {unbanning ? (
+              <IconLoader2 size={13} className="animate-spin" />
+            ) : (
+              <IconUserCheck size={13} />
+            )}
             Unban User
           </Button>
         ) : (
@@ -401,7 +464,7 @@ function DangerZone({ userId, userName, isBanned }: {
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              className="bg-amber-500 hover:bg-amber-600 text-white gap-2"
+              className="gap-2 bg-amber-500 text-white hover:bg-amber-600"
               onClick={handleBan}
               disabled={banning}
             >
@@ -424,7 +487,7 @@ export function UserDetailPage({ userId }: { userId: string }) {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh] gap-2 text-muted-foreground">
+      <div className="flex min-h-[60vh] items-center justify-center gap-2 text-muted-foreground">
         <IconLoader2 size={20} className="animate-spin" />
         <span className="text-sm">Loading user…</span>
       </div>
@@ -433,7 +496,7 @@ export function UserDetailPage({ userId }: { userId: string }) {
 
   if (isError || !user) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-3 text-muted-foreground">
+      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-3 text-muted-foreground">
         <p className="text-sm">User not found or you do not have permission.</p>
         <Link to="/admin/users" className="text-sm underline underline-offset-2 hover:opacity-70">
           ← Back to User Management
@@ -442,15 +505,14 @@ export function UserDetailPage({ userId }: { userId: string }) {
     )
   }
 
-  const cfg = ROLE_CONFIG[user.role ?? 'user'] ?? ROLE_CONFIG.user
+  const cfg = ROLE_CONFIG[user.role ?? "user"] ?? ROLE_CONFIG.user
 
   return (
-    <div className="flex flex-col gap-6 p-6 max-w-4xl mx-auto">
-
+    <div className="mx-auto flex max-w-4xl flex-col gap-6 p-6">
       {/* ── Back link ── */}
       <Link
         to="/admin/users"
-        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors w-fit"
+        className="inline-flex w-fit items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
       >
         <IconArrowLeft size={14} />
         Back to User Management
@@ -458,35 +520,43 @@ export function UserDetailPage({ userId }: { userId: string }) {
 
       {/* ── User header card ── */}
       <div className="flex items-center gap-4 rounded-xl border border-border/60 bg-card p-5 shadow-sm">
-        <div className="size-14 rounded-full bg-linear-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-2xl font-bold text-white shrink-0">
+        <div className="flex size-14 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-violet-500 to-indigo-600 text-2xl font-bold text-white">
           {user.name.charAt(0).toUpperCase()}
         </div>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap">
-            <h1 className="text-xl font-bold tracking-tight truncate">{user.name}</h1>
-            <Badge variant="outline" className={`text-[11px] font-semibold px-2 py-0.5 ${cfg.className}`}>
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <h1 className="truncate text-xl font-bold tracking-tight">{user.name}</h1>
+            <Badge
+              variant="outline"
+              className={`px-2 py-0.5 text-[11px] font-semibold ${cfg.className}`}
+            >
               {cfg.label}
             </Badge>
             {user.banned && (
-              <Badge variant="outline" className="text-[11px] font-semibold px-2 py-0.5 bg-red-500/10 text-red-500 border-red-500/30">
+              <Badge
+                variant="outline"
+                className="border-red-500/30 bg-red-500/10 px-2 py-0.5 text-[11px] font-semibold text-red-500"
+              >
                 Banned
               </Badge>
             )}
           </div>
-          <p className="text-sm text-muted-foreground mt-0.5 font-mono">{user.email}</p>
-          <p className="text-xs text-muted-foreground mt-1">
-            Member since {new Date(user.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+          <p className="mt-0.5 font-mono text-sm text-muted-foreground">{user.email}</p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Member since{" "}
+            {new Date(user.createdAt).toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}
           </p>
         </div>
-        <IconShieldCheck size={22} className="text-muted-foreground/40 shrink-0" />
+        <IconShieldCheck size={22} className="shrink-0 text-muted-foreground/40" />
       </div>
 
       {/* ── Global Role ── */}
-      <Section
-        title="Global Role"
-        description="The user's platform-wide permissions tier."
-      >
-        <GlobalRolePanel userId={user.id} currentRole={user.role ?? 'user'} />
+      <Section title="Global Role" description="The user's platform-wide permissions tier.">
+        <GlobalRolePanel userId={user.id} currentRole={user.role ?? "user"} />
       </Section>
 
       {/* ── Resource Permissions ── */}

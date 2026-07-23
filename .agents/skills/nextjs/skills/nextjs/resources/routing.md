@@ -416,56 +416,56 @@ export function SearchResults() {
 
 ```typescript
 // middleware.ts
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import { NextResponse } from "next/server"
+import type { NextRequest } from "next/server"
 
 export function middleware(request: NextRequest) {
   // Clone and modify headers
-  const requestHeaders = new Headers(request.headers);
-  requestHeaders.set('x-pathname', request.nextUrl.pathname);
+  const requestHeaders = new Headers(request.headers)
+  requestHeaders.set("x-pathname", request.nextUrl.pathname)
 
   return NextResponse.next({
     request: {
-      headers: requestHeaders
-    }
-  });
+      headers: requestHeaders,
+    },
+  })
 }
 
 export const config = {
-  matcher: '/posts/:path*'
-};
+  matcher: "/posts/:path*",
+}
 ```
 
 ### Authentication Middleware
 
 ```typescript
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import { NextResponse } from "next/server"
+import type { NextRequest } from "next/server"
 
 export function middleware(request: NextRequest) {
-  const token = request.cookies.get('token');
+  const token = request.cookies.get("token")
 
   if (!token) {
-    return NextResponse.redirect(new URL('/login', request.url));
+    return NextResponse.redirect(new URL("/login", request.url))
   }
 
-  return NextResponse.next();
+  return NextResponse.next()
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/profile/:path*']
-};
+  matcher: ["/dashboard/:path*", "/profile/:path*"],
+}
 ```
 
 ### Redirects
 
 ```typescript
 export function middleware(request: NextRequest) {
-  if (request.nextUrl.pathname === '/old-posts') {
-    return NextResponse.redirect(new URL('/posts', request.url));
+  if (request.nextUrl.pathname === "/old-posts") {
+    return NextResponse.redirect(new URL("/posts", request.url))
   }
 
-  return NextResponse.next();
+  return NextResponse.next()
 }
 ```
 
@@ -474,13 +474,13 @@ export function middleware(request: NextRequest) {
 ```typescript
 export function middleware(request: NextRequest) {
   // Rewrite /blog/* to /posts/*
-  if (request.nextUrl.pathname.startsWith('/blog')) {
+  if (request.nextUrl.pathname.startsWith("/blog")) {
     return NextResponse.rewrite(
-      new URL(request.nextUrl.pathname.replace('/blog', '/posts'), request.url)
-    );
+      new URL(request.nextUrl.pathname.replace("/blog", "/posts"), request.url),
+    )
   }
 
-  return NextResponse.next();
+  return NextResponse.next()
 }
 ```
 
@@ -510,31 +510,27 @@ export default async function PostPage({
 ### In Server Actions
 
 ```typescript
-'use server';
+"use server"
 
-import { redirect } from 'next/navigation';
+import { redirect } from "next/navigation"
 
 export async function createPost(formData: FormData) {
   const post = await db.post.create({
-    data: { title: formData.get('title') as string }
-  });
+    data: { title: formData.get("title") as string },
+  })
 
-  redirect(`/posts/${post.id}`);
+  redirect(`/posts/${post.id}`)
 }
 ```
 
 ### Permanent Redirects
 
 ```typescript
-import { permanentRedirect } from 'next/navigation';
+import { permanentRedirect } from "next/navigation"
 
-export default async function OldPostPage({
-  params
-}: {
-  params: Promise<{ id: string }>
-}) {
-  const { id } = await params;
-  permanentRedirect(`/posts/${id}`);
+export default async function OldPostPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  permanentRedirect(`/posts/${id}`)
 }
 ```
 
@@ -544,17 +540,17 @@ export default async function OldPostPage({
 
 ```typescript
 // app/api/posts/route.ts
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server"
 
 export async function GET() {
-  const posts = await getPosts();
-  return NextResponse.json({ posts });
+  const posts = await getPosts()
+  return NextResponse.json({ posts })
 }
 
 export async function POST(request: Request) {
-  const body = await request.json();
-  const post = await createPost(body);
-  return NextResponse.json({ post }, { status: 201 });
+  const body = await request.json()
+  const post = await createPost(body)
+  return NextResponse.json({ post }, { status: 201 })
 }
 ```
 
@@ -562,70 +558,58 @@ export async function POST(request: Request) {
 
 ```typescript
 // app/api/posts/[id]/route.ts
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from "next/server"
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const post = await getPost(params.id);
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+  const post = await getPost(params.id)
 
   if (!post) {
-    return NextResponse.json(
-      { error: 'Not found' },
-      { status: 404 }
-    );
+    return NextResponse.json({ error: "Not found" }, { status: 404 })
   }
 
-  return NextResponse.json({ post });
+  return NextResponse.json({ post })
 }
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const body = await request.json();
-  const post = await updatePost(params.id, body);
-  return NextResponse.json({ post });
+export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
+  const body = await request.json()
+  const post = await updatePost(params.id, body)
+  return NextResponse.json({ post })
 }
 
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  await deletePost(params.id);
-  return new NextResponse(null, { status: 204 });
+export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+  await deletePost(params.id)
+  return new NextResponse(null, { status: 204 })
 }
 ```
 
 ### Headers and Cookies
 
 ```typescript
-import { cookies, headers } from 'next/headers';
+import { cookies, headers } from "next/headers"
 
 export async function GET() {
   // Read headers
-  const headersList = headers();
-  const userAgent = headersList.get('user-agent');
+  const headersList = headers()
+  const userAgent = headersList.get("user-agent")
 
   // Read cookies
-  const cookieStore = cookies();
-  const token = cookieStore.get('token');
+  const cookieStore = cookies()
+  const token = cookieStore.get("token")
 
-  return NextResponse.json({ userAgent, token });
+  return NextResponse.json({ userAgent, token })
 }
 
 export async function POST(request: Request) {
-  const response = NextResponse.json({ success: true });
+  const response = NextResponse.json({ success: true })
 
   // Set cookie
-  response.cookies.set('token', 'abc123', {
+  response.cookies.set("token", "abc123", {
     httpOnly: true,
     secure: true,
-    maxAge: 60 * 60 * 24 // 1 day
-  });
+    maxAge: 60 * 60 * 24, // 1 day
+  })
 
-  return response;
+  return response
 }
 ```
 

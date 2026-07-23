@@ -1,0 +1,11 @@
+node_modules
+dist
+.output
+.vinxi
+.tanstack
+
+# auto-generated — do not reformat
+src/routeTree.gen.ts
+src/db/migrations
+
+pnpm-lock.yaml

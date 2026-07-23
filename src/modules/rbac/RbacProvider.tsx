@@ -1,7 +1,9 @@
-import { type ReactNode, useMemo } from 'react'
-import { authClient } from '@/lib/auth-client'
-import { RbacContext } from './RbacContext'
-import type { GlobalRole, RbacContextValue } from './types'
+import { useMemo, type ReactNode } from "react"
+
+import { authClient } from "@/lib/auth-client"
+
+import { RbacContext } from "./RbacContext"
+import type { GlobalRole, RbacContextValue } from "./types"
 
 /** Global role hierarchy — higher index = more permissive. */
 const ROLE_RANK: Record<string, number> = {
@@ -29,13 +31,13 @@ export function RbacProvider({ children }: RbacProviderProps) {
       ? { id: session.user.id, role: (session.user as { role?: string }).role }
       : null
 
-    const userRank = ROLE_RANK[user?.role ?? 'user'] ?? 0
+    const userRank = ROLE_RANK[user?.role ?? "user"] ?? 0
 
     return {
       user,
       isLoading: isPending,
       hasGlobalRole: (role: GlobalRole) => userRank >= (ROLE_RANK[role] ?? 0),
-      isAdmin: user?.role === 'admin',
+      isAdmin: user?.role === "admin",
     }
   }, [session, isPending])
 

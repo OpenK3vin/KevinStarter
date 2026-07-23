@@ -1,5 +1,5 @@
-import { db } from './src/db'
-import { resourceRoles, projects } from './src/db/schema'
+import { db } from "./src/db"
+import { projects, resourceRoles } from "./src/db/schema"
 
 async function run() {
   const roles = await db.select().from(resourceRoles)

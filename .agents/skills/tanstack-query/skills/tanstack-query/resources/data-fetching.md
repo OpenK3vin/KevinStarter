@@ -7,16 +7,16 @@ Queries that depend on data from other queries:
 ```typescript
 // First query - Get user ID
 const { data: user } = useQuery({
-  queryKey: ['user'],
-  queryFn: fetchCurrentUser
-});
+  queryKey: ["user"],
+  queryFn: fetchCurrentUser,
+})
 
 // Second query - Depends on user ID
 const { data: posts } = useQuery({
-  queryKey: ['posts', user?.id],
+  queryKey: ["posts", user?.id],
   queryFn: () => fetchUserPosts(user!.id),
-  enabled: !!user  // Only run when user is available
-});
+  enabled: !!user, // Only run when user is available
+})
 ```
 
 ## Parallel Queries
@@ -131,12 +131,12 @@ Cancel queries when component unmounts:
 
 ```typescript
 const { data, isLoading } = useQuery({
-  queryKey: ['search', searchTerm],
+  queryKey: ["search", searchTerm],
   queryFn: async ({ signal }) => {
-    const response = await fetch(`/api/search?q=${searchTerm}`, { signal });
-    return response.json();
-  }
-});
+    const response = await fetch(`/api/search?q=${searchTerm}`, { signal })
+    return response.json()
+  },
+})
 ```
 
 ## Initial Data
@@ -145,14 +145,13 @@ Provide initial data to avoid loading state:
 
 ```typescript
 const { data } = useQuery({
-  queryKey: ['post', postId],
+  queryKey: ["post", postId],
   queryFn: () => fetchPost(postId),
   initialData: () => {
     // Get from cache or other source
-    return queryClient.getQueryData(['posts'])
-      ?.find(post => post.id === postId);
-  }
-});
+    return queryClient.getQueryData(["posts"])?.find((post) => post.id === postId)
+  },
+})
 ```
 
 ## Placeholder Data
@@ -175,31 +174,31 @@ placeholderData: { posts: [], total: 0 }
 Update UI immediately, rollback on error:
 
 ```typescript
-const queryClient = useQueryClient();
+const queryClient = useQueryClient()
 
 const { mutate } = useMutation({
   mutationFn: updatePost,
   onMutate: async (newPost) => {
     // Cancel outgoing queries
-    await queryClient.cancelQueries({ queryKey: ['post', newPost.id] });
+    await queryClient.cancelQueries({ queryKey: ["post", newPost.id] })
 
     // Snapshot current value
-    const previousPost = queryClient.getQueryData(['post', newPost.id]);
+    const previousPost = queryClient.getQueryData(["post", newPost.id])
 
     // Optimistically update
-    queryClient.setQueryData(['post', newPost.id], newPost);
+    queryClient.setQueryData(["post", newPost.id], newPost)
 
-    return { previousPost };
+    return { previousPost }
   },
   onError: (err, newPost, context) => {
     // Rollback on error
-    queryClient.setQueryData(['post', newPost.id], context?.previousPost);
+    queryClient.setQueryData(["post", newPost.id], context?.previousPost)
   },
   onSettled: (newPost) => {
     // Refetch after success or error
-    queryClient.invalidateQueries({ queryKey: ['post', newPost.id] });
-  }
-});
+    queryClient.invalidateQueries({ queryKey: ["post", newPost.id] })
+  },
+})
 ```
 
 ## Query Retries
@@ -208,11 +207,11 @@ Configure retry behavior:
 
 ```typescript
 const { data } = useQuery({
-  queryKey: ['post', postId],
+  queryKey: ["post", postId],
   queryFn: () => fetchPost(postId),
-  retry: 3,  // Retry 3 times
-  retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000)  // Exponential backoff
-});
+  retry: 3, // Retry 3 times
+  retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff
+})
 ```
 
 ## Error Handling

@@ -21,10 +21,11 @@
  *  user    → viewer  on Example Two
  */
 
-import { auth } from "../lib/auth";
-import { db } from "./index";
-import { examples, projects, resourceRoles, user } from "./schema";
-import { eq } from "drizzle-orm";
+import { eq } from "drizzle-orm"
+
+import { auth } from "../lib/auth"
+import { db } from "./index"
+import { examples, projects, resourceRoles, user } from "./schema"
 
 // ── Seed data ────────────────────────────────────────────────────────────────
 
@@ -53,7 +54,7 @@ const SEED_USERS = [
     name: "Bob User",
     role: "user" as const,
   },
-];
+]
 
 const SEED_EXAMPLES = [
   {
@@ -68,7 +69,7 @@ const SEED_EXAMPLES = [
     name: "Example Three",
     description: "Third example row — no specific grant; admin-only access.",
   },
-];
+]
 
 const SEED_PROJECTS = [
   {
@@ -83,12 +84,12 @@ const SEED_PROJECTS = [
     name: "Gamma Project",
     description: "Data pipeline migration — editor Eve has editor access.",
   },
-];
+]
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 function log(msg: string) {
-  console.log(`  ${msg}`);
+  console.log(`  ${msg}`)
 }
 
 /**
@@ -103,98 +104,100 @@ async function ensureUser(u: (typeof SEED_USERS)[number]) {
   // Check existence BEFORE calling signUpEmail so we don't swallow real errors
   const existing = await db.query.user.findFirst({
     where: eq(user.email, u.email),
-  });
+  })
 
   if (existing) {
-    log(`⏭️  User already exists, skipping signup: ${u.email}`);
+    log(`⏭️  User already exists, skipping signup: ${u.email}`)
   } else {
     // Create via better-auth (sets password hash, creates session tables, etc.)
     await auth.api.signUpEmail({
       body: { email: u.email, password: u.password, name: u.name },
-    });
-    log(`✅ Created user: ${u.email}`);
+    })
+    log(`✅ Created user: ${u.email}`)
   }
 
   // Always force-sync the role — handles both fresh creates and re-runs where
   // the role may have been changed manually.
-  const currentUser = existing ?? (await db.query.user.findFirst({
-    where: eq(user.email, u.email),
-  }));
+  const currentUser =
+    existing ??
+    (await db.query.user.findFirst({
+      where: eq(user.email, u.email),
+    }))
 
   if (currentUser && currentUser.role !== u.role) {
-    await db.update(user).set({ role: u.role }).where(eq(user.email, u.email));
-    log(`🔑 Set role '${u.role}' for ${u.email}`);
+    await db.update(user).set({ role: u.role }).where(eq(user.email, u.email))
+    log(`🔑 Set role '${u.role}' for ${u.email}`)
   } else if (currentUser && currentUser.role === u.role) {
-    log(`🔑 Role '${u.role}' already set for ${u.email}`);
+    log(`🔑 Role '${u.role}' already set for ${u.email}`)
   }
 }
 
 // ── Main ─────────────────────────────────────────────────────────────────────
 
 async function main() {
-  console.log("\n🌱 Seeding database...\n");
+  console.log("\n🌱 Seeding database...\n")
 
   // ── 1. Users ──────────────────────────────────────────────────────────────
-  console.log("👤 Creating users...");
+  console.log("👤 Creating users...")
   for (const u of SEED_USERS) {
-    await ensureUser(u);
+    await ensureUser(u)
   }
 
   // Fetch users to get their IDs for resource role grants
-  const allUsers = await db.query.user.findMany();
-  const editorUser = allUsers.find((u) => u.email === "editor@example.com");
-  const regularUser = allUsers.find((u) => u.email === "user@example.com");
+  const allUsers = await db.query.user.findMany()
+  const editorUser = allUsers.find((u) => u.email === "editor@example.com")
+  const regularUser = allUsers.find((u) => u.email === "user@example.com")
 
   // ── 2. Examples ───────────────────────────────────────────────────────────
-  console.log("\n📄 Creating examples...");
+  console.log("\n📄 Creating examples...")
 
-  const allExamples = await db.query.examples.findMany();
+  const allExamples = await db.query.examples.findMany()
 
   if (allExamples.length > 0) {
-    log("⏭️  Examples already exist, skipping seed");
+    log("⏭️  Examples already exist, skipping seed")
   } else {
     const newExamples = SEED_EXAMPLES.map((e) => ({
       id: crypto.randomUUID(),
       name: e.name,
       description: e.description,
       createdAt: new Date(),
-    }));
-    await db.insert(examples).values(newExamples);
-    newExamples.forEach((e) => log(`✅ ${e.name}`));
-    allExamples.push(...newExamples as any[]);
+    }))
+    await db.insert(examples).values(newExamples)
+    newExamples.forEach((e) => log(`✅ ${e.name}`))
+    allExamples.push(...(newExamples as any[]))
   }
 
-  const exampleOne = allExamples.find((e) => e.name === "Example One");
-  const exampleTwo = allExamples.find((e) => e.name === "Example Two");
+  const exampleOne = allExamples.find((e) => e.name === "Example One")
+  const exampleTwo = allExamples.find((e) => e.name === "Example Two")
 
   // ── 3. Projects ───────────────────────────────────────────────────────────
-  console.log("\n📁 Creating projects...");
+  console.log("\n📁 Creating projects...")
 
-  const allProjects = await db.query.projects.findMany();
+  const allProjects = await db.query.projects.findMany()
 
   if (allProjects.length > 0) {
-    log("⏭️  Projects already exist, skipping seed");
+    log("⏭️  Projects already exist, skipping seed")
   } else {
     const newProjects = SEED_PROJECTS.map((p) => ({
       id: crypto.randomUUID(),
       name: p.name,
       description: p.description,
       createdAt: new Date(),
-    }));
-    await db.insert(projects).values(newProjects);
-    newProjects.forEach((p) => log(`✅ ${p.name}`));
-    allProjects.push(...newProjects as any[]);
+    }))
+    await db.insert(projects).values(newProjects)
+    newProjects.forEach((p) => log(`✅ ${p.name}`))
+    allProjects.push(...(newProjects as any[]))
   }
 
-  const alphaProject = allProjects.find((p) => p.name === "Alpha Project");
-  const betaProject = allProjects.find((p) => p.name === "Beta Project");
-  const gammaProject = allProjects.find((p) => p.name === "Gamma Project");
+  const alphaProject = allProjects.find((p) => p.name === "Alpha Project")
+  const betaProject = allProjects.find((p) => p.name === "Beta Project")
+  const gammaProject = allProjects.find((p) => p.name === "Gamma Project")
 
   // ── 4. Resource role grants ───────────────────────────────────────────────
   // resource_roles has a unique index on (userId, resourceType, resourceId),
   // so onConflictDoNothing() correctly deduplicates here.
-  console.log("\n🔐 Granting resource roles...");
-  const grants = [];
+  console.log("\n🔐 Granting resource roles...")
+  const grants = []
 
   if (editorUser && alphaProject && gammaProject && exampleOne) {
     grants.push(
@@ -222,10 +225,8 @@ async function main() {
         role: "editor",
         createdAt: new Date(),
       },
-    );
-    log(
-      `✅ editor@example.com → editor on Alpha Project, Gamma Project, Example One`,
-    );
+    )
+    log(`✅ editor@example.com → editor on Alpha Project, Gamma Project, Example One`)
   }
 
   if (regularUser && betaProject && exampleTwo) {
@@ -246,27 +247,27 @@ async function main() {
         role: "viewer",
         createdAt: new Date(),
       },
-    );
-    log(`✅ user@example.com → viewer on Beta Project, Example Two`);
+    )
+    log(`✅ user@example.com → viewer on Beta Project, Example Two`)
   }
 
   if (grants.length) {
-    await db.insert(resourceRoles).values(grants).onConflictDoNothing();
+    await db.insert(resourceRoles).values(grants).onConflictDoNothing()
   }
 
   // ── Summary ───────────────────────────────────────────────────────────────
-  console.log("\n─────────────────────────────────────────────────");
-  console.log("✅ Seed complete!\n");
-  console.log("Test credentials:");
-  console.log("  superadmin@example.com / Password123!  (super_admin)");
-  console.log("  admin@example.com      / Password123!  (admin)");
-  console.log("  editor@example.com     / Password123!  (editor)");
-  console.log("  user@example.com       / Password123!  (user)\n");
+  console.log("\n─────────────────────────────────────────────────")
+  console.log("✅ Seed complete!\n")
+  console.log("Test credentials:")
+  console.log("  superadmin@example.com / Password123!  (super_admin)")
+  console.log("  admin@example.com      / Password123!  (admin)")
+  console.log("  editor@example.com     / Password123!  (editor)")
+  console.log("  user@example.com       / Password123!  (user)\n")
 }
 
 main()
   .then(() => process.exit(0))
   .catch((err) => {
-    console.error("\n❌ Seed failed:", err);
-    process.exit(1);
-  });
+    console.error("\n❌ Seed failed:", err)
+    process.exit(1)
+  })

@@ -58,18 +58,18 @@ Geometry  Materials  (pure mesh / material factories)
 
 ## R3F vs Imperative Three.js — Key Differences
 
-| Concept            | Imperative (old)                                      | R3F Declarative (current)                                  |
-| ------------------ | ----------------------------------------------------- | ---------------------------------------------------------- |
-| **Renderer**       | `new THREE.WebGLRenderer()` in `useEffect`            | `<Canvas gl={…}>` handles creation/disposal automatically  |
-| **Scene / Camera** | `new THREE.Scene()`, `new THREE.PerspectiveCamera()`  | `<Canvas camera={…}>` — scene is implicit                  |
-| **Lights**         | `scene.add(new THREE.AmbientLight(…))`                | `<ambientLight />`, `<directionalLight />`                 |
-| **Render loop**    | `requestAnimationFrame` + manual `renderer.render()`  | Automatic — R3F renders every frame                        |
-| **Per-frame work** | Inside RAF callback                                   | `useFrame((state, delta) => { … })`                        |
-| **Resize**         | Manual `resize` listener + `renderer.setSize()`       | Automatic — R3F adapts to parent container                 |
-| **DPR**            | `renderer.setPixelRatio(Math.min(dpr, N))`            | `<Canvas dpr={[1, 2]}>` or `dpr` prop                     |
-| **Cleanup**        | `cancelAnimationFrame`, `renderer.dispose()`, manual  | Automatic — React unmount handles everything               |
-| **Adding objects** | `scene.add(group)` in imperative code                 | `<primitive object={group} />` or R3F JSX elements         |
-| **Refs to scene**  | N/A                                                   | `useThree()` for `scene`, `camera`, `gl`, `viewport`, etc. |
+| Concept            | Imperative (old)                                     | R3F Declarative (current)                                  |
+| ------------------ | ---------------------------------------------------- | ---------------------------------------------------------- |
+| **Renderer**       | `new THREE.WebGLRenderer()` in `useEffect`           | `<Canvas gl={…}>` handles creation/disposal automatically  |
+| **Scene / Camera** | `new THREE.Scene()`, `new THREE.PerspectiveCamera()` | `<Canvas camera={…}>` — scene is implicit                  |
+| **Lights**         | `scene.add(new THREE.AmbientLight(…))`               | `<ambientLight />`, `<directionalLight />`                 |
+| **Render loop**    | `requestAnimationFrame` + manual `renderer.render()` | Automatic — R3F renders every frame                        |
+| **Per-frame work** | Inside RAF callback                                  | `useFrame((state, delta) => { … })`                        |
+| **Resize**         | Manual `resize` listener + `renderer.setSize()`      | Automatic — R3F adapts to parent container                 |
+| **DPR**            | `renderer.setPixelRatio(Math.min(dpr, N))`           | `<Canvas dpr={[1, 2]}>` or `dpr` prop                      |
+| **Cleanup**        | `cancelAnimationFrame`, `renderer.dispose()`, manual | Automatic — React unmount handles everything               |
+| **Adding objects** | `scene.add(group)` in imperative code                | `<primitive object={group} />` or R3F JSX elements         |
+| **Refs to scene**  | N/A                                                  | `useThree()` for `scene`, `camera`, `gl`, `viewport`, etc. |
 
 ### What does NOT change
 
@@ -170,22 +170,27 @@ A scene component is split into two parts:
 ```tsx
 // ── Inner component (lives inside <Canvas>) ───────────────────────
 function RopeContent(props: RopeContentProps) {
-  const groupRef = useRef<THREE.Group>(null);
-  const { viewport, camera } = useThree();
-  const [rowData, setRowData] = useState<RowData | null>(null);
+  const groupRef = useRef<THREE.Group>(null)
+  const { viewport, camera } = useThree()
+  const [rowData, setRowData] = useState<RowData | null>(null)
 
-  useEffect(() => {
-    // 1. Layout → config data (uses viewport dimensions)
-    // 2. Placement/Spawn → data structs (returns THREE groups)
-    // 3. Store in state/ref for useFrame access
-    return () => { /* dispose if needed */ };
-  }, [/* props that require full rebuild */]);
+  useEffect(
+    () => {
+      // 1. Layout → config data (uses viewport dimensions)
+      // 2. Placement/Spawn → data structs (returns THREE groups)
+      // 3. Store in state/ref for useFrame access
+      return () => {
+        /* dispose if needed */
+      }
+    },
+    [/* props that require full rebuild */],
+  )
 
   useFrame((state) => {
-    if (rowData) updateRow(rowData, state.clock.elapsedTime);
-  });
+    if (rowData) updateRow(rowData, state.clock.elapsedTime)
+  })
 
-  return rowData ? <primitive ref={groupRef} object={rowData.group} /> : null;
+  return rowData ? <primitive ref={groupRef} object={rowData.group} /> : null
 }
 
 // ── Outer wrapper (public API) ────────────────────────────────────
@@ -193,7 +198,7 @@ export default function RopeScene(props: RopeSceneProps) {
   return (
     <Canvas
       camera={{ fov: FOV_DEG, position: [0, 0.5, CAMERA_Z], near: 0.1, far: 120 }}
-      gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
+      gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
       dpr={[1, 2]}
       style={{ width: props.width, height: props.height }}
       className={props.className}
@@ -202,7 +207,7 @@ export default function RopeScene(props: RopeSceneProps) {
       <directionalLight position={[4, 8, 6]} intensity={0.8} color="#fff8e0" />
       <RopeContent {...relevantProps} />
     </Canvas>
-  );
+  )
 }
 ```
 
@@ -241,9 +246,9 @@ Each decoration type has its own `constants/index.ts`. Two types never share one
 
 Every decoration **must** define:
 
-| Constant   | Purpose                                              |
-| ---------- | ---------------------------------------------------- |
-| `CAMERA_Z` | Camera Z position (used in `<Canvas camera={…}>`)    |
+| Constant   | Purpose                                                 |
+| ---------- | ------------------------------------------------------- |
+| `CAMERA_Z` | Camera Z position (used in `<Canvas camera={…}>`)       |
 | `FOV_DEG`  | Vertical FOV in degrees (used in `<Canvas camera={…}>`) |
 
 ---
@@ -253,9 +258,10 @@ Every decoration **must** define:
 `src/components/decorations/index.ts` — the only file outside the folder imports from.
 
 Adding a new decoration = two lines:
+
 ```ts
-export { default as MyScene } from "./my-decoration/my-scene";
-export type { MySceneProps } from "./my-decoration/my-scene";
+export { default as MyScene } from "./my-decoration/my-scene"
+export type { MySceneProps } from "./my-decoration/my-scene"
 ```
 
 ---
@@ -304,13 +310,13 @@ export type { MySceneProps } from "./my-decoration/my-scene";
 
 ## Quick Reference
 
-| Need to...                             | Layer           | Location                                 |
-| -------------------------------------- | --------------- | ---------------------------------------- |
-| Set up renderer, camera, lights        | Scene Component | `<Canvas>` props + JSX lights            |
-| Per-frame animation loop               | Scene Component | `useFrame()` in inner content component  |
-| Read viewport/camera                   | Scene Component | `useThree()` in inner content component  |
-| Render imperative THREE groups         | Scene Component | `<primitive object={group} />`           |
-| Compute frustum size                   | Utils           | `utils/math.ts` → `frustumHalfH`         |
-| Build a mesh                           | Geometry        | `geometry/<item>.ts`                     |
-| Per-frame mutation                     | Animation       | `animation/<n>.ts`                       |
-| Draw a wire or string                  | Utils           | `utils/three.ts` → `cylMesh`             |
+| Need to...                      | Layer           | Location                                |
+| ------------------------------- | --------------- | --------------------------------------- |
+| Set up renderer, camera, lights | Scene Component | `<Canvas>` props + JSX lights           |
+| Per-frame animation loop        | Scene Component | `useFrame()` in inner content component |
+| Read viewport/camera            | Scene Component | `useThree()` in inner content component |
+| Render imperative THREE groups  | Scene Component | `<primitive object={group} />`          |
+| Compute frustum size            | Utils           | `utils/math.ts` → `frustumHalfH`        |
+| Build a mesh                    | Geometry        | `geometry/<item>.ts`                    |
+| Per-frame mutation              | Animation       | `animation/<n>.ts`                      |
+| Draw a wire or string           | Utils           | `utils/three.ts` → `cylMesh`            |

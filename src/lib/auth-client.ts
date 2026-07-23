@@ -1,6 +1,7 @@
-import { createAuthClient } from 'better-auth/react'
-import { adminClient } from 'better-auth/client/plugins'
-import { ac, roles } from './permissions'
+import { adminClient } from "better-auth/client/plugins"
+import { createAuthClient } from "better-auth/react"
+
+import { ac, roles } from "./permissions"
 
 /**
  * Client-side auth client.
@@ -12,4 +13,4 @@ export const authClient = createAuthClient({
   plugins: [adminClient({ ac, roles })],
 })
 
-export type { Session, User } from 'better-auth'
+export type { Session, User } from "better-auth"

@@ -1,15 +1,17 @@
-import { createFileRoute, Link, useRouter } from '@tanstack/react-router'
-import { useSuspenseQuery } from '@tanstack/react-query'
-import { getProject, deleteProject } from '@/features/projects/server/projectApi'
-import { Card, CardContent } from '@/components/ui/card'
-import { useState } from 'react'
-import { useRbac } from '@/modules/rbac'
-import { PageLayout } from '@/components/layout/page-layout'
-export const Route = createFileRoute('/_authenticated/projects/$projectId/')({
+import { useState } from "react"
+import { useSuspenseQuery } from "@tanstack/react-query"
+import { Link, createFileRoute, useRouter } from "@tanstack/react-router"
+
+import { useRbac } from "@/modules/rbac"
+import { deleteProject, getProject } from "@/features/projects/server/projectApi"
+import { PageLayout } from "@/components/layout/page-layout"
+import { Card, CardContent } from "@/components/ui/card"
+
+export const Route = createFileRoute("/_authenticated/projects/$projectId/")({
   loader: async ({ params: { projectId }, context: { queryClient } }) => {
     // This inherently checks 'read' access on the server
     await queryClient.ensureQueryData({
-      queryKey: ['project', projectId],
+      queryKey: ["project", projectId],
       queryFn: () => getProject({ data: { id: projectId } }),
     })
   },
@@ -23,19 +25,19 @@ function ProjectViewPage() {
   const [isDeleting, setIsDeleting] = useState(false)
 
   const { data: project } = useSuspenseQuery({
-    queryKey: ['project', projectId],
+    queryKey: ["project", projectId],
     queryFn: () => getProject({ data: { id: projectId } }),
   })
 
   async function handleDelete() {
-    if (!confirm('Are you sure you want to delete this project?')) return
+    if (!confirm("Are you sure you want to delete this project?")) return
     setIsDeleting(true)
     try {
       await deleteProject({ data: { id: projectId } })
       await router.invalidate()
-      router.navigate({ to: '/projects' })
+      router.navigate({ to: "/projects" })
     } catch (e) {
-      alert(e instanceof Error ? e.message : 'Delete failed')
+      alert(e instanceof Error ? e.message : "Delete failed")
       setIsDeleting(false)
     }
   }
@@ -44,7 +46,7 @@ function ProjectViewPage() {
     <PageLayout
       className="max-w-3xl"
       backLink={
-        <Link to="/projects" className="text-sm font-medium text-sea-ink hover:underline">
+        <Link to="/projects" className="text-sea-ink text-sm font-medium hover:underline">
           &larr; Back to projects
         </Link>
       }
@@ -57,18 +59,18 @@ function ProjectViewPage() {
           <Link
             to="/projects/$projectId/edit"
             params={{ projectId }}
-            className="px-4 py-2 bg-sea-ink/10 text-sea-ink hover:bg-sea-ink/20 rounded-lg text-sm font-medium transition"
+            className="bg-sea-ink/10 text-sea-ink hover:bg-sea-ink/20 rounded-lg px-4 py-2 text-sm font-medium transition"
           >
             Edit
           </Link>
-          
+
           {isAdmin && (
             <button
               onClick={handleDelete}
               disabled={isDeleting}
-              className="px-4 py-2 bg-destructive/10 text-destructive hover:bg-destructive/20 rounded-lg text-sm font-medium transition disabled:opacity-50"
+              className="rounded-lg bg-destructive/10 px-4 py-2 text-sm font-medium text-destructive transition hover:bg-destructive/20 disabled:opacity-50"
             >
-              {isDeleting ? 'Deleting...' : 'Delete'}
+              {isDeleting ? "Deleting..." : "Delete"}
             </button>
           )}
         </>
@@ -76,11 +78,11 @@ function ProjectViewPage() {
     >
       <Card className="island-shell border-none">
         <CardContent className="pt-6">
-          <div className="prose prose-sm text-sea-ink-soft">
+          <div className="text-sea-ink-soft prose prose-sm">
             {project.description ? (
               <p>{project.description}</p>
             ) : (
-              <p className="italic text-sea-ink-soft/60">No description provided.</p>
+              <p className="text-sea-ink-soft/60 italic">No description provided.</p>
             )}
           </div>
         </CardContent>

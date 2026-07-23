@@ -1,20 +1,16 @@
-import {
-  HeadContent,
-  Scripts,
-  createRootRouteWithContext,
-} from '@tanstack/react-router'
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
-import { TanStackDevtools } from '@tanstack/react-devtools'
-import { Toaster } from 'sonner'
-import { TooltipProvider } from '@/components/ui/tooltip'
-import { FeatureFlagProvider, getEnvFlags } from '@/modules/feature-flags'
-import { RbacProvider } from '@/modules/rbac'
+import { TanStackDevtools } from "@tanstack/react-devtools"
+import type { QueryClient } from "@tanstack/react-query"
+import { HeadContent, Scripts, createRootRouteWithContext } from "@tanstack/react-router"
+import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools"
 
-import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
+import { Toaster } from "sonner"
 
-import appCss from '../styles.css?url'
+import { FeatureFlagProvider, getEnvFlags } from "@/modules/feature-flags"
+import { RbacProvider } from "@/modules/rbac"
+import { TooltipProvider } from "@/components/ui/tooltip"
 
-import type { QueryClient } from '@tanstack/react-query'
+import TanStackQueryDevtools from "../integrations/tanstack-query/devtools"
+import appCss from "../styles.css?url"
 
 interface MyRouterContext {
   queryClient: QueryClient
@@ -24,19 +20,19 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
   head: () => ({
     meta: [
       {
-        charSet: 'utf-8',
+        charSet: "utf-8",
       },
       {
-        name: 'viewport',
-        content: 'width=device-width, initial-scale=1',
+        name: "viewport",
+        content: "width=device-width, initial-scale=1",
       },
       {
-        title: 'My App',
+        title: "My App",
       },
     ],
     links: [
       {
-        rel: 'stylesheet',
+        rel: "stylesheet",
         href: appCss,
       },
     ],
@@ -61,25 +57,28 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <head>
         <HeadContent />
       </head>
-      <body suppressHydrationWarning className="bg-background text-foreground antialiased min-h-screen">
+      <body
+        suppressHydrationWarning
+        className="min-h-screen bg-background text-foreground antialiased"
+      >
         <FeatureFlagProvider flags={getEnvFlags()}>
           <RbacProvider>
             <TooltipProvider>
-            {children}
+              {children}
               <Toaster theme="light" closeButton richColors position="top-right" />
             </TooltipProvider>
-          <TanStackDevtools
-            config={{
-              position: 'bottom-right',
-            }}
-            plugins={[
-              {
-                name: 'Tanstack Router',
-                render: <TanStackRouterDevtoolsPanel />,
-              },
-              TanStackQueryDevtools,
-            ]}
-          />
+            <TanStackDevtools
+              config={{
+                position: "bottom-right",
+              }}
+              plugins={[
+                {
+                  name: "Tanstack Router",
+                  render: <TanStackRouterDevtoolsPanel />,
+                },
+                TanStackQueryDevtools,
+              ]}
+            />
             <Scripts />
           </RbacProvider>
         </FeatureFlagProvider>

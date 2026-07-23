@@ -1,5 +1,11 @@
-import { useState } from 'react'
-import { toast } from 'sonner'
+import { useState } from "react"
+
+import { IconLoader2 } from "@tabler/icons-react"
+import { toast } from "sonner"
+
+import type { ManagedUser } from "@/features/users/api/users.api"
+import { useUpdateUserRole } from "@/features/users/api/users.hooks"
+import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
@@ -7,25 +13,21 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
-import { Label } from '@/components/ui/label'
+} from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { useUpdateUserRole } from '@/features/users/api/users.hooks'
-import { IconLoader2 } from '@tabler/icons-react'
-import type { ManagedUser } from '@/features/users/api/users.api'
+} from "@/components/ui/select"
 
 const ASSIGNABLE_ROLES = [
-  { value: 'user', label: 'User' },
-  { value: 'editor', label: 'Editor' },
-  { value: 'admin', label: 'Admin' },
-  { value: 'super_admin', label: 'Super Admin' },
+  { value: "user", label: "User" },
+  { value: "editor", label: "Editor" },
+  { value: "admin", label: "Admin" },
+  { value: "super_admin", label: "Super Admin" },
 ]
 
 interface EditRoleDialogProps {
@@ -35,7 +37,7 @@ interface EditRoleDialogProps {
 }
 
 export function EditRoleDialog({ user, open, onOpenChange }: EditRoleDialogProps) {
-  const [selectedRole, setSelectedRole] = useState(user.role ?? 'user')
+  const [selectedRole, setSelectedRole] = useState(user.role ?? "user")
   const { mutateAsync, isPending } = useUpdateUserRole()
 
   async function handleSave() {
@@ -44,24 +46,22 @@ export function EditRoleDialog({ user, open, onOpenChange }: EditRoleDialogProps
       toast.success(`Role updated to "${selectedRole}" for ${user.name}`)
       onOpenChange(false)
     } catch (err: any) {
-      toast.error(err?.message ?? 'Failed to update role')
+      toast.error(err?.message ?? "Failed to update role")
     }
   }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-sm border border-border/60 bg-card shadow-2xl">
+      <DialogContent className="border border-border/60 bg-card shadow-2xl sm:max-w-sm">
         <DialogHeader>
-          <DialogTitle className="text-base font-semibold tracking-tight">
-            Change Role
-          </DialogTitle>
+          <DialogTitle className="text-base font-semibold tracking-tight">Change Role</DialogTitle>
           <DialogDescription className="text-sm text-muted-foreground">
             Updating role for <span className="font-medium text-foreground">{user.name}</span>
           </DialogDescription>
         </DialogHeader>
 
-        <div className="py-2 grid gap-2">
-          <Label className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
+        <div className="grid gap-2 py-2">
+          <Label className="text-xs font-medium tracking-widest text-muted-foreground uppercase">
             New Role
           </Label>
           <Select value={selectedRole} onValueChange={setSelectedRole}>
@@ -79,20 +79,16 @@ export function EditRoleDialog({ user, open, onOpenChange }: EditRoleDialogProps
         </div>
 
         <DialogFooter className="gap-2">
-          <Button
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-            disabled={isPending}
-          >
+          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isPending}>
             Cancel
           </Button>
           <Button
             onClick={handleSave}
-            disabled={isPending || selectedRole === (user.role ?? 'user')}
+            disabled={isPending || selectedRole === (user.role ?? "user")}
             className="gap-2"
           >
             {isPending && <IconLoader2 size={14} className="animate-spin" />}
-            {isPending ? 'Saving…' : 'Save Role'}
+            {isPending ? "Saving…" : "Save Role"}
           </Button>
         </DialogFooter>
       </DialogContent>

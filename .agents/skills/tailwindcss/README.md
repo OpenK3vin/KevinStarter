@@ -7,6 +7,7 @@ Tailwind CSS v4 utility-first styling patterns including responsive design, dark
 **Skill:** `tailwindcss`
 
 Covers:
+
 - Utility-first CSS patterns
 - Layout utilities (Flexbox, Grid, positioning)
 - Responsive design with breakpoints
@@ -31,6 +32,7 @@ This kit is automatically detected if your project has Tailwind CSS:
 ```
 
 Or if these files exist:
+
 - `tailwind.config.js` / `tailwind.config.ts`
 - `postcss.config.js`
 - CSS files with `@tailwind` directives
@@ -38,11 +40,13 @@ Or if these files exist:
 ## Installation
 
 Auto-detected projects:
+
 ```bash
 npx claude-code-setup --yes
 ```
 
 Explicit installation:
+
 ```bash
 npx claude-code-setup --kit tailwindcss
 ```
@@ -52,6 +56,7 @@ npx claude-code-setup --kit tailwindcss
 **None** - Tailwind CSS kit is standalone and works with any framework.
 
 Works well with:
+
 - `react` - React components
 - `nextjs` - Next.js applications
 - `shadcn` - shadcn/ui component library

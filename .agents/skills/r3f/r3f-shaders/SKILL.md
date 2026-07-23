@@ -8,10 +8,11 @@ description: React Three Fiber shaders - GLSL, shaderMaterial, uniforms, custom 
 ## Quick Start
 
 ```tsx
-import { Canvas, useFrame, extend } from '@react-three/fiber'
-import { shaderMaterial } from '@react-three/drei'
-import { useRef } from 'react'
-import * as THREE from 'three'
+import { useRef } from "react"
+
+import { shaderMaterial } from "@react-three/drei"
+import { Canvas, extend, useFrame } from "@react-three/fiber"
+import * as THREE from "three"
 
 // Create custom shader material
 const ColorShiftMaterial = shaderMaterial(
@@ -33,7 +34,7 @@ const ColorShiftMaterial = shaderMaterial(
     void main() {
       gl_FragColor = vec4(vUv.x + sin(time), vUv.y + cos(time), color.b, 1.0);
     }
-  `
+  `,
 )
 
 // Extend so it can be used as JSX
@@ -71,9 +72,9 @@ The recommended way to create shader materials in R3F.
 ### Basic Pattern
 
 ```tsx
-import { shaderMaterial } from '@react-three/drei'
-import { extend } from '@react-three/fiber'
-import * as THREE from 'three'
+import { shaderMaterial } from "@react-three/drei"
+import { extend } from "@react-three/fiber"
+import * as THREE from "three"
 
 // 1. Define the material
 const MyShaderMaterial = shaderMaterial(
@@ -107,7 +108,7 @@ const MyShaderMaterial = shaderMaterial(
       vec4 texColor = texture2D(map, vUv);
       gl_FragColor = vec4(color * texColor.rgb, opacity);
     }
-  `
+  `,
 )
 
 // 2. Extend R3F
@@ -159,9 +160,9 @@ When you edit shader code, the material automatically updates. Without `key`, yo
 ### TypeScript Support
 
 ```tsx
-import { shaderMaterial } from '@react-three/drei'
-import { extend, Object3DNode } from '@react-three/fiber'
-import * as THREE from 'three'
+import { shaderMaterial } from "@react-three/drei"
+import { Object3DNode, extend } from "@react-three/fiber"
+import * as THREE from "three"
 
 // Define uniform types
 type WaveMaterialUniforms = {
@@ -174,24 +175,21 @@ const WaveMaterial = shaderMaterial(
   {
     time: 0,
     amplitude: 0.5,
-    color: new THREE.Color('hotpink'),
+    color: new THREE.Color("hotpink"),
   } as WaveMaterialUniforms,
   // vertex shader
   `...`,
   // fragment shader
-  `...`
+  `...`,
 )
 
 // Extend with proper types
 extend({ WaveMaterial })
 
 // Declare for TypeScript
-declare module '@react-three/fiber' {
+declare module "@react-three/fiber" {
   interface ThreeElements {
-    waveMaterial: Object3DNode<
-      typeof WaveMaterial & THREE.ShaderMaterial,
-      typeof WaveMaterial
-    >
+    waveMaterial: Object3DNode<typeof WaveMaterial & THREE.ShaderMaterial, typeof WaveMaterial>
   }
 }
 ```
@@ -201,9 +199,10 @@ declare module '@react-three/fiber' {
 For full control without Drei helper.
 
 ```tsx
-import { useFrame } from '@react-three/fiber'
-import { useMemo, useRef } from 'react'
-import * as THREE from 'three'
+import { useMemo, useRef } from "react"
+
+import { useFrame } from "@react-three/fiber"
+import * as THREE from "three"
 
 function CustomShaderMesh() {
   const materialRef = useRef()
@@ -212,7 +211,7 @@ function CustomShaderMesh() {
     return new THREE.ShaderMaterial({
       uniforms: {
         time: { value: 0 },
-        color: { value: new THREE.Color('cyan') },
+        color: { value: new THREE.Color("cyan") },
         resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
       },
       vertexShader: `
@@ -268,20 +267,20 @@ const MyMaterial = shaderMaterial(
     bounds: new THREE.Vector4(0, 0, 1, 1),
 
     // Color (becomes vec3)
-    color: new THREE.Color('#ff0000'),
+    color: new THREE.Color("#ff0000"),
 
     // Matrices
     customMatrix: new THREE.Matrix4(),
 
     // Textures
-    map: null,        // sampler2D
-    cubeMap: null,    // samplerCube
+    map: null, // sampler2D
+    cubeMap: null, // samplerCube
 
     // Arrays
     positions: [new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()],
   },
   vertexShader,
-  fragmentShader
+  fragmentShader,
 )
 ```
 
@@ -367,10 +366,10 @@ void main() {
 ### Texture Sampling
 
 ```tsx
-import { useTexture } from '@react-three/drei'
+import { useTexture } from "@react-three/drei"
 
 function TexturedShaderMesh() {
-  const texture = useTexture('/textures/color.jpg')
+  const texture = useTexture("/textures/color.jpg")
   const materialRef = useRef()
 
   return (
@@ -399,7 +398,7 @@ const TextureMaterial = shaderMaterial(
       vec4 texColor = texture2D(map, vUv);
       gl_FragColor = texColor;
     }
-  `
+  `,
 )
 ```
 
@@ -430,7 +429,7 @@ const WaveMaterial = shaderMaterial(
     void main() {
       gl_FragColor = vec4(vUv, 1.0, 1.0);
     }
-  `
+  `,
 )
 
 extend({ WaveMaterial })
@@ -455,7 +454,7 @@ function WavePlane() {
 
 ```tsx
 const FresnelMaterial = shaderMaterial(
-  { fresnelColor: new THREE.Color('cyan'), baseColor: new THREE.Color('navy') },
+  { fresnelColor: new THREE.Color("cyan"), baseColor: new THREE.Color("navy") },
   `
     varying vec3 vNormal;
     varying vec3 vWorldPosition;
@@ -478,7 +477,7 @@ const FresnelMaterial = shaderMaterial(
 
       gl_FragColor = vec4(mix(baseColor, fresnelColor, fresnel), 1.0);
     }
-  `
+  `,
 )
 ```
 
@@ -539,7 +538,7 @@ vec3 smooth = mix(colorA, colorB, t);
 
 ```tsx
 const DissolveMaterial = shaderMaterial(
-  { progress: 0, noiseScale: 10.0, edgeColor: new THREE.Color('orange') },
+  { progress: 0, noiseScale: 10.0, edgeColor: new THREE.Color("orange") },
   `
     varying vec2 vUv;
     void main() {
@@ -580,7 +579,7 @@ const DissolveMaterial = shaderMaterial(
 
       gl_FragColor = vec4(mix(edgeColor, baseColor, edge), 1.0);
     }
-  `
+  `,
 )
 ```
 
@@ -591,9 +590,10 @@ const DissolveMaterial = shaderMaterial(
 Modify existing material shaders.
 
 ```tsx
-import { useRef, useEffect } from 'react'
-import { useFrame } from '@react-three/fiber'
-import * as THREE from 'three'
+import { useEffect, useRef } from "react"
+
+import { useFrame } from "@react-three/fiber"
+import * as THREE from "three"
 
 function ModifiedStandardMaterial() {
   const materialRef = useRef()
@@ -607,15 +607,15 @@ function ModifiedStandardMaterial() {
         shaderRef.current = shader
 
         // Add uniform declaration
-        shader.vertexShader = 'uniform float time;\n' + shader.vertexShader
+        shader.vertexShader = "uniform float time;\n" + shader.vertexShader
 
         // Modify vertex shader
         shader.vertexShader = shader.vertexShader.replace(
-          '#include <begin_vertex>',
+          "#include <begin_vertex>",
           `
             #include <begin_vertex>
             transformed.y += sin(position.x * 10.0 + time) * 0.1;
-          `
+          `,
         )
       }
     }
@@ -640,14 +640,14 @@ function ModifiedStandardMaterial() {
 
 ```javascript
 // Vertex shader chunks
-'#include <begin_vertex>'       // After position is calculated
-'#include <project_vertex>'     // After gl_Position
-'#include <beginnormal_vertex>' // Normal calculation start
+"#include <begin_vertex>" // After position is calculated
+"#include <project_vertex>" // After gl_Position
+"#include <beginnormal_vertex>" // Normal calculation start
 
 // Fragment shader chunks
-'#include <color_fragment>'     // After diffuse color
-'#include <output_fragment>'    // Final output
-'#include <fog_fragment>'       // After fog applied
+"#include <color_fragment>" // After diffuse color
+"#include <output_fragment>" // Final output
+"#include <fog_fragment>" // After fog applied
 ```
 
 ## GLSL Built-in Functions
@@ -678,9 +678,10 @@ normalize(v), reflect(I, N), refract(I, N, eta)
 ## Instanced Shaders
 
 ```tsx
-import { useRef, useMemo } from 'react'
-import { useFrame } from '@react-three/fiber'
-import * as THREE from 'three'
+import { useMemo, useRef } from "react"
+
+import { useFrame } from "@react-three/fiber"
+import * as THREE from "three"
 
 function InstancedShaderMesh({ count = 1000 }) {
   const meshRef = useRef()
@@ -706,7 +707,7 @@ function InstancedShaderMesh({ count = 1000 }) {
   const shaderMaterial = useMemo(() => {
     return new THREE.ShaderMaterial({
       uniforms: {
-        time: { value: 0 }
+        time: { value: 0 },
       },
       vertexShader: `
         attribute vec3 offset;
@@ -725,7 +726,7 @@ function InstancedShaderMesh({ count = 1000 }) {
         void main() {
           gl_FragColor = vec4(vColor, 1.0);
         }
-      `
+      `,
     })
   }, [])
 
@@ -778,10 +779,10 @@ const MyMaterial = shaderMaterial(
 
 ```javascript
 // vite.config.js
-import glsl from 'vite-plugin-glsl'
+import glsl from "vite-plugin-glsl"
 
 export default {
-  plugins: [glsl()]
+  plugins: [glsl()],
 }
 ```
 
@@ -818,8 +819,8 @@ function DebugShaderMesh() {
   useEffect(() => {
     // Log compiled shaders
     if (materialRef.current) {
-      console.log('Vertex:', materialRef.current.vertexShader)
-      console.log('Fragment:', materialRef.current.fragmentShader)
+      console.log("Vertex:", materialRef.current.vertexShader)
+      console.log("Fragment:", materialRef.current.fragmentShader)
     }
   }, [])
 

@@ -1,23 +1,24 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import type { ManagedUser, CreateUserInput, UpdateRoleInput, BanInput } from './users.api'
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+
+import type { BanInput, CreateUserInput, ManagedUser, UpdateRoleInput } from "./users.api"
 import {
-  listUsers,
-  createUser,
-  updateUserRole,
+  assignResourceRole,
   banUser,
-  unbanUser,
-  removeUser,
+  createUser,
   getUserById,
   getUserResources,
-  assignResourceRole,
+  listUsers,
+  removeUser,
   revokeResourceRole,
-} from './users.api'
+  unbanUser,
+  updateUserRole,
+} from "./users.api"
 
-const QUERY_KEY = ['users'] as const
+const QUERY_KEY = ["users"] as const
 
 export function useUser(userId: string) {
   return useQuery({
-    queryKey: ['user', userId] as const,
+    queryKey: ["user", userId] as const,
     queryFn: () => getUserById({ data: userId }),
     enabled: !!userId,
     staleTime: 30_000,
@@ -37,10 +38,7 @@ export function useCreateUser() {
   return useMutation({
     mutationFn: (input: CreateUserInput) => createUser({ data: input }),
     onSuccess: (newUser) => {
-      queryClient.setQueryData<ManagedUser[]>(QUERY_KEY, (prev = []) => [
-        newUser,
-        ...prev,
-      ])
+      queryClient.setQueryData<ManagedUser[]>(QUERY_KEY, (prev = []) => [newUser, ...prev])
       queryClient.invalidateQueries({ queryKey: QUERY_KEY })
     },
   })
@@ -52,9 +50,7 @@ export function useUpdateUserRole() {
     mutationFn: (input: UpdateRoleInput) => updateUserRole({ data: input }),
     onSuccess: (_data, input) => {
       queryClient.setQueryData<ManagedUser[]>(QUERY_KEY, (prev = []) =>
-        prev.map((u) =>
-          u.id === input.userId ? { ...u, role: input.role } : u,
-        ),
+        prev.map((u) => (u.id === input.userId ? { ...u, role: input.role } : u)),
       )
       queryClient.invalidateQueries({ queryKey: QUERY_KEY })
     },
@@ -68,9 +64,7 @@ export function useBanUser() {
     onSuccess: (_data, input) => {
       queryClient.setQueryData<ManagedUser[]>(QUERY_KEY, (prev = []) =>
         prev.map((u) =>
-          u.id === input.userId
-            ? { ...u, banned: true, banReason: input.reason ?? null }
-            : u,
+          u.id === input.userId ? { ...u, banned: true, banReason: input.reason ?? null } : u,
         ),
       )
       queryClient.invalidateQueries({ queryKey: QUERY_KEY })
@@ -84,9 +78,7 @@ export function useUnbanUser() {
     mutationFn: (userId: string) => unbanUser({ data: userId }),
     onSuccess: (_data, userId) => {
       queryClient.setQueryData<ManagedUser[]>(QUERY_KEY, (prev = []) =>
-        prev.map((u) =>
-          u.id === userId ? { ...u, banned: false, banReason: null } : u,
-        ),
+        prev.map((u) => (u.id === userId ? { ...u, banned: false, banReason: null } : u)),
       )
       queryClient.invalidateQueries({ queryKey: QUERY_KEY })
     },
@@ -111,7 +103,7 @@ export function useRemoveUser() {
 // ---------------------------------------------------------------------------
 
 export const resourceKeys = {
-  all: ['user-resources'] as const,
+  all: ["user-resources"] as const,
   byUser: (userId: string) => [...resourceKeys.all, userId] as const,
 }
 
@@ -126,8 +118,11 @@ export function useUserResources(userId: string) {
 export function useAssignResourceRole(userId: string) {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (input: { resourceType: 'project', resourceId: string, role: 'editor' | 'viewer' }) => 
-      assignResourceRole({ data: { userId, ...input } }),
+    mutationFn: (input: {
+      resourceType: "project"
+      resourceId: string
+      role: "editor" | "viewer"
+    }) => assignResourceRole({ data: { userId, ...input } }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: resourceKeys.byUser(userId) })
     },

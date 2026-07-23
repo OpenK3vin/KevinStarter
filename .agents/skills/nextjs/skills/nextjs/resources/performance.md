@@ -59,13 +59,13 @@ module.exports = {
   images: {
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: 'cdn.example.com',
-        pathname: '/images/**',
+        protocol: "https",
+        hostname: "cdn.example.com",
+        pathname: "/images/**",
       },
     ],
   },
-};
+}
 ```
 
 ## Code Splitting
@@ -132,14 +132,14 @@ export default async function PostPage({ params }: { params: { id: string } }) {
 
 ```typescript
 // Generate top 100 posts, rest on-demand
-export const dynamicParams = true; // Allow dynamic params (default)
+export const dynamicParams = true // Allow dynamic params (default)
 
 export async function generateStaticParams() {
-  const topPosts = await getTopPosts(100);
+  const topPosts = await getTopPosts(100)
 
   return topPosts.map((post) => ({
-    id: post.id
-  }));
+    id: post.id,
+  }))
 }
 ```
 
@@ -161,20 +161,20 @@ export default async function PostsPage() {
 
 ```typescript
 // app/api/revalidate/route.ts
-import { revalidatePath, revalidateTag } from 'next/cache';
+import { revalidatePath, revalidateTag } from "next/cache"
 
 export async function POST(request: Request) {
-  const { path, tag } = await request.json();
+  const { path, tag } = await request.json()
 
   if (path) {
-    revalidatePath(path);
+    revalidatePath(path)
   }
 
   if (tag) {
-    revalidateTag(tag);
+    revalidateTag(tag)
   }
 
-  return Response.json({ revalidated: true, now: Date.now() });
+  return Response.json({ revalidated: true, now: Date.now() })
 }
 ```
 
@@ -184,39 +184,39 @@ export async function POST(request: Request) {
 
 ```typescript
 // Cache indefinitely
-fetch('https://api.example.com/settings', {
-  cache: 'force-cache'
-});
+fetch("https://api.example.com/settings", {
+  cache: "force-cache",
+})
 ```
 
 ### No Store
 
 ```typescript
 // Never cache
-fetch('https://api.example.com/user', {
-  cache: 'no-store'
-});
+fetch("https://api.example.com/user", {
+  cache: "no-store",
+})
 ```
 
 ### Revalidate
 
 ```typescript
 // Cache for 1 hour
-fetch('https://api.example.com/posts', {
-  next: { revalidate: 3600 }
-});
+fetch("https://api.example.com/posts", {
+  next: { revalidate: 3600 },
+})
 ```
 
 ### Tagged Caching
 
 ```typescript
 // Tag for selective revalidation
-fetch('https://api.example.com/posts', {
-  next: { tags: ['posts'] }
-});
+fetch("https://api.example.com/posts", {
+  next: { tags: ["posts"] },
+})
 
 // Later, revalidate
-revalidateTag('posts');
+revalidateTag("posts")
 ```
 
 ## Streaming and Suspense
@@ -297,13 +297,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 ### Local Fonts
 
 ```typescript
-import localFont from 'next/font/local';
+import localFont from "next/font/local"
 
 const myFont = localFont({
-  src: './my-font.woff2',
-  display: 'swap',
-  variable: '--font-my-font'
-});
+  src: "./my-font.woff2",
+  display: "swap",
+  variable: "--font-my-font",
+})
 ```
 
 ## Route Segment Config
@@ -312,39 +312,39 @@ const myFont = localFont({
 
 ```typescript
 // Force dynamic rendering
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic"
 
 // Force static rendering
-export const dynamic = 'force-static';
+export const dynamic = "force-static"
 
 // Auto (default)
-export const dynamic = 'auto';
+export const dynamic = "auto"
 
 // Error on dynamic
-export const dynamic = 'error';
+export const dynamic = "error"
 ```
 
 ### Runtime
 
 ```typescript
 // Use Node.js runtime (default)
-export const runtime = 'nodejs';
+export const runtime = "nodejs"
 
 // Use Edge runtime
-export const runtime = 'edge';
+export const runtime = "edge"
 ```
 
 ### Fetch Cache
 
 ```typescript
 // Default fetch cache behavior
-export const fetchCache = 'auto';
+export const fetchCache = "auto"
 
 // Force cache all fetches
-export const fetchCache = 'force-cache';
+export const fetchCache = "force-cache"
 
 // Never cache fetches
-export const fetchCache = 'force-no-store';
+export const fetchCache = "force-no-store"
 ```
 
 ## Lazy Loading Components
@@ -409,13 +409,13 @@ npm install @next/bundle-analyzer
 
 ```javascript
 // next.config.js
-const withBundleAnalyzer = require('@next/bundle-analyzer')({
-  enabled: process.env.ANALYZE === 'true'
-});
+const withBundleAnalyzer = require("@next/bundle-analyzer")({
+  enabled: process.env.ANALYZE === "true",
+})
 
 module.exports = withBundleAnalyzer({
   // Your Next.js config
-});
+})
 ```
 
 ```bash
@@ -448,16 +448,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 ```typescript
 // app/web-vitals.ts
 export function reportWebVitals(metric: any) {
-  console.log(metric);
+  console.log(metric)
 
   // Send to analytics
-  if (metric.label === 'web-vital') {
+  if (metric.label === "web-vital") {
     // Track CLS, FID, FCP, LCP, TTFB
-    analytics.track('Web Vital', {
+    analytics.track("Web Vital", {
       name: metric.name,
       value: metric.value,
-      id: metric.id
-    });
+      id: metric.id,
+    })
   }
 }
 ```
@@ -468,14 +468,14 @@ export function reportWebVitals(metric: any) {
 
 ```typescript
 // lib/db.ts
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client"
 
-const globalForPrisma = global as unknown as { prisma: PrismaClient };
+const globalForPrisma = global as unknown as { prisma: PrismaClient }
 
-export const db = globalForPrisma.prisma || new PrismaClient();
+export const db = globalForPrisma.prisma || new PrismaClient()
 
-if (process.env.NODE_ENV !== 'production') {
-  globalForPrisma.prisma = db;
+if (process.env.NODE_ENV !== "production") {
+  globalForPrisma.prisma = db
 }
 ```
 
@@ -491,20 +491,20 @@ const posts = await db.post.findMany({
     author: {
       select: {
         name: true,
-        avatar: true
-      }
-    }
+        avatar: true,
+      },
+    },
   },
-  take: 10
-});
+  take: 10,
+})
 
 // Use indexes
 await db.post.findMany({
   where: {
     published: true, // Should have index
-    categoryId: categoryId // Should have index
-  }
-});
+    categoryId: categoryId, // Should have index
+  },
+})
 ```
 
 ## Parallel Data Fetching
@@ -559,21 +559,21 @@ export default function Dashboard() {
 
 ```typescript
 export const metadata = {
-  title: 'Posts',
-  description: 'Browse all posts',
+  title: "Posts",
+  description: "Browse all posts",
   openGraph: {
-    title: 'Posts',
-    description: 'Browse all posts',
-    images: ['/og-image.jpg']
-  }
-};
+    title: "Posts",
+    description: "Browse all posts",
+    images: ["/og-image.jpg"],
+  },
+}
 ```
 
 ### Dynamic Metadata
 
 ```typescript
 export async function generateMetadata({ params }: { params: { id: string } }) {
-  const post = await getPost(params.id);
+  const post = await getPost(params.id)
 
   return {
     title: post.title,
@@ -581,9 +581,9 @@ export async function generateMetadata({ params }: { params: { id: string } }) {
     openGraph: {
       title: post.title,
       description: post.excerpt,
-      images: [post.coverImage]
-    }
-  };
+      images: [post.coverImage],
+    },
+  }
 }
 ```
 

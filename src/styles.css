@@ -1,6 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=Geist+Mono:wght@100..900&display=swap");
 @import "tailwindcss";
-@plugin '@tailwindcss/typography';
+@plugin "@tailwindcss/typography";
 
 @import "tw-animate-css";
 
@@ -183,7 +183,9 @@ body {
     0 1px 0 var(--inset-glint) inset,
     0 18px 34px oklch(0.3 0.05 200 / 0.1),
     0 4px 14px oklch(0.2 0.05 200 / 0.06);
-  transition: transform 180ms ease, border-color 180ms ease;
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease;
 }
 
 .feature-card:hover {

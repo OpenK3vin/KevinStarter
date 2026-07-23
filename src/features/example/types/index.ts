@@ -12,5 +12,5 @@ export interface Example {
   createdAt: number
 }
 
-export type CreateExampleInput = Pick<Example, 'name' | 'description'>
-export type UpdateExampleInput = Partial<Pick<Example, 'name' | 'description'>>
+export type CreateExampleInput = Pick<Example, "name" | "description">
+export type UpdateExampleInput = Partial<Pick<Example, "name" | "description">>

@@ -1,4 +1,4 @@
-import { createAccessControl } from 'better-auth/plugins/access'
+import { createAccessControl } from "better-auth/plugins/access"
 
 /**
  * Resource actions available across the app.
@@ -9,8 +9,8 @@ import { createAccessControl } from 'better-auth/plugins/access'
  * import from here — it must be safe to bundle on either side.
  */
 export const statement = {
-  project: ['create', 'read', 'update', 'delete'],
-  user: ['create', 'list', 'read', 'update', 'delete', 'ban', 'set-role', 'impersonate'],
+  project: ["create", "read", "update", "delete"],
+  user: ["create", "list", "read", "update", "delete", "ban", "set-role", "impersonate"],
 } as const
 
 export const ac = createAccessControl(statement)
@@ -21,17 +21,17 @@ export const roles = {
    * managing roles. Only assignable by another super_admin.
    */
   super_admin: ac.newRole({
-    project: ['create', 'read', 'update', 'delete'],
-    user: ['create', 'list', 'read', 'update', 'delete', 'ban', 'set-role', 'impersonate'],
+    project: ["create", "read", "update", "delete"],
+    user: ["create", "list", "read", "update", "delete", "ban", "set-role", "impersonate"],
   }),
   admin: ac.newRole({
-    project: ['create', 'read', 'update', 'delete'],
-    user: ['ban', 'set-role'],
+    project: ["create", "read", "update", "delete"],
+    user: ["ban", "set-role"],
   }),
   editor: ac.newRole({
-    project: ['create', 'read', 'update'],
+    project: ["create", "read", "update"],
   }),
   user: ac.newRole({
-    project: ['create', 'read'],
+    project: ["create", "read"],
   }),
 }

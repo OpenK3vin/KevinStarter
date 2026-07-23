@@ -1,7 +1,8 @@
-import { createMiddleware } from '@tanstack/react-start'
-import { getRequestHeaders } from '@tanstack/react-start/server'
-import { auth } from '@/lib/auth'
-import { roles, statement } from '@/lib/permissions'
+import { createMiddleware } from "@tanstack/react-start"
+import { getRequestHeaders } from "@tanstack/react-start/server"
+
+import { auth } from "@/lib/auth"
+import { roles, statement } from "@/lib/permissions"
 
 type Resource = keyof typeof statement
 
@@ -14,18 +15,18 @@ type Resource = keyof typeof statement
  */
 export const requirePermission = <R extends Resource>(
   resource: R,
-  action: (typeof statement)[R][number]
+  action: (typeof statement)[R][number],
 ) => {
   return createMiddleware().server(async ({ next }) => {
     const headers = getRequestHeaders()
     const session = await auth.api.getSession({ headers })
-    
+
     // In Better Auth, role is typically stored on the user object
-    const roleName = (session?.user as any)?.role || 'user'
-    
+    const roleName = (session?.user as any)?.role || "user"
+
     // Look up the role in our static permissions object
     const roleConfig = roles[roleName as keyof typeof roles]
-    
+
     // Find the statements for this specific resource
     const allowedActions = (roleConfig?.statements as any)?.[resource] || []
 

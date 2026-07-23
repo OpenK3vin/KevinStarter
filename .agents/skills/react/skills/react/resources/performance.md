@@ -212,17 +212,17 @@ function SearchResults({ query }: { query: string }) {
 
 ```typescript
 // ❌ Bad: Single context for everything
-const AppContext = createContext({ user, theme, settings, notifications });
+const AppContext = createContext({ user, theme, settings, notifications })
 
 // ✅ Good: Separate contexts to prevent unnecessary re-renders
-const UserContext = createContext(user);
-const ThemeContext = createContext(theme);
-const SettingsContext = createContext(settings);
+const UserContext = createContext(user)
+const ThemeContext = createContext(theme)
+const SettingsContext = createContext(settings)
 
 // Even better: Use context selectors
 function useUserName() {
-  const user = useContext(UserContext);
-  return user.name; // Only re-render when name changes
+  const user = useContext(UserContext)
+  return user.name // Only re-render when name changes
 }
 ```
 

@@ -1,10 +1,13 @@
-import { createServerFn } from '@tanstack/react-start'
-import { auth } from '@/lib/auth'
-import { requirePermission } from '@/lib/auth.middleware'
-import { z } from 'zod'
-import { db } from '@/db'
-import { resourceRoles, projects } from '@/db/schema'
-import { eq, and } from 'drizzle-orm'
+import { createServerFn } from "@tanstack/react-start"
+
+import { and, eq } from "drizzle-orm"
+import { z } from "zod"
+
+import { db } from "@/db"
+
+import { projects, resourceRoles } from "@/db/schema"
+import { auth } from "@/lib/auth"
+import { requirePermission } from "@/lib/auth.middleware"
 
 // ---------------------------------------------------------------------------
 // Types
@@ -46,8 +49,8 @@ export interface BanInput {
  * List all users. Requires 'list' permission on 'user'.
  * (Currently only super_admin)
  */
-export const listUsers = createServerFn({ method: 'GET' })
-  .middleware([requirePermission('user', 'list')])
+export const listUsers = createServerFn({ method: "GET" })
+  .middleware([requirePermission("user", "list")])
   .handler(async ({ context }): Promise<ManagedUser[]> => {
     const result = await auth.api.listUsers({
       headers: context.headers,
@@ -61,12 +64,10 @@ export const listUsers = createServerFn({ method: 'GET' })
       id: u.id,
       name: u.name,
       email: u.email,
-      role: u.role ?? 'user',
+      role: u.role ?? "user",
       banned: u.banned ?? false,
       banReason: u.banReason ?? null,
-      createdAt: u.createdAt instanceof Date
-        ? u.createdAt.toISOString()
-        : String(u.createdAt),
+      createdAt: u.createdAt instanceof Date ? u.createdAt.toISOString() : String(u.createdAt),
       image: u.image ?? null,
     }))
   })
@@ -75,15 +76,15 @@ export const listUsers = createServerFn({ method: 'GET' })
  * Create a new user with an initial role. Requires 'create' permission on 'user'.
  * (Currently only super_admin)
  */
-export const createUser = createServerFn({ method: 'POST' })
-  .middleware([requirePermission('user', 'create')])
+export const createUser = createServerFn({ method: "POST" })
+  .middleware([requirePermission("user", "create")])
   .validator((input: CreateUserInput) => input)
   .handler(async ({ data, context }): Promise<ManagedUser> => {
-    const validRoles = ['user', 'admin', 'editor'] as const
-    type ValidRole = typeof validRoles[number]
+    const validRoles = ["user", "admin", "editor"] as const
+    type ValidRole = (typeof validRoles)[number]
     const safeRole = (validRoles as readonly string[]).includes(data.role)
       ? (data.role as ValidRole)
-      : 'user'
+      : "user"
 
     const result = await auth.api.createUser({
       headers: context.headers,
@@ -103,9 +104,7 @@ export const createUser = createServerFn({ method: 'POST' })
       role: u.role ?? data.role,
       banned: false,
       banReason: null,
-      createdAt: u.createdAt instanceof Date
-        ? u.createdAt.toISOString()
-        : String(u.createdAt),
+      createdAt: u.createdAt instanceof Date ? u.createdAt.toISOString() : String(u.createdAt),
       image: u.image ?? null,
     }
   })
@@ -114,15 +113,15 @@ export const createUser = createServerFn({ method: 'POST' })
  * Update a user's role. Requires 'set-role' permission on 'user'.
  * (admin and super_admin)
  */
-export const updateUserRole = createServerFn({ method: 'POST' })
-  .middleware([requirePermission('user', 'set-role')])
+export const updateUserRole = createServerFn({ method: "POST" })
+  .middleware([requirePermission("user", "set-role")])
   .validator((input: UpdateRoleInput) => input)
   .handler(async ({ data, context }): Promise<void> => {
-    const validRoles = ['user', 'admin', 'editor'] as const
-    type ValidRole = typeof validRoles[number]
+    const validRoles = ["user", "admin", "editor"] as const
+    type ValidRole = (typeof validRoles)[number]
     const safeRole = (validRoles as readonly string[]).includes(data.role)
       ? (data.role as ValidRole)
-      : 'user'
+      : "user"
 
     await auth.api.setRole({
       headers: context.headers,
@@ -134,8 +133,8 @@ export const updateUserRole = createServerFn({ method: 'POST' })
  * Ban a user. Requires 'ban' permission on 'user'.
  * (admin and super_admin)
  */
-export const banUser = createServerFn({ method: 'POST' })
-  .middleware([requirePermission('user', 'ban')])
+export const banUser = createServerFn({ method: "POST" })
+  .middleware([requirePermission("user", "ban")])
   .validator((input: BanInput) => input)
   .handler(async ({ data, context }): Promise<void> => {
     await auth.api.banUser({
@@ -148,8 +147,8 @@ export const banUser = createServerFn({ method: 'POST' })
  * Unban a user. Requires 'ban' permission on 'user'.
  * (admin and super_admin)
  */
-export const unbanUser = createServerFn({ method: 'POST' })
-  .middleware([requirePermission('user', 'ban')])
+export const unbanUser = createServerFn({ method: "POST" })
+  .middleware([requirePermission("user", "ban")])
   .validator((userId: string) => userId)
   .handler(async ({ data: userId, context }): Promise<void> => {
     await auth.api.unbanUser({ headers: context.headers, body: { userId } })
@@ -159,8 +158,8 @@ export const unbanUser = createServerFn({ method: 'POST' })
  * Delete a user permanently. Requires 'delete' permission on 'user'.
  * (Currently only super_admin)
  */
-export const removeUser = createServerFn({ method: 'POST' })
-  .middleware([requirePermission('user', 'delete')])
+export const removeUser = createServerFn({ method: "POST" })
+  .middleware([requirePermission("user", "delete")])
   .validator((userId: string) => userId)
   .handler(async ({ data: userId, context }): Promise<void> => {
     await auth.api.removeUser({ headers: context.headers, body: { userId } })
@@ -173,8 +172,8 @@ export const removeUser = createServerFn({ method: 'POST' })
 /**
  * Fetch a single user by ID. Requires 'read' permission on 'user'.
  */
-export const getUserById = createServerFn({ method: 'GET' })
-  .middleware([requirePermission('user', 'read')])
+export const getUserById = createServerFn({ method: "GET" })
+  .middleware([requirePermission("user", "read")])
   .validator((userId: string) => userId)
   .handler(async ({ data: userId, context }): Promise<ManagedUser> => {
     const result = await auth.api.listUsers({
@@ -183,12 +182,12 @@ export const getUserById = createServerFn({ method: 'GET' })
     })
     const users = (result as any).users ?? []
     const u = users.find((u: any) => u.id === userId)
-    if (!u) throw new Error('User not found')
+    if (!u) throw new Error("User not found")
     return {
       id: u.id,
       name: u.name,
       email: u.email,
-      role: u.role ?? 'user',
+      role: u.role ?? "user",
       banned: u.banned ?? false,
       banReason: u.banReason ?? null,
       createdAt: u.createdAt instanceof Date ? u.createdAt.toISOString() : String(u.createdAt),
@@ -200,8 +199,8 @@ export const getUserById = createServerFn({ method: 'GET' })
 // Resource Roles
 // ---------------------------------------------------------------------------
 
-export const getUserResources = createServerFn({ method: 'GET' })
-  .middleware([requirePermission('user', 'read')])
+export const getUserResources = createServerFn({ method: "GET" })
+  .middleware([requirePermission("user", "read")])
   .validator((userId: string) => userId)
   .handler(async ({ data: userId }) => {
     // We join with projects to get project names
@@ -222,13 +221,13 @@ export const getUserResources = createServerFn({ method: 'GET' })
 
 const AssignResourceInput = z.object({
   userId: z.string(),
-  resourceType: z.enum(['project']),
+  resourceType: z.enum(["project"]),
   resourceId: z.string(),
-  role: z.enum(['editor', 'viewer']),
+  role: z.enum(["editor", "viewer"]),
 })
 
-export const assignResourceRole = createServerFn({ method: 'POST' })
-  .middleware([requirePermission('user', 'set-role')])
+export const assignResourceRole = createServerFn({ method: "POST" })
+  .middleware([requirePermission("user", "set-role")])
   .validator((data: unknown) => AssignResourceInput.parse(data))
   .handler(async ({ data }) => {
     // Check if assignment already exists
@@ -236,13 +235,14 @@ export const assignResourceRole = createServerFn({ method: 'POST' })
       where: and(
         eq(resourceRoles.userId, data.userId),
         eq(resourceRoles.resourceType, data.resourceType),
-        eq(resourceRoles.resourceId, data.resourceId)
-      )
+        eq(resourceRoles.resourceId, data.resourceId),
+      ),
     })
 
     if (existing) {
       // Update role if exists
-      await db.update(resourceRoles)
+      await db
+        .update(resourceRoles)
         .set({ role: data.role })
         .where(eq(resourceRoles.id, existing.id))
       return { success: true }
@@ -260,8 +260,8 @@ export const assignResourceRole = createServerFn({ method: 'POST' })
     return { success: true }
   })
 
-export const revokeResourceRole = createServerFn({ method: 'POST' })
-  .middleware([requirePermission('user', 'set-role')])
+export const revokeResourceRole = createServerFn({ method: "POST" })
+  .middleware([requirePermission("user", "set-role")])
   .validator((assignmentId: string) => assignmentId)
   .handler(async ({ data: assignmentId }) => {
     await db.delete(resourceRoles).where(eq(resourceRoles.id, assignmentId))

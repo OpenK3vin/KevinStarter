@@ -1,11 +1,11 @@
 /** Global roles managed by better-auth's admin plugin. */
-export type GlobalRole = 'admin' | 'editor' | 'user'
+export type GlobalRole = "admin" | "editor" | "user"
 
 /** Actions that can be performed on any resource. */
-export type ResourceAction = 'read' | 'create' | 'update' | 'delete'
+export type ResourceAction = "read" | "create" | "update" | "delete"
 
 /** Per-resource roles stored in the resource_roles table. */
-export type ResourceRole = 'editor' | 'viewer'
+export type ResourceRole = "editor" | "viewer"
 
 /** Minimum user shape required for server-side can() checks. */
 export type RbacUser = {

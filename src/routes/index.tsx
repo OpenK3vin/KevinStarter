@@ -1,57 +1,51 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { Link, createFileRoute } from "@tanstack/react-router"
+
+import { IconCode, IconFolder, IconLogin, IconShieldLock } from "@tabler/icons-react"
+
+import { authClient } from "@/lib/auth-client"
+import { Button } from "@/components/ui/button"
 import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
-  CardFooter,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import {
-  IconFolder,
-  IconShieldLock,
-  IconCode,
-  IconLogin,
-} from "@tabler/icons-react";
-import { authClient } from "@/lib/auth-client";
+} from "@/components/ui/card"
 
 export const Route = createFileRoute("/")({
   component: LandingPage,
-});
+})
 
 function LandingPage() {
-  const { data: session, isPending } = authClient.useSession();
+  const { data: session, isPending } = authClient.useSession()
 
   return (
-    <div className="flex flex-col gap-6 py-12 px-4 md:px-8 max-w-6xl mx-auto rise-in w-full">
-      <div className="flex flex-col items-center text-center gap-4 py-12">
-        <h1 className="text-5xl font-bold tracking-tight display-title">
+    <div className="rise-in mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-12 md:px-8">
+      <div className="flex flex-col items-center gap-4 py-12 text-center">
+        <h1 className="display-title text-5xl font-bold tracking-tight">
           Welcome to KevinPulse Starter
         </h1>
 
         {!isPending && session ? (
-          <p className="text-muted-foreground text-xl">
+          <p className="text-xl text-muted-foreground">
             You are currently logged in as{" "}
-            <span className="font-semibold text-foreground">
-              {session.user.email}
-            </span>
-            .
+            <span className="font-semibold text-foreground">{session.user.email}</span>.
           </p>
         ) : !isPending ? (
-          <p className="text-muted-foreground text-xl max-w-2xl">
-            A production-ready TanStack Start template with RBAC, Drizzle ORM,
-            and modern UI components.
+          <p className="max-w-2xl text-xl text-muted-foreground">
+            A production-ready TanStack Start template with RBAC, Drizzle ORM, and modern UI
+            components.
           </p>
         ) : (
-          <p className="text-muted-foreground text-xl max-w-2xl">Loading...</p>
+          <p className="max-w-2xl text-xl text-muted-foreground">Loading...</p>
         )}
 
         {!session && !isPending && (
           <div className="mt-4">
             <Button size="lg" asChild>
               <Link to="/login" className="gap-2">
-                <IconLogin className="w-5 h-5" />
+                <IconLogin className="h-5 w-5" />
                 Sign In to Test Authentication
               </Link>
             </Button>
@@ -59,15 +53,13 @@ function LandingPage() {
         )}
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mt-8">
+      <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {/* Auth Testing Card */}
-        <Card className="island-shell border-none flex flex-col">
+        <Card className="island-shell flex flex-col border-none">
           <CardHeader>
-            <IconShieldLock className="w-8 h-8 mb-4 text-sea-ink" />
+            <IconShieldLock className="text-sea-ink mb-4 h-8 w-8" />
             <CardTitle>Authentication & Roles</CardTitle>
-            <CardDescription>
-              Test out global role-based access control (RBAC).
-            </CardDescription>
+            <CardDescription>Test out global role-based access control (RBAC).</CardDescription>
           </CardHeader>
           <CardContent className="flex-1">
             <p className="text-sm text-muted-foreground">
@@ -95,19 +87,17 @@ function LandingPage() {
         </Card>
 
         {/* Explore Projects Card */}
-        <Card className="island-shell border-none flex flex-col">
+        <Card className="island-shell flex flex-col border-none">
           <CardHeader>
-            <IconFolder className="w-8 h-8 mb-4 text-sea-ink" />
+            <IconFolder className="text-sea-ink mb-4 h-8 w-8" />
             <CardTitle>Resource Authorization</CardTitle>
-            <CardDescription>
-              Granular permissions per resource.
-            </CardDescription>
+            <CardDescription>Granular permissions per resource.</CardDescription>
           </CardHeader>
           <CardContent className="flex-1">
             <p className="text-sm text-muted-foreground">
-              Head over to the Projects section. You can only view or edit
-              projects that you have been explicitly granted access to,
-              demonstrating row-level security and granular resource roles.
+              Head over to the Projects section. You can only view or edit projects that you have
+              been explicitly granted access to, demonstrating row-level security and granular
+              resource roles.
             </p>
           </CardContent>
           <CardFooter>
@@ -120,14 +110,14 @@ function LandingPage() {
         </Card>
 
         {/* Under the Hood Card */}
-        <Card className="island-shell border-none flex flex-col">
+        <Card className="island-shell flex flex-col border-none">
           <CardHeader>
-            <IconCode className="w-8 h-8 mb-4 text-sea-ink" />
+            <IconCode className="text-sea-ink mb-4 h-8 w-8" />
             <CardTitle>Built with the best</CardTitle>
             <CardDescription>Modern React stack.</CardDescription>
           </CardHeader>
           <CardContent className="flex-1">
-            <ul className="text-sm text-muted-foreground list-disc pl-4 space-y-2">
+            <ul className="list-disc space-y-2 pl-4 text-sm text-muted-foreground">
               <li>
                 <strong>TanStack Start</strong> & Router
               </li>
@@ -148,5 +138,5 @@ function LandingPage() {
         </Card>
       </div>
     </div>
-  );
+  )
 }

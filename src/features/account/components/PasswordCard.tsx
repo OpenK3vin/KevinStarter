@@ -1,3 +1,5 @@
+import { useState } from "react"
+
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -11,23 +13,67 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 
+import { authClient } from "@/lib/auth-client"
+
 import { usePasswordForm } from "../hooks/usePasswordForm"
 
 export function PasswordCard({ hasCredentialAccount }: { hasCredentialAccount: boolean }) {
+  // All hooks must be called unconditionally (before any early return)
+  const { data: session } = authClient.useSession()
   const { form, isExpanded, setIsExpanded, isSaving, error, onSubmit, handleCancel } =
     usePasswordForm()
+  const [setPasswordState, setSetPasswordState] = useState<"idle" | "sending" | "sent" | "error">(
+    "idle",
+  )
+  const [setPasswordError, setSetPasswordError] = useState<string | null>(null)
+
+  async function handleSetPassword() {
+    const email = session?.user?.email
+    if (!email) return
+    setSetPasswordState("sending")
+    setSetPasswordError(null)
+    const { error: apiError } = await authClient.forgetPassword({
+      email,
+      redirectTo: `${window.location.origin}/reset-password`,
+    })
+    if (apiError) {
+      setSetPasswordError(apiError.message ?? "Failed to send email. Please try again.")
+      setSetPasswordState("error")
+    } else {
+      setSetPasswordState("sent")
+    }
+  }
 
   if (!hasCredentialAccount) {
     return (
       <Card className="island-shell border-none">
         <CardHeader>
           <CardTitle>Password</CardTitle>
-          <CardDescription>Change your password.</CardDescription>
+          <CardDescription>Add a password to your account.</CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground">
-            You're signed in with Google. No password has been set for this account.
-          </p>
+          {setPasswordState === "sent" ? (
+            <p className="text-sm text-muted-foreground">
+              Check your inbox — we've emailed you a link to set your password.
+            </p>
+          ) : (
+            <div className="flex items-center justify-between gap-4">
+              <p className="text-sm text-muted-foreground">
+                You're signed in with Google. No password has been set for this account.
+              </p>
+              <Button
+                variant="outline"
+                onClick={handleSetPassword}
+                disabled={setPasswordState === "sending"}
+                className="shrink-0"
+              >
+                {setPasswordState === "sending" ? "Sending…" : "Set Password"}
+              </Button>
+            </div>
+          )}
+          {setPasswordState === "error" && setPasswordError && (
+            <p className="mt-3 text-sm text-destructive">{setPasswordError}</p>
+          )}
         </CardContent>
       </Card>
     )

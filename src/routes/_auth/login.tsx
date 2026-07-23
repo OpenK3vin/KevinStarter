@@ -76,7 +76,7 @@ function LoginPage() {
   return (
     <div className="rise-in space-y-6">
       <div className="space-y-1 text-center">
-        <h1 className="display-title text-3xl font-bold">Welcome back</h1>
+        <h1 className="text-3xl font-bold">Welcome back</h1>
         <p className="text-sm text-muted-foreground">Sign in to your account to continue</p>
       </div>
 

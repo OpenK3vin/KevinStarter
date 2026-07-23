@@ -31,6 +31,14 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: false, // don't block sign in, but allow them to verify later
+    sendResetPasswordEmail: async ({ user, url }) => {
+      await transporter.sendMail({
+        from: '"Acme" <noreply@acme.inc>',
+        to: user.email,
+        subject: "Set your password",
+        html: `Click the link to set your password: <a href="${url}">${url}</a>`,
+      })
+    },
   },
   emailVerification: {
     sendOnSignUp: false, // Wait for them to click "Verify Email" in Account Settings

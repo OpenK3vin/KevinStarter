@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react"
+
 import { Link } from "@tanstack/react-router"
 
 import {
@@ -21,9 +22,6 @@ import {
 } from "@tabler/icons-react"
 import { toast } from "sonner"
 
-import { authClient } from "@/lib/auth-client"
-import type { ManagedUser } from "@/features/users/api/users.api"
-import { useBanUser, useRemoveUser, useUnbanUser, useUsers } from "@/features/users/api/users.hooks"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -51,6 +49,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+
+import type { ManagedUser } from "@/features/users/api/users.api"
+import { useBanUser, useRemoveUser, useUnbanUser, useUsers } from "@/features/users/api/users.hooks"
+import { authClient } from "@/lib/auth-client"
 
 import { AssignResourceDialog } from "./AssignResourceDialog"
 import { EditRoleDialog } from "./EditRoleDialog"

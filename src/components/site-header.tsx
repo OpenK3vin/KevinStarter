@@ -7,7 +7,7 @@ import { SidebarTrigger } from "@/components/ui/sidebar"
 export function SiteHeader() {
   const location = useLocation()
   const parts = location.pathname.split("/").filter(Boolean)
-  
+
   let title = "Dashboard"
   if (parts.length > 0) {
     const mainSection = parts[0]

@@ -1,4 +1,4 @@
-import { useRouter, Link } from "@tanstack/react-router"
+import { Link, useRouter } from "@tanstack/react-router"
 
 import {
   IconCreditCard,
@@ -8,7 +8,6 @@ import {
   IconUserCircle,
 } from "@tabler/icons-react"
 
-import { authClient } from "@/lib/auth-client"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
   DropdownMenu,
@@ -25,6 +24,8 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
+
+import { authClient } from "@/lib/auth-client"
 
 export function NavUser() {
   const { isMobile } = useSidebar()

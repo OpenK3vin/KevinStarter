@@ -1,10 +1,10 @@
 import { useState } from "react"
+
 import { useQuery } from "@tanstack/react-query"
 
 import { IconLoader2, IconTrash } from "@tabler/icons-react"
 import { toast } from "sonner"
 
-import { getProjects } from "@/features/projects/server/projectApi"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -20,6 +20,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+
+import { getProjects } from "@/features/projects/server/projectApi"
 
 import type { ManagedUser } from "../api/users.api"
 import { useAssignResourceRole, useRevokeResourceRole, useUserResources } from "../api/users.hooks"

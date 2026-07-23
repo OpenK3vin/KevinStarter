@@ -1,4 +1,5 @@
 import { useState } from "react"
+
 import { Link, createFileRoute, useRouter } from "@tanstack/react-router"
 
 import { z } from "zod"
@@ -6,7 +7,6 @@ import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 
-import { authClient } from "@/lib/auth-client"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import {
@@ -18,6 +18,8 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+
+import { authClient } from "@/lib/auth-client"
 
 export const Route = createFileRoute("/_auth/register")({
   component: RegisterPage,

@@ -4,8 +4,6 @@ import { IconLoader2, IconUserPlus } from "@tabler/icons-react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 
-import type { CreateUserInput } from "@/features/users/api/users.api"
-import { useCreateUser } from "@/features/users/api/users.hooks"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -25,6 +23,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+
+import type { CreateUserInput } from "@/features/users/api/users.api"
+import { useCreateUser } from "@/features/users/api/users.hooks"
 
 const ASSIGNABLE_ROLES = [
   { value: "user", label: "User" },

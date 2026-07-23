@@ -1,4 +1,5 @@
 import * as React from "react"
+
 import {
   flexRender,
   getCoreRowModel,
@@ -17,7 +18,6 @@ import {
 
 import { z } from "zod"
 
-import { useIsMobile } from "@/hooks/use-mobile"
 import {
   DndContext,
   KeyboardSensor,
@@ -100,6 +100,8 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+
+import { useIsMobile } from "@/hooks/use-mobile"
 
 export const schema = z.object({
   id: z.number(),

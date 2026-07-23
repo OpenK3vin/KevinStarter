@@ -5,8 +5,8 @@ import { eq } from "drizzle-orm"
 import { z } from "zod"
 
 import { db } from "@/db"
-
 import { examples } from "@/db/schema"
+
 import { auth } from "@/lib/auth"
 import { can } from "@/modules/rbac/can"
 

@@ -1,4 +1,5 @@
 import { useState } from "react"
+
 import { useSuspenseQuery } from "@tanstack/react-query"
 import { Link, createFileRoute, useRouter } from "@tanstack/react-router"
 
@@ -7,7 +8,6 @@ import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 
-import { getProject, updateProject } from "@/features/projects/server/projectApi"
 import { PageLayout } from "@/components/layout/page-layout"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -21,6 +21,8 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+
+import { getProject, updateProject } from "@/features/projects/server/projectApi"
 
 export const Route = createFileRoute("/_authenticated/projects/$projectId/edit")({
   loader: async ({ params: { projectId }, context: { queryClient } }) => {

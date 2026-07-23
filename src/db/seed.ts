@@ -25,7 +25,7 @@ import { eq } from "drizzle-orm"
 
 import { auth } from "../lib/auth"
 import { db } from "./index"
-import { examples, projects, resourceRoles, user } from "./schema"
+import { account, examples, projects, resourceRoles, session, user, verification } from "./schema"
 
 // ── Seed data ────────────────────────────────────────────────────────────────
 
@@ -136,6 +136,15 @@ async function ensureUser(u: (typeof SEED_USERS)[number]) {
 
 async function main() {
   console.log("\n🌱 Seeding database...\n")
+
+  console.log("🧹 Wiping existing data to reset to default state...")
+  await db.delete(resourceRoles)
+  await db.delete(verification)
+  await db.delete(session)
+  await db.delete(account)
+  await db.delete(user)
+  await db.delete(examples)
+  await db.delete(projects)
 
   // ── 1. Users ──────────────────────────────────────────────────────────────
   console.log("👤 Creating users...")

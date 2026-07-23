@@ -1,8 +1,10 @@
 import { useSuspenseQuery } from "@tanstack/react-query"
 
-import type { ExampleRow } from "@/db/schema"
-import { useFeatureFlag } from "@/modules/feature-flags"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+
+import type { ExampleRow } from "@/db/schema"
+
+import { useFeatureFlag } from "@/modules/feature-flags"
 
 import { getExamples } from "../api/example"
 

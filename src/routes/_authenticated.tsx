@@ -1,9 +1,10 @@
 import { Outlet, createFileRoute, redirect } from "@tanstack/react-router"
 
-import { getAuthSession } from "@/features/auth/server/authApi"
 import { AppSidebar } from "@/components/app-sidebar"
 import { SiteHeader } from "@/components/site-header"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
+
+import { getAuthSession } from "@/features/auth/server/authApi"
 
 /**
  * Layout guard for authenticated routes.

@@ -2,7 +2,6 @@ import { Link, createFileRoute } from "@tanstack/react-router"
 
 import { IconCode, IconFolder, IconLogin, IconShieldLock } from "@tabler/icons-react"
 
-import { authClient } from "@/lib/auth-client"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -12,6 +11,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+
+import { authClient } from "@/lib/auth-client"
 
 export const Route = createFileRoute("/")({
   component: LandingPage,

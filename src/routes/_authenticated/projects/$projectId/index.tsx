@@ -1,11 +1,13 @@
 import { useState } from "react"
+
 import { useSuspenseQuery } from "@tanstack/react-query"
 import { Link, createFileRoute, useRouter } from "@tanstack/react-router"
 
-import { useRbac } from "@/modules/rbac"
-import { deleteProject, getProject } from "@/features/projects/server/projectApi"
 import { PageLayout } from "@/components/layout/page-layout"
 import { Card, CardContent } from "@/components/ui/card"
+
+import { deleteProject, getProject } from "@/features/projects/server/projectApi"
+import { useRbac } from "@/modules/rbac"
 
 export const Route = createFileRoute("/_authenticated/projects/$projectId/")({
   loader: async ({ params: { projectId }, context: { queryClient } }) => {

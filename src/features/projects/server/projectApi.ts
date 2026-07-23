@@ -5,8 +5,8 @@ import { eq } from "drizzle-orm"
 import { z } from "zod"
 
 import { db } from "@/db"
-
 import { projects, resourceRoles } from "@/db/schema"
+
 import { auth } from "@/lib/auth"
 import { batchCan, can } from "@/modules/rbac/can"
 

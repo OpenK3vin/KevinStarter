@@ -4,8 +4,8 @@ import { and, eq } from "drizzle-orm"
 import { z } from "zod"
 
 import { db } from "@/db"
-
 import { projects, resourceRoles } from "@/db/schema"
+
 import { auth } from "@/lib/auth"
 import { requirePermission } from "@/lib/auth.middleware"
 

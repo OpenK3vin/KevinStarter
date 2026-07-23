@@ -1,4 +1,5 @@
 import { useState } from "react"
+
 import { useQuery } from "@tanstack/react-query"
 import { Link } from "@tanstack/react-router"
 
@@ -14,16 +15,6 @@ import {
 } from "@tabler/icons-react"
 import { toast } from "sonner"
 
-import { getProjects } from "@/features/projects/server/projectApi"
-import {
-  useAssignResourceRole,
-  useBanUser,
-  useRevokeResourceRole,
-  useUnbanUser,
-  useUpdateUserRole,
-  useUser,
-  useUserResources,
-} from "@/features/users/api/users.hooks"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -43,6 +34,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+
+import { getProjects } from "@/features/projects/server/projectApi"
+import {
+  useAssignResourceRole,
+  useBanUser,
+  useRevokeResourceRole,
+  useUnbanUser,
+  useUpdateUserRole,
+  useUser,
+  useUserResources,
+} from "@/features/users/api/users.hooks"
 
 // ---------------------------------------------------------------------------
 // Constants

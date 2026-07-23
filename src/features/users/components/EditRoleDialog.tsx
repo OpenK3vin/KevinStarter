@@ -3,8 +3,6 @@ import { useState } from "react"
 import { IconLoader2 } from "@tabler/icons-react"
 import { toast } from "sonner"
 
-import type { ManagedUser } from "@/features/users/api/users.api"
-import { useUpdateUserRole } from "@/features/users/api/users.hooks"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -22,6 +20,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+
+import type { ManagedUser } from "@/features/users/api/users.api"
+import { useUpdateUserRole } from "@/features/users/api/users.hooks"
 
 const ASSIGNABLE_ROLES = [
   { value: "user", label: "User" },

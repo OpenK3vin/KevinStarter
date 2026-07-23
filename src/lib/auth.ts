@@ -1,12 +1,19 @@
-import { db } from "@/db"
 import { betterAuth } from "better-auth"
 import { drizzleAdapter } from "better-auth/adapters/drizzle"
 import { admin as adminPlugin } from "better-auth/plugins"
 import { tanstackStartCookies } from "better-auth/tanstack-start"
+import nodemailer from "nodemailer"
 
+import { db } from "@/db"
 import * as schema from "@/db/schema"
 
-import { ac, roles } from "./permissions"
+import { ac, roles } from "@/lib/permissions"
+
+const transporter = nodemailer.createTransport({
+  host: "localhost",
+  port: 1025,
+  secure: false, // true for 465, false for other ports
+})
 
 export const auth = betterAuth({
   baseURL: process.env.BETTER_AUTH_URL || "http://localhost:3000",
@@ -23,6 +30,18 @@ export const auth = betterAuth({
   },
   emailAndPassword: {
     enabled: true,
+    requireEmailVerification: false, // don't block sign in, but allow them to verify later
+  },
+  emailVerification: {
+    sendOnSignUp: false, // Wait for them to click "Verify Email" in Account Settings
+    sendVerificationEmail: async ({ user, url }) => {
+      await transporter.sendMail({
+        from: '"Acme" <noreply@acme.inc>',
+        to: user.email,
+        subject: "Verify your email address",
+        html: `Click the link to verify your email: <a href="${url}">${url}</a>`,
+      })
+    },
   },
   socialProviders: {
     google: {

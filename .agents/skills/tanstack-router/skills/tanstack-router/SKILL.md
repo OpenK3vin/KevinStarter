@@ -207,6 +207,7 @@ navigate({ to: '/posts', search: { filter: 'published' } });
 ```typescript
 // routes/posts/index.tsx
 import { lazy } from "react"
+
 import { createFileRoute } from "@tanstack/react-router"
 
 const PostsPage = lazy(() => import("~/features/posts/PostsPage"))

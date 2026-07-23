@@ -2,9 +2,9 @@
 
 import * as React from "react"
 
-import { cn } from "@/shared/lib/utils.ts"
 import { AlertDialog as AlertDialogPrimitive } from "radix-ui"
 
+import { cn } from "@/shared/lib/utils.ts"
 import { Button } from "@/components/ui/button.tsx"
 
 function AlertDialog({ ...props }: React.ComponentProps<typeof AlertDialogPrimitive.Root>) {

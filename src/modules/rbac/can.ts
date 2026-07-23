@@ -1,7 +1,6 @@
 import { and, eq, inArray } from "drizzle-orm"
 
 import { db } from "@/db"
-
 import { resourceRoles } from "@/db/schema"
 
 import { resourceRoleAllows } from "./resourcePermissions"

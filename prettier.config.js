@@ -5,8 +5,10 @@ export default {
   trailingComma: "all",
   printWidth: 100,
 
-  // tailwindcss plugin MUST be listed last, or it silently
-  // disables the import-sort plugin's output
+  // Imported directly rather than referenced by string — pnpm's strict
+  // node_modules layout is known to sometimes prevent Prettier from
+  // resolving this plugin by name. tailwindcss plugin MUST still be
+  // listed last, or it silently disables the import-sort plugin's output.
   plugins: ["@ianvs/prettier-plugin-sort-imports", "prettier-plugin-tailwindcss"],
 
   // Tailwind v4 config lives in CSS, not a JS config file
@@ -15,6 +17,7 @@ export default {
   importOrder: [
     "^react$",
     "^react-dom(/.*)?$",
+    "",
     "^@tanstack/(.*)$",
     "",
     "^drizzle-orm(/.*)?$",
@@ -22,11 +25,16 @@ export default {
     "",
     "<THIRD_PARTY_MODULES>",
     "",
-    "^@/db/(.*)$",
+    "^@/shared/(.*)$",
+    "^@/components/(.*)$",
+    "",
+    "^@/db(/.*)?$",
+    "",
+    "^@/features/(.*)$",
+    "^@/hooks/(.*)$",
+    "^@/integration/(.*)$",
     "^@/lib/(.*)$",
     "^@/modules/(.*)$",
-    "^@/features/(.*)$",
-    "^@/components/(.*)$",
     "^@/routes/(.*)$",
     "",
     "^[./]",

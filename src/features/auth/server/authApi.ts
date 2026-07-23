@@ -10,3 +10,19 @@ export const getAuthSession = createServerFn({ method: "GET" }).handler(async ()
   })
   return session
 })
+
+export const listUserAccounts = createServerFn({ method: "GET" }).handler(async () => {
+  const headers = getRequestHeaders()
+  const accounts = await auth.api.listUserAccounts({
+    headers,
+  })
+  return accounts
+})
+
+export const listSessions = createServerFn({ method: "GET" }).handler(async () => {
+  const headers = getRequestHeaders()
+  const sessions = await auth.api.listSessions({
+    headers,
+  })
+  return sessions
+})

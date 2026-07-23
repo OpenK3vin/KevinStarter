@@ -1,4 +1,4 @@
-import { useRouter } from "@tanstack/react-router"
+import { useRouter, Link } from "@tanstack/react-router"
 
 import {
   IconCreditCard,
@@ -96,9 +96,11 @@ export function NavUser() {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <IconUserCircle />
-                Account
+              <DropdownMenuItem asChild>
+                <Link to="/account" className="w-full cursor-default">
+                  <IconUserCircle />
+                  Account
+                </Link>
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <IconCreditCard />

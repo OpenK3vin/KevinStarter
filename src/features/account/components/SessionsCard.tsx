@@ -43,6 +43,8 @@ export function SessionsCard() {
       const { error } = await authClient.revokeSession({ token })
       if (error) throw error
       toast.success("Session revoked successfully")
+      // Bust cookie cache so this client re-validates its own session against the DB
+      await authClient.getSession({ query: { disableCookieCache: true } })
       refetch()
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Failed to revoke session")

@@ -39,6 +39,8 @@ export function usePasswordForm(onSuccess?: () => void) {
         revokeOtherSessions: values.revokeOtherSessions,
       })
       if (apiError) throw apiError
+      // Bust cookie cache so this client re-validates its own session against the DB
+      await authClient.getSession({ query: { disableCookieCache: true } })
       toast.success("Password changed successfully")
       form.reset()
       setIsExpanded(false)

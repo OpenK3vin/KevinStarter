@@ -15,3 +15,6 @@ __unconfig*
 sqlite.db
 sqlite.db-shm
 sqlite.db-wal
+
+# repomix
+*-codebase.xml

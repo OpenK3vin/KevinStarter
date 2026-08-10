@@ -32,11 +32,16 @@ function parseBoolean(value: string | boolean | undefined): boolean {
  */
 export function getEnvFlags(options: EnvFlagOptions = {}): Record<string, boolean> {
   return {
-    // ── Add new flags here ──────────────────────────────────────────
+    // ── Add new flags here ───────────────────────────────────────────────
     example: parseBoolean(
       options.env ? options.env.VITE_FF_EXAMPLE : import.meta.env.VITE_FF_EXAMPLE,
     ),
-    // ───────────────────────────────────────────────────────────────
+    twoFactorRequired: parseBoolean(
+      options.env
+        ? options.env.VITE_FF_2FA_REQUIRED
+        : import.meta.env.VITE_FF_2FA_REQUIRED,
+    ),
+    // ───────────────────────────────────────────────────────────────────
   }
 }
 
@@ -58,6 +63,7 @@ export function getEnvFlagDebugInfo(options: EnvFlagOptions = {}): {
   const env = options.env ?? import.meta.env
   const rawValues = {
     VITE_FF_EXAMPLE: env.VITE_FF_EXAMPLE,
+    VITE_FF_2FA_REQUIRED: env.VITE_FF_2FA_REQUIRED,
   }
 
   return {

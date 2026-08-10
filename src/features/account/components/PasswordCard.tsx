@@ -1,5 +1,6 @@
 import { useState } from "react"
 
+import { PasswordInput } from "@/components/custom-ui/password-input"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -11,7 +12,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
 
 import { authClient } from "@/lib/auth-client"
 
@@ -32,7 +32,7 @@ export function PasswordCard({ hasCredentialAccount }: { hasCredentialAccount: b
     if (!email) return
     setSetPasswordState("sending")
     setSetPasswordError(null)
-    const { error: apiError } = await authClient.forgetPassword({
+    const { error: apiError } = await authClient.requestPasswordReset({
       email,
       redirectTo: `${window.location.origin}/reset-password`,
     })
@@ -113,7 +113,7 @@ export function PasswordCard({ hasCredentialAccount }: { hasCredentialAccount: b
                   <FormItem>
                     <FormLabel>Current Password</FormLabel>
                     <FormControl>
-                      <Input type="password" {...field} />
+                      <PasswordInput {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -127,7 +127,7 @@ export function PasswordCard({ hasCredentialAccount }: { hasCredentialAccount: b
                   <FormItem>
                     <FormLabel>New Password</FormLabel>
                     <FormControl>
-                      <Input type="password" {...field} />
+                      <PasswordInput {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -141,7 +141,7 @@ export function PasswordCard({ hasCredentialAccount }: { hasCredentialAccount: b
                   <FormItem>
                     <FormLabel>Confirm Password</FormLabel>
                     <FormControl>
-                      <Input type="password" {...field} />
+                      <PasswordInput {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

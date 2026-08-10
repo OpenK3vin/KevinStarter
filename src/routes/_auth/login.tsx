@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 import { Link, createFileRoute, useRouter } from "@tanstack/react-router"
 
@@ -6,12 +6,22 @@ import { z } from "zod"
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
+import QRCode from "react-qr-code"
 
+import { PasswordInput } from "@/components/custom-ui/password-input"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -30,26 +40,59 @@ const loginSchema = z.object({
   password: z.string().min(1, "Password is required"),
 })
 
-type LoginValues = z.infer<typeof loginSchema>
+const verifySchema = z.object({
+  code: z.string().min(1, "Code is required").max(20, "Code too long"),
+})
+
+const setupCodeSchema = z.object({
+  code: z.string().length(6, "Code must be 6 digits"),
+})
+
+type Step = "login" | "verify-2fa" | "setup-scan" | "setup-backup"
 
 function LoginPage() {
   const router = useRouter()
+  const [step, setStep] = useState<Step>("login")
+
+  // Login state
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
 
-  const form = useForm<LoginValues>({
+  // Verify state
+  const [useBackupCode, setUseBackupCode] = useState(false)
+
+  // Setup state
+  const [totpURI, setTotpURI] = useState<string | null>(null)
+  const [backupCodes, setBackupCodes] = useState<string[]>([])
+
+  const loginForm = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-    },
+    defaultValues: { email: "", password: "" },
   })
 
-  async function onSubmit(values: LoginValues) {
+  const verifyForm = useForm<z.infer<typeof verifySchema>>({
+    resolver: zodResolver(verifySchema),
+    defaultValues: { code: "" },
+  })
+
+  const setupForm = useForm<z.infer<typeof setupCodeSchema>>({
+    resolver: zodResolver(setupCodeSchema),
+    defaultValues: { code: "" },
+  })
+
+  useEffect(() => {
+    const handler = () => {
+      setStep("verify-2fa")
+    }
+    window.addEventListener("two-factor-redirect", handler)
+    return () => window.removeEventListener("two-factor-redirect", handler)
+  }, [])
+
+  async function onLoginSubmit(values: z.infer<typeof loginSchema>) {
     setError(null)
     setIsLoading(true)
 
-    const { error: signInError } = await authClient.signIn.email({
+    const { data, error: signInError } = await authClient.signIn.email({
       email: values.email,
       password: values.password,
     })
@@ -61,8 +104,36 @@ function LoginPage() {
       return
     }
 
-    await router.invalidate()
-    router.navigate({ to: "/" })
+    // Give the event loop a tick to ensure the event listener fires if 2FA intercepted
+    await new Promise((resolve) => setTimeout(resolve, 0))
+
+    const user = data?.user as any
+    if (user && !user.twoFactorEnabled) {
+      // 2FA is not enabled, setup inline
+      setIsLoading(true)
+      const { data: enableData, error: enableError } = await authClient.twoFactor.enable({
+        password: values.password,
+      })
+      setIsLoading(false)
+
+      if (enableError) {
+        setError(enableError.message ?? "Failed to initialize 2FA setup.")
+        return
+      }
+
+      if (enableData?.totpURI) {
+        setTotpURI(enableData.totpURI)
+        if (enableData.backupCodes) setBackupCodes(enableData.backupCodes)
+        setStep("setup-scan")
+      }
+      return
+    }
+
+    if (user && user.twoFactorEnabled) {
+      // Should have been handled by the event listener changing step, but safely fallback
+      setStep("verify-2fa")
+      return
+    }
   }
 
   async function handleGoogleSignIn() {
@@ -71,6 +142,238 @@ function LoginPage() {
       provider: "google",
       callbackURL: "/",
     })
+  }
+
+  async function onVerifySubmit(values: z.infer<typeof verifySchema>) {
+    setError(null)
+    setIsLoading(true)
+
+    if (useBackupCode) {
+      const { error: verifyError } = await authClient.twoFactor.verifyBackupCode({
+        code: values.code,
+      })
+      setIsLoading(false)
+      if (verifyError) {
+        setError(verifyError.message ?? "Invalid backup code. Please try again.")
+        return
+      }
+    } else {
+      const { error: verifyError } = await authClient.twoFactor.verifyTotp({
+        code: values.code,
+      })
+      setIsLoading(false)
+      if (verifyError) {
+        setError(verifyError.message ?? "Invalid code. Please try again.")
+        return
+      }
+    }
+
+    await router.invalidate()
+    router.navigate({ to: "/" })
+  }
+
+  async function onSetupSubmit(values: z.infer<typeof setupCodeSchema>) {
+    setError(null)
+    setIsLoading(true)
+
+    const { error: verifyError } = await authClient.twoFactor.verifyTotp({
+      code: values.code,
+    })
+
+    setIsLoading(false)
+
+    if (verifyError) {
+      setError(verifyError.message ?? "Invalid verification code.")
+      return
+    }
+
+    setStep("setup-backup")
+  }
+
+  function handleSetupFinish() {
+    router.invalidate()
+    router.navigate({ to: "/" })
+  }
+
+  if (step === "verify-2fa") {
+    return (
+      <div className="rise-in space-y-6">
+        <div className="space-y-1 text-center">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="h-7 w-7 text-primary"
+              aria-hidden="true"
+            >
+              <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+            </svg>
+          </div>
+          <h1 className="text-3xl font-bold">Two-Factor Auth</h1>
+          <p className="text-sm text-muted-foreground">
+            {useBackupCode
+              ? "Enter one of your saved backup codes"
+              : "Enter the 6-digit code from your authenticator app"}
+          </p>
+        </div>
+
+        <Card className="island-shell border-none">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-lg">Verification</CardTitle>
+            <CardDescription>
+              {useBackupCode
+                ? "Use a backup code to access your account"
+                : "Open your authenticator app and enter the code shown"}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Form {...verifyForm}>
+              <form onSubmit={verifyForm.handleSubmit(onVerifySubmit)} className="space-y-4">
+                {error && (
+                  <div className="rounded-lg border border-destructive/20 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+                    {error}
+                  </div>
+                )}
+
+                <FormField
+                  control={verifyForm.control}
+                  name="code"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{useBackupCode ? "Backup Code" : "Authentication Code"}</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="text"
+                          inputMode={useBackupCode ? "text" : "numeric"}
+                          autoComplete="one-time-code"
+                          placeholder={useBackupCode ? "xxxxxxxx-xxxx" : "000000"}
+                          maxLength={useBackupCode ? 20 : 6}
+                          className="text-center font-mono text-2xl tracking-[0.5em]"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <Button type="submit" disabled={isLoading} className="w-full">
+                  {isLoading ? "Verifying…" : "Verify"}
+                </Button>
+              </form>
+            </Form>
+
+            <div className="mt-4 text-center">
+              <button
+                type="button"
+                onClick={() => {
+                  setUseBackupCode(!useBackupCode)
+                  setError(null)
+                  verifyForm.reset()
+                }}
+                className="text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+              >
+                {useBackupCode
+                  ? "Use authenticator app instead"
+                  : "Lost your device? Use a backup code"}
+              </button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  if (step === "setup-scan") {
+    return (
+      <div className="rise-in space-y-6">
+        <div className="space-y-1 text-center">
+          <h1 className="text-3xl font-bold">Secure Your Account</h1>
+          <p className="text-sm text-muted-foreground">Setup Two-Factor Authentication</p>
+        </div>
+        <Card className="island-shell border-none">
+          <CardHeader>
+            <CardTitle>Scan QR Code</CardTitle>
+            <CardDescription>
+              Scan this QR code with your authenticator app (e.g. Google Authenticator, Authy).
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="flex justify-center rounded-xl border bg-white p-4">
+              {totpURI && <QRCode value={totpURI} size={200} />}
+            </div>
+
+            <Form {...setupForm}>
+              <form onSubmit={setupForm.handleSubmit(onSetupSubmit)} className="space-y-4">
+                {error && <div className="text-sm text-destructive">{error}</div>}
+                <FormField
+                  control={setupForm.control}
+                  name="code"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Verification Code</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="000000"
+                          maxLength={6}
+                          className="text-center font-mono text-2xl tracking-widest"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Enter the 6-digit code from your app to verify setup.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? "Verifying..." : "Verify Code"}
+                </Button>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  if (step === "setup-backup") {
+    return (
+      <div className="rise-in space-y-6">
+        <div className="space-y-1 text-center">
+          <h1 className="text-3xl font-bold">Secure Your Account</h1>
+          <p className="text-sm text-muted-foreground">Save your backup codes</p>
+        </div>
+        <Card className="island-shell border-none">
+          <CardHeader>
+            <CardTitle>Save Backup Codes</CardTitle>
+            <CardDescription>
+              If you lose access to your authenticator app, you can use these backup codes to sign
+              in. Save them in a secure place.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 gap-2 rounded-md bg-muted p-4 font-mono text-sm">
+              {backupCodes.map((code, idx) => (
+                <div key={idx}>{code}</div>
+              ))}
+            </div>
+          </CardContent>
+          <CardFooter>
+            <Button onClick={handleSetupFinish} className="w-full">
+              I have saved my backup codes
+            </Button>
+          </CardFooter>
+        </Card>
+      </div>
+    )
   }
 
   return (
@@ -86,11 +389,10 @@ function LoginPage() {
           <CardDescription>Enter your email and password below</CardDescription>
         </CardHeader>
         <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <Form {...loginForm}>
+            <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-4">
               {error && (
                 <div
-                  id="login-error"
                   role="alert"
                   className="rounded-lg border border-destructive/20 bg-destructive/10 px-4 py-3 text-sm text-destructive"
                 >
@@ -99,7 +401,7 @@ function LoginPage() {
               )}
 
               <FormField
-                control={form.control}
+                control={loginForm.control}
                 name="email"
                 render={({ field }) => (
                   <FormItem>
@@ -119,15 +421,14 @@ function LoginPage() {
               />
 
               <FormField
-                control={form.control}
+                control={loginForm.control}
                 name="password"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Input
+                      <PasswordInput
                         id="login-password"
-                        type="password"
                         autoComplete="current-password"
                         placeholder="••••••••"
                         {...field}

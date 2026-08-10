@@ -7,6 +7,7 @@ import { EmailCard } from "@/features/account/components/EmailCard"
 import { PasswordCard } from "@/features/account/components/PasswordCard"
 import { ProfileCard } from "@/features/account/components/ProfileCard"
 import { SessionsCard } from "@/features/account/components/SessionsCard"
+import { TwoFactorCard } from "@/features/account/components/TwoFactorCard"
 import { listUserAccounts } from "@/features/auth/server/authApi"
 
 export const Route = createFileRoute("/_authenticated/account/")({
@@ -35,6 +36,7 @@ function AccountPage() {
         <ProfileCard />
         <EmailCard />
         <PasswordCard hasCredentialAccount={hasCredentialAccount} />
+        <TwoFactorCard />
         <SessionsCard />
       </div>
     </PageLayout>

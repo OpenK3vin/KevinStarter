@@ -20,7 +20,8 @@
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
     "db:push": "drizzle-kit push",
-    "db:seed": "tsx --env-file .env src/db/seed.ts"
+    "db:seed": "tsx --env-file .env src/db/seed.ts",
+    "codebase:compile": "repomix -o kevin-starter-codebase.xml"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -52,6 +53,7 @@
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-hook-form": "^7.81.0",
+    "react-qr-code": "^2.0.15",
     "recharts": "3.8.0",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.0.2",
@@ -81,5 +83,6 @@
     "typescript": "^6.0.2",
     "vite": "^8.0.0",
     "vitest": "^4.1.5"
-  }
+  },
+  "packageManager": "pnpm@10.32.1+sha512.a706938f0e89ac1456b6563eab4edf1d1faf3368d1191fc5c59790e96dc918e4456ab2e67d613de1043d2e8c81f87303e6b40d4ffeca9df15ef1ad567348f2be"
 }

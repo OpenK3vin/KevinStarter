@@ -6,6 +6,7 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 
 import { getAuthSession } from "@/features/auth/server/authApi"
 
+
 /**
  * Layout guard for authenticated routes.
  *
@@ -17,11 +18,21 @@ import { getAuthSession } from "@/features/auth/server/authApi"
  * this fast (no round-trip to the DB on most requests).
  */
 export const Route = createFileRoute("/_authenticated")({
-  beforeLoad: async () => {
+  beforeLoad: async ({ location }) => {
     const session = await getAuthSession()
     if (!session) {
       throw redirect({ to: "/login" })
     }
+
+    // 2FA enforcement: if the flag is on and the user hasn't enrolled,
+    // redirect to setup — except when they're already going there.
+    const twoFactorEnabled = (session.user as any)?.twoFactorEnabled ?? false
+    const isSetupRoute = location.pathname.startsWith("/two-factor/setup")
+
+    if (!twoFactorEnabled && !isSetupRoute) {
+      throw redirect({ to: "/two-factor/setup" })
+    }
+
     // Expose session to child routes via context
     return { session }
   },

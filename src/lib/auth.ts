@@ -9,6 +9,8 @@ import * as schema from "@/db/schema"
 
 import { ac, roles } from "@/lib/permissions"
 
+const isTwoFactorRequired = process.env.VITE_FF_2FA_REQUIRED === "true"
+
 const transporter = nodemailer.createTransport({
   host: "localhost",
   port: 1025,
@@ -65,9 +67,16 @@ export const auth = betterAuth({
       defaultRole: "user",
       adminRole: ["super_admin", "admin"],
     }),
-    twoFactorPlugin({
-      issuer: "KevinStarter",
-    }),
+    // Only enforce 2FA at the server level when the feature flag is on.
+    // Without this guard, users with twoFactorEnabled=true would always get
+    // twoFactorRedirect=true on sign-in regardless of the flag.
+    ...(isTwoFactorRequired
+      ? [
+          twoFactorPlugin({
+            issuer: "KevinStarter",
+          }),
+        ]
+      : []),
     tanstackStartCookies(), // must be last
   ],
 })

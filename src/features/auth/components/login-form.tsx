@@ -1,5 +1,7 @@
 import { useState } from "react"
 
+import { useRouter } from "@tanstack/react-router"
+
 import { z } from "zod"
 
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -20,12 +22,14 @@ import {
 import { Input } from "@/components/ui/input"
 
 import { authClient } from "@/lib/auth-client"
+import { getEnvFlags } from "@/modules/feature-flags/envFlags"
 
 import { useLoginMutation } from "../api/auth.hooks"
 import { loginSchema } from "../api/auth.schemas"
 import { backupCodesAtom, stepAtom, totpURIAtom } from "../state/auth.atoms"
 
 export function LoginForm() {
+  const router = useRouter()
   const setStep = useSetAtom(stepAtom)
   const setBackupCodes = useSetAtom(backupCodesAtom)
   const setTotpURI = useSetAtom(totpURIAtom)
@@ -42,11 +46,11 @@ export function LoginForm() {
     try {
       const data = await loginMutation.mutateAsync(values)
 
-      // If the user doesn't have 2FA set up yet, initiate inline setup.
-      // (If 2FA is already enabled, authClient dispatches "two-factor-redirect"
-      //  automatically and login.tsx's event listener handles the step change.)
-      const user = data?.user as any
-      if (user && !user.twoFactorEnabled) {
+      const flags = getEnvFlags()
+      const user = (data as any)?.user
+
+      if (flags.twoFactorRequired && user && !user.twoFactorEnabled) {
+        // 2FA flag is on and user hasn't set up 2FA — start inline enrollment.
         const { data: enableData, error: enableError } = await authClient.twoFactor.enable({
           password: values.password,
         })
@@ -56,7 +60,14 @@ export function LoginForm() {
           if (enableData.backupCodes) setBackupCodes(enableData.backupCodes)
           setStep("setup-scan")
         }
+      } else if (user) {
+        // Normal successful login — user is fully authenticated.
+        // (If 2FA is required and enabled, authClient dispatches "two-factor-redirect"
+        //  and login.tsx's event listener changes the step to verify-2fa.)
+        await router.invalidate()
+        router.navigate({ to: "/" })
       }
+      // If data.twoFactorRedirect is true, the event listener in login.tsx handles the step.
     } catch (err) {
       // Errors surfaced via loginMutation.error
     }

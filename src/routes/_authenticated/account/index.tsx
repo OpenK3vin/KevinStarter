@@ -9,6 +9,7 @@ import { ProfileCard } from "@/features/account/components/ProfileCard"
 import { SessionsCard } from "@/features/account/components/SessionsCard"
 import { TwoFactorCard } from "@/features/account/components/TwoFactorCard"
 import { listUserAccounts } from "@/features/auth/server/authApi"
+import { getEnvFlags } from "@/modules/feature-flags"
 
 export const Route = createFileRoute("/_authenticated/account/")({
   loader: async ({ context: { queryClient } }) => {
@@ -28,6 +29,8 @@ function AccountPage() {
     queryFn: () => listUserAccounts(),
   })
 
+  const flags = getEnvFlags()
+
   const hasCredentialAccount = accounts?.some((a) => a.providerId === "credential") ?? false
 
   return (
@@ -36,7 +39,7 @@ function AccountPage() {
         <ProfileCard />
         <EmailCard />
         <PasswordCard hasCredentialAccount={hasCredentialAccount} />
-        <TwoFactorCard />
+        {flags.twoFactorRequired && <TwoFactorCard />}
         <SessionsCard />
       </div>
     </PageLayout>

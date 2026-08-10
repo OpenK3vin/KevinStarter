@@ -5,7 +5,7 @@ import { SiteHeader } from "@/components/site-header"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 
 import { getAuthSession } from "@/features/auth/server/authApi"
-
+import { getEnvFlags } from "@/modules/feature-flags/envFlags"
 
 /**
  * Layout guard for authenticated routes.
@@ -24,12 +24,13 @@ export const Route = createFileRoute("/_authenticated")({
       throw redirect({ to: "/login" })
     }
 
-    // 2FA enforcement: if the flag is on and the user hasn't enrolled,
-    // redirect to setup — except when they're already going there.
+    // 2FA enforcement: redirect to setup only when the flag is on and the
+    // user hasn't enrolled yet — except when they're already going there.
+    const flags = getEnvFlags()
     const twoFactorEnabled = (session.user as any)?.twoFactorEnabled ?? false
     const isSetupRoute = location.pathname.startsWith("/two-factor/setup")
 
-    if (!twoFactorEnabled && !isSetupRoute) {
+    if (flags.twoFactorRequired && !twoFactorEnabled && !isSetupRoute) {
       throw redirect({ to: "/two-factor/setup" })
     }
 

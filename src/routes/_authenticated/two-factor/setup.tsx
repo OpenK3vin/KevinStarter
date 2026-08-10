@@ -158,7 +158,7 @@ function TwoFactorSetupPage() {
                       <FormItem>
                         <FormLabel>Verification Code</FormLabel>
                         <FormControl>
-                          <Input placeholder="000000" maxLength={6} className="text-center text-2xl tracking-widest font-mono" {...field} />
+                          <Input placeholder="000000" maxLength={6} className="h-14 text-center text-2xl tracking-widest font-mono" {...field} />
                         </FormControl>
                         <FormDescription>Enter the 6-digit code from your app to verify setup.</FormDescription>
                         <FormMessage />

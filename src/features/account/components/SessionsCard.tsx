@@ -25,13 +25,14 @@ export function SessionsCard() {
       if (error) throw error
       // better-auth v1 listSessions often returns an array of sessions directly, or an array of { session, user }
       // We will normalize it to ensure we always have access to the session fields
-      return (data as any[]).map((item) => item.session || item) as Array<{
-        id: string
-        token: string
-        userAgent?: string | null
-        ipAddress?: string | null
-        updatedAt: string | Date
-      }>
+      // return (data as any[]).map((item) => item.session || item) as Array<{
+      //   id: string
+      //   token: string
+      //   userAgent?: string | null
+      //   ipAddress?: string | null
+      //   updatedAt: string | Date
+      // }>
+      return data
     },
   })
 
@@ -68,7 +69,8 @@ export function SessionsCard() {
         ) : sessions?.length ? (
           <div className="space-y-4">
             {sessions.map((session) => {
-              const isCurrent = session.token === currentSession?.session.token
+              if (!session) return null
+              const isCurrent = session.token === currentSession?.session?.token
               return (
                 <div
                   key={session.id}

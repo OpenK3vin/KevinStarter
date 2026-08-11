@@ -45,7 +45,6 @@ export function LoginForm() {
   async function onLoginSubmit(values: z.infer<typeof loginSchema>) {
     try {
       const data = await loginMutation.mutateAsync(values)
-      console.log("🚀 ~ login-form.tsx:48 ~ onLoginSubmit ~ data:", data)
 
       const flags = getEnvFlags()
       const user = (data as any)?.user

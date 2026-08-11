@@ -17,6 +17,8 @@ import { Route as AuthRegisterRouteImport } from './routes/_auth/register'
 import { Route as AuthResetPasswordRouteImport } from './routes/_auth/reset-password'
 import { Route as AuthenticatedAccountIndexRouteImport } from './routes/_authenticated/account/index'
 import { Route as AuthenticatedProjectsIndexRouteImport } from './routes/_authenticated/projects/index'
+import { Route as AuthenticatedTwoFactorManageRouteImport } from './routes/_authenticated/two-factor/manage'
+import { Route as AuthenticatedTwoFactorSetupRouteImport } from './routes/_authenticated/two-factor/setup'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as AuthenticatedAdminUsersIndexRouteImport } from './routes/_authenticated/admin/users/index'
 import { Route as AuthenticatedAdminUsersUserIdRouteImport } from './routes/_authenticated/admin/users/$userId'
@@ -63,6 +65,18 @@ const AuthenticatedProjectsIndexRoute =
     path: '/projects/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedTwoFactorManageRoute =
+  AuthenticatedTwoFactorManageRouteImport.update({
+    id: '/two-factor/manage',
+    path: '/two-factor/manage',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedTwoFactorSetupRoute =
+  AuthenticatedTwoFactorSetupRouteImport.update({
+    id: '/two-factor/setup',
+    path: '/two-factor/setup',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -98,6 +112,8 @@ export interface FileRoutesByFullPath {
   '/login': typeof AuthLoginRoute
   '/register': typeof AuthRegisterRoute
   '/reset-password': typeof AuthResetPasswordRoute
+  '/two-factor/manage': typeof AuthenticatedTwoFactorManageRoute
+  '/two-factor/setup': typeof AuthenticatedTwoFactorSetupRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/account/': typeof AuthenticatedAccountIndexRoute
   '/projects/': typeof AuthenticatedProjectsIndexRoute
@@ -111,6 +127,8 @@ export interface FileRoutesByTo {
   '/login': typeof AuthLoginRoute
   '/register': typeof AuthRegisterRoute
   '/reset-password': typeof AuthResetPasswordRoute
+  '/two-factor/manage': typeof AuthenticatedTwoFactorManageRoute
+  '/two-factor/setup': typeof AuthenticatedTwoFactorSetupRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/account': typeof AuthenticatedAccountIndexRoute
   '/projects': typeof AuthenticatedProjectsIndexRoute
@@ -127,6 +145,8 @@ export interface FileRoutesById {
   '/_auth/login': typeof AuthLoginRoute
   '/_auth/register': typeof AuthRegisterRoute
   '/_auth/reset-password': typeof AuthResetPasswordRoute
+  '/_authenticated/two-factor/manage': typeof AuthenticatedTwoFactorManageRoute
+  '/_authenticated/two-factor/setup': typeof AuthenticatedTwoFactorSetupRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/_authenticated/account/': typeof AuthenticatedAccountIndexRoute
   '/_authenticated/projects/': typeof AuthenticatedProjectsIndexRoute
@@ -142,6 +162,8 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/reset-password'
+    | '/two-factor/manage'
+    | '/two-factor/setup'
     | '/api/auth/$'
     | '/account/'
     | '/projects/'
@@ -155,6 +177,8 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/reset-password'
+    | '/two-factor/manage'
+    | '/two-factor/setup'
     | '/api/auth/$'
     | '/account'
     | '/projects'
@@ -170,6 +194,8 @@ export interface FileRouteTypes {
     | '/_auth/login'
     | '/_auth/register'
     | '/_auth/reset-password'
+    | '/_authenticated/two-factor/manage'
+    | '/_authenticated/two-factor/setup'
     | '/api/auth/$'
     | '/_authenticated/account/'
     | '/_authenticated/projects/'
@@ -244,6 +270,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProjectsIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/two-factor/manage': {
+      id: '/_authenticated/two-factor/manage'
+      path: '/two-factor/manage'
+      fullPath: '/two-factor/manage'
+      preLoaderRoute: typeof AuthenticatedTwoFactorManageRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/two-factor/setup': {
+      id: '/_authenticated/two-factor/setup'
+      path: '/two-factor/setup'
+      fullPath: '/two-factor/setup'
+      preLoaderRoute: typeof AuthenticatedTwoFactorSetupRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -297,6 +337,8 @@ const AuthRouteChildren: AuthRouteChildren = {
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
 interface AuthenticatedRouteChildren {
+  AuthenticatedTwoFactorManageRoute: typeof AuthenticatedTwoFactorManageRoute
+  AuthenticatedTwoFactorSetupRoute: typeof AuthenticatedTwoFactorSetupRoute
   AuthenticatedAccountIndexRoute: typeof AuthenticatedAccountIndexRoute
   AuthenticatedProjectsIndexRoute: typeof AuthenticatedProjectsIndexRoute
   AuthenticatedAdminUsersUserIdRoute: typeof AuthenticatedAdminUsersUserIdRoute
@@ -306,6 +348,8 @@ interface AuthenticatedRouteChildren {
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedTwoFactorManageRoute: AuthenticatedTwoFactorManageRoute,
+  AuthenticatedTwoFactorSetupRoute: AuthenticatedTwoFactorSetupRoute,
   AuthenticatedAccountIndexRoute: AuthenticatedAccountIndexRoute,
   AuthenticatedProjectsIndexRoute: AuthenticatedProjectsIndexRoute,
   AuthenticatedAdminUsersUserIdRoute: AuthenticatedAdminUsersUserIdRoute,

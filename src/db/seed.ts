@@ -32,25 +32,25 @@ import { account, examples, projects, resourceRoles, session, user, verification
 const SEED_USERS = [
   {
     email: "superadmin@example.com",
-    password: "Password123!",
+    password: "Password123",
     name: "Super Admin",
     role: "super_admin" as const,
   },
   {
     email: "admin@example.com",
-    password: "Password123!",
+    password: "Password123",
     name: "Alice Admin",
     role: "admin" as const,
   },
   {
     email: "editor@example.com",
-    password: "Password123!",
+    password: "Password123",
     name: "Eve Editor",
     role: "editor" as const,
   },
   {
     email: "user@example.com",
-    password: "Password123!",
+    password: "Password123",
     name: "Bob User",
     role: "user" as const,
   },
@@ -268,10 +268,10 @@ async function main() {
   console.log("\n─────────────────────────────────────────────────")
   console.log("✅ Seed complete!\n")
   console.log("Test credentials:")
-  console.log("  superadmin@example.com / Password123!  (super_admin)")
-  console.log("  admin@example.com      / Password123!  (admin)")
-  console.log("  editor@example.com     / Password123!  (editor)")
-  console.log("  user@example.com       / Password123!  (user)\n")
+  console.log("  superadmin@example.com / Password123  (super_admin)")
+  console.log("  admin@example.com      / Password123  (admin)")
+  console.log("  editor@example.com     / Password123  (editor)")
+  console.log("  user@example.com       / Password123  (user)\n")
 }
 
 main()

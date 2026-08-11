@@ -3,11 +3,17 @@ import { tanstackStart } from "@tanstack/react-start/plugin/vite"
 
 import tailwindcss from "@tailwindcss/vite"
 import viteReact from "@vitejs/plugin-react"
-import { defineConfig } from "vite"
+import { defineConfig, loadEnv } from "vite"
 
-const config = defineConfig({
-  resolve: { tsconfigPaths: true },
-  plugins: [devtools(), tailwindcss(), tanstackStart(), viteReact()],
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), "")
+  const port = parseInt(env.PORT || "3000", 10)
+
+  return {
+    resolve: { tsconfigPaths: true },
+    plugins: [devtools(), tailwindcss(), tanstackStart(), viteReact()],
+    server: {
+      port,
+    },
+  }
 })
-
-export default config

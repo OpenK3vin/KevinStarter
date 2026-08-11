@@ -1,6 +1,6 @@
 import { betterAuth } from "better-auth"
 import { drizzleAdapter } from "better-auth/adapters/drizzle"
-import { admin as adminPlugin } from "better-auth/plugins"
+import { admin as adminPlugin, twoFactor as twoFactorPlugin } from "better-auth/plugins"
 import { tanstackStartCookies } from "better-auth/tanstack-start"
 import nodemailer from "nodemailer"
 
@@ -9,6 +9,8 @@ import * as schema from "@/db/schema"
 
 import { ac, roles } from "@/lib/permissions"
 
+const isTwoFactorRequired = process.env.VITE_FF_2FA_REQUIRED === "true"
+
 const transporter = nodemailer.createTransport({
   host: "localhost",
   port: 1025,
@@ -16,6 +18,7 @@ const transporter = nodemailer.createTransport({
 })
 
 export const auth = betterAuth({
+  appName: "KevinStarter",
   baseURL: process.env.BETTER_AUTH_URL || "http://localhost:3000",
   trustedOrigins: [process.env.BETTER_AUTH_URL || "http://localhost:3000", "http://localhost:3001"],
   database: drizzleAdapter(db, {
@@ -31,7 +34,7 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: false, // don't block sign in, but allow them to verify later
-    sendResetPasswordEmail: async ({ user, url }) => {
+    sendResetPasswordEmail: async ({ user, url }: { user: { email: string }; url: string }) => {
       await transporter.sendMail({
         from: '"Acme" <noreply@acme.inc>',
         to: user.email,
@@ -42,7 +45,7 @@ export const auth = betterAuth({
   },
   emailVerification: {
     sendOnSignUp: false, // Wait for them to click "Verify Email" in Account Settings
-    sendVerificationEmail: async ({ user, url }) => {
+    sendVerificationEmail: async ({ user, url }: { user: { email: string }; url: string }) => {
       await transporter.sendMail({
         from: '"Acme" <noreply@acme.inc>',
         to: user.email,
@@ -64,6 +67,16 @@ export const auth = betterAuth({
       defaultRole: "user",
       adminRole: ["super_admin", "admin"],
     }),
+    // Only enforce 2FA at the server level when the feature flag is on.
+    // Without this guard, users with twoFactorEnabled=true would always get
+    // twoFactorRedirect=true on sign-in regardless of the flag.
+    ...(isTwoFactorRequired
+      ? [
+          twoFactorPlugin({
+            issuer: "KevinStarter",
+          }),
+        ]
+      : []),
     tanstackStartCookies(), // must be last
   ],
 })

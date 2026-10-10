@@ -1,14 +1,36 @@
 {
   "name": "create-k3vin-start",
   "version": "0.1.0",
-  "description": "Scaffolding CLI for K3vin Start",
+  "description": "Scaffold a new KevinStarter project — TanStack Start + better-auth + Drizzle + PostgreSQL",
+  "keywords": [
+    "tanstack",
+    "tanstack-start",
+    "create",
+    "starter",
+    "scaffold",
+    "better-auth",
+    "drizzle",
+    "postgresql",
+    "react"
+  ],
+  "homepage": "https://github.com/OpenK3vin/KevinStarter",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/OpenK3vin/KevinStarter.git",
+    "directory": "cli"
+  },
+  "license": "MIT",
   "main": "dist/index.js",
   "bin": {
     "create-k3vin-start": "dist/index.js"
   },
   "type": "module",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsup src/index.ts --format esm --clean",
+    "prepublishOnly": "pnpm run build && pnpm run test",
     "dev": "tsup src/index.ts --format esm --watch",
     "start": "node dist/index.js",
     "test": "vitest run",

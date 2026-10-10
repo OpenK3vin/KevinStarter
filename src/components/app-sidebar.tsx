@@ -39,16 +39,20 @@ const data = {
     avatar: "/avatars/shadcn.jpg",
   },
   navMain: [
+    // @feature:dashboard:start
     {
       title: "Dashboard",
       url: "/",
       icon: IconDashboard,
     },
+    // @feature:dashboard:end
+    // @feature:demo:start
     {
       title: "Projects",
       url: "/projects",
       icon: IconFolder,
     },
+    // @feature:demo:end
   ],
   navClouds: [
     {

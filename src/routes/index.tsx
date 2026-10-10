@@ -25,7 +25,7 @@ function LandingPage() {
     <div className="rise-in mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-12 md:px-8">
       <div className="flex flex-col items-center gap-4 py-12 text-center">
         <h1 className="display-title text-5xl font-bold tracking-tight">
-          Welcome to KevinPulse Starter
+          Welcome to KevinStarter
         </h1>
 
         {!isPending && session ? (

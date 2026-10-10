@@ -7,7 +7,9 @@ import { EmailCard } from "@/features/account/components/EmailCard"
 import { PasswordCard } from "@/features/account/components/PasswordCard"
 import { ProfileCard } from "@/features/account/components/ProfileCard"
 import { SessionsCard } from "@/features/account/components/SessionsCard"
+// @feature:two-factor:start
 import { TwoFactorCard } from "@/features/account/components/TwoFactorCard"
+// @feature:two-factor:end
 import { listUserAccounts } from "@/features/auth/server/authApi"
 import { getEnvFlags } from "@/modules/feature-flags"
 
@@ -39,7 +41,9 @@ function AccountPage() {
         <ProfileCard />
         <EmailCard />
         <PasswordCard hasCredentialAccount={hasCredentialAccount} />
+        {/* @feature:two-factor:start */}
         {flags.twoFactorRequired && <TwoFactorCard />}
+        {/* @feature:two-factor:end */}
         <SessionsCard />
       </div>
     </PageLayout>

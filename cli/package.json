@@ -1,0 +1,30 @@
+{
+  "name": "create-k3vin-start",
+  "version": "0.1.0",
+  "description": "Scaffolding CLI for K3vin Start",
+  "main": "dist/index.js",
+  "bin": {
+    "create-k3vin-start": "dist/index.js"
+  },
+  "type": "module",
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --clean",
+    "dev": "tsup src/index.ts --format esm --watch",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@clack/prompts": "^0.9.1",
+    "citty": "^0.1.6",
+    "giget": "^1.2.3",
+    "picocolors": "^1.1.1",
+    "replace-in-file": "^8.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.1",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

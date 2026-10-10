@@ -1,15 +1,11 @@
 {
-  "name": "k3vin-starter-template",
-  "version": "0.2.0",
+  "name": "kevin-starter",
+  "version": "0.1.0",
   "type": "module",
-  "bin": {
-    "kevin": "./init.js"
-  },
   "imports": {
     "@/*": "./src/*"
   },
   "scripts": {
-    "create": "node init.js",
     "dev": "dotenv -e .env -- docker compose up -d --wait && vite dev",
     "generate-routes": "dotenv -e .env -- tsr generate",
     "format": "prettier --write .",
@@ -21,7 +17,8 @@
     "db:studio": "dotenv -e .env -- drizzle-kit studio",
     "db:push": "dotenv -e .env -- drizzle-kit push",
     "db:seed": "tsx --env-file .env src/db/seed.ts",
-    "codebase:compile": "repomix -o kevin-starter-codebase.xml"
+    "codebase:compile": "repomix -o kevin-starter-codebase.xml",
+    "release": "pnpm --filter create-k3vin-start release"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -64,7 +61,6 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@clack/prompts": "^1.7.0",
     "@ianvs/prettier-plugin-sort-imports": "^4.7.1",
     "@tailwindcss/typography": "^0.5.16",
     "@tanstack/devtools-vite": "latest",
@@ -79,7 +75,6 @@
     "dotenv-cli": "^11.0.0",
     "drizzle-kit": "^0.31.10",
     "jsdom": "^28.1.0",
-    "picocolors": "^1.1.1",
     "prettier": "^3.9.6",
     "prettier-plugin-tailwindcss": "^0.8.1",
     "typescript": "^6.0.2",

@@ -68,6 +68,7 @@ function RegisterPage() {
     router.navigate({ to: "/" })
   }
 
+  // @feature:google:start
   async function handleGoogleSignUp() {
     setIsLoading(true)
     await authClient.signIn.social({
@@ -75,6 +76,7 @@ function RegisterPage() {
       callbackURL: "/",
     })
   }
+  // @feature:google:end
 
   return (
     <div className="rise-in space-y-6">
@@ -167,6 +169,7 @@ function RegisterPage() {
             </form>
           </Form>
 
+          {/* @feature:google:start */}
           <div className="mt-4 flex items-center before:flex-1 before:border-t before:border-border after:flex-1 after:border-t after:border-border">
             <span className="px-3 text-xs tracking-wider text-muted-foreground uppercase">or</span>
           </div>
@@ -197,6 +200,7 @@ function RegisterPage() {
             </svg>
             Sign up with Google
           </Button>
+          {/* @feature:google:end */}
         </CardContent>
       </Card>
 

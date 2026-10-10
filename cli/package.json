@@ -1,0 +1,58 @@
+{
+  "name": "create-k3vin-start",
+  "version": "0.1.1",
+  "description": "Scaffold a new KevinStarter project — TanStack Start + better-auth + Drizzle + PostgreSQL",
+  "keywords": [
+    "tanstack",
+    "tanstack-start",
+    "create",
+    "starter",
+    "scaffold",
+    "better-auth",
+    "drizzle",
+    "postgresql",
+    "react"
+  ],
+  "homepage": "https://github.com/OpenK3vin/KevinStarter",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/OpenK3vin/KevinStarter.git",
+    "directory": "cli"
+  },
+  "license": "MIT",
+  "main": "dist/index.js",
+  "bin": {
+    "create-k3vin-start": "dist/index.js"
+  },
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --clean",
+    "prepublishOnly": "pnpm run build && pnpm run test",
+    "publish:npm": "pnpm publish --access public --no-git-checks",
+    "release": "pnpm run build && pnpm run test && pnpm publish --access public --no-git-checks",
+    "dev": "tsup src/index.ts --format esm --watch",
+    "start": "node dist/index.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@clack/prompts": "^0.9.1",
+    "citty": "^0.1.6",
+    "giget": "^1.2.3",
+    "picocolors": "^1.1.1",
+    "replace-in-file": "^8.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.1",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

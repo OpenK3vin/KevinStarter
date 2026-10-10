@@ -1,6 +1,6 @@
-# KevinPulse Starter Template
+# KevinStarter Template
 
-A clean, empty-slate app mirroring the full KevinPulse architecture and tooling.
+A clean, empty-slate app mirroring the full KevinStarter architecture and tooling.
 
 ## Stack Overview
 
@@ -71,7 +71,7 @@ The project uses the "New York" style, "zinc" base color, and CSS variables enco
 
 ## Agent Infrastructure
 
-This template includes all `.agents/` rules and skills from KevinPulse.
+This template includes all `.agents/` rules and skills from KevinStarter.
 
 - **Skills**: Run `npx @tanstack/intent@latest load <use>` based on the mappings in `AGENTS.md`.
 - **Rules**: Enforce OKLCH, architectural choices, and PR styles.

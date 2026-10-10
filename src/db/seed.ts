@@ -8,10 +8,10 @@
  * Users created
  * ─────────────────────────────────────────────────────────────────────────
  *  email                      password       role
- *  superadmin@example.com     Password123!   super_admin  (user management, full control)
- *  admin@example.com          Password123!   admin        (global admin, bypasses RBAC)
- *  editor@example.com         Password123!   editor       (can create projects)
- *  user@example.com           Password123!   user         (regular user, viewer access)
+ *  superadmin@example.com     Password123    super_admin  (user management, full control)
+ *  admin@example.com          Password123    admin        (global admin, bypasses RBAC)
+ *  editor@example.com         Password123    editor       (can create projects)
+ *  user@example.com           Password123    user         (regular user, viewer access)
  *
  * Resource grants
  * ─────────────────────────────────────────────────────────────────────────
@@ -25,7 +25,10 @@ import { eq } from "drizzle-orm"
 
 import { auth } from "../lib/auth"
 import { db } from "./index"
-import { account, examples, projects, resourceRoles, session, user, verification } from "./schema"
+import { account, resourceRoles, session, user, verification } from "./schema"
+// @feature:demo:start
+import { examples, projects } from "./schema"
+// @feature:demo:end
 
 // ── Seed data ────────────────────────────────────────────────────────────────
 
@@ -56,6 +59,7 @@ const SEED_USERS = [
   },
 ]
 
+// @feature:demo:start
 const SEED_EXAMPLES = [
   {
     name: "Example One",
@@ -85,6 +89,7 @@ const SEED_PROJECTS = [
     description: "Data pipeline migration — editor Eve has editor access.",
   },
 ]
+// @feature:demo:end
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -143,8 +148,10 @@ async function main() {
   await db.delete(session)
   await db.delete(account)
   await db.delete(user)
+  // @feature:demo:start
   await db.delete(examples)
   await db.delete(projects)
+  // @feature:demo:end
 
   // ── 1. Users ──────────────────────────────────────────────────────────────
   console.log("👤 Creating users...")
@@ -157,6 +164,7 @@ async function main() {
   const editorUser = allUsers.find((u) => u.email === "editor@example.com")
   const regularUser = allUsers.find((u) => u.email === "user@example.com")
 
+  // @feature:demo:start
   // ── 2. Examples ───────────────────────────────────────────────────────────
   console.log("\n📄 Creating examples...")
 
@@ -263,6 +271,7 @@ async function main() {
   if (grants.length) {
     await db.insert(resourceRoles).values(grants).onConflictDoNothing()
   }
+  // @feature:demo:end
 
   // ── Summary ───────────────────────────────────────────────────────────────
   console.log("\n─────────────────────────────────────────────────")

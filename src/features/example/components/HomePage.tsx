@@ -21,7 +21,7 @@ export function HomePage() {
   return (
     <div className="page-wrap rise-in space-y-8 py-12">
       <header className="space-y-2">
-        <h1 className="text-sea-ink text-4xl font-bold">Welcome to Kevin Starter</h1>
+        <h1 className="text-sea-ink text-4xl font-bold">Welcome to KevinStarter</h1>
         <p className="text-sea-ink-soft text-lg">
           The ultimate boilerplate with TanStack Start, TanStack Router, Tailwind v4, Shadcn, and
           Drizzle SQLite.

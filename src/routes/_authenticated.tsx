@@ -24,6 +24,7 @@ export const Route = createFileRoute("/_authenticated")({
       throw redirect({ to: "/login" })
     }
 
+    // @feature:two-factor:start
     // 2FA enforcement: redirect to setup only when the flag is on and the
     // user hasn't enrolled yet — except when they're already going there.
     const flags = getEnvFlags()
@@ -33,6 +34,7 @@ export const Route = createFileRoute("/_authenticated")({
     if (flags.twoFactorRequired && !twoFactorEnabled && !isSetupRoute) {
       throw redirect({ to: "/two-factor/setup" })
     }
+    // @feature:two-factor:end
 
     // Expose session to child routes via context
     return { session }

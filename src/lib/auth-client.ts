@@ -1,9 +1,14 @@
-import { adminClient, twoFactorClient } from "better-auth/client/plugins"
+import { adminClient } from "better-auth/client/plugins"
+// @feature:two-factor:start
+import { twoFactorClient } from "better-auth/client/plugins"
+// @feature:two-factor:end
 import { createAuthClient } from "better-auth/react"
 
 import { ac, roles } from "./permissions"
 
+// @feature:two-factor:start
 const isTwoFactorRequired = import.meta.env.VITE_FF_2FA_REQUIRED === "true"
+// @feature:two-factor:end
 
 /**
  * Client-side auth client.
@@ -14,9 +19,7 @@ const isTwoFactorRequired = import.meta.env.VITE_FF_2FA_REQUIRED === "true"
 export const authClient = createAuthClient({
   plugins: [
     adminClient({ ac, roles }),
-    // Mirror the server-side guard: only register the twoFactor client plugin
-    // when the feature flag is on. When off, sign-in never triggers the
-    // twoFactorRedirect event so users flow straight through to the app.
+    // @feature:two-factor:start
     ...(isTwoFactorRequired
       ? [
           twoFactorClient({
@@ -27,6 +30,7 @@ export const authClient = createAuthClient({
           }),
         ]
       : []),
+    // @feature:two-factor:end
   ],
 })
 

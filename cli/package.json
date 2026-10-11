@@ -1,6 +1,6 @@
 {
   "name": "create-k3vin-start",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Scaffold a new KevinStarter project — TanStack Start + better-auth + Drizzle + PostgreSQL",
   "keywords": [
     "tanstack",
@@ -32,7 +32,7 @@
     "build": "tsup src/index.ts --format esm --clean",
     "prepublishOnly": "pnpm run build && pnpm run test",
     "publish:npm": "pnpm publish --access public --no-git-checks",
-    "release": "pnpm run build && pnpm run test && pnpm publish --access public --no-git-checks",
+    "release": "bumpp && pnpm run build && pnpm run test && pnpm publish --access public --no-git-checks",
     "dev": "tsup src/index.ts --format esm --watch",
     "start": "node dist/index.js",
     "test": "vitest run",
@@ -48,6 +48,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.10.1",
+    "bumpp": "^12.3.0",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"

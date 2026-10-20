@@ -13,10 +13,12 @@ import {
 } from "@clack/prompts"
 import pc from "picocolors"
 import { downloadTemplate } from "giget"
-import { resolve } from "node:path"
+import { basename, resolve } from "node:path"
 import { existsSync } from "node:fs"
 import { rename } from "node:fs/promises"
 import { pruneFeatures } from "./pruner.js"
+import { renameProject } from "./renamer.js"
+import pkg from "../package.json" with { type: "json" }
 
 const FEATURES = [
   {
@@ -46,7 +48,7 @@ const ALL_FEATURE_VALUES = FEATURES.map((f) => f.value)
 const main = defineCommand({
   meta: {
     name: "create-k3vin-start",
-    version: "0.1.0",
+    version: pkg.version,
     description: "Scaffold a new KevinStarter project",
   },
   args: {
@@ -147,7 +149,19 @@ const main = defineCommand({
       await rename(templateEnv, dotEnv)
     }
 
-    // ── 5. Prune unselected features ─────────────────────────────────────────
+    // ── 5. Rename project ────────────────────────────────────────────────────
+    const projectName = basename(targetPath)
+    s.start(`Setting project name to ${projectName}…`)
+    try {
+      await renameProject(targetPath, projectName)
+      s.stop("Project renamed.")
+    } catch (error) {
+      s.stop(pc.red("Renaming failed."))
+      clackLog.error(String(error))
+      process.exit(1)
+    }
+
+    // ── 6. Prune unselected features ─────────────────────────────────────────
     const unselected = ALL_FEATURE_VALUES.filter(
       (f) => !selectedFeatures.includes(f)
     )
@@ -164,7 +178,7 @@ const main = defineCommand({
       }
     }
 
-    // ── 6. Done ──────────────────────────────────────────────────────────────
+    // ── 7. Done ──────────────────────────────────────────────────────────────
     outro(
       [
         pc.green(`✔ Project created at ${pc.bold(projectDir)}`),

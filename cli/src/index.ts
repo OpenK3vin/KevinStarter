@@ -1,22 +1,25 @@
 #!/usr/bin/env node
-import { defineCommand, runMain } from "citty"
+import { existsSync } from "node:fs"
+import { rename } from "node:fs/promises"
+import { resolve } from "node:path"
+
 import {
-  intro,
-  outro,
-  text,
-  spinner,
-  confirm,
-  multiselect,
-  isCancel,
   cancel,
   log as clackLog,
+  confirm,
+  intro,
+  isCancel,
+  multiselect,
+  outro,
+  spinner,
+  text,
 } from "@clack/prompts"
-import pc from "picocolors"
+import { defineCommand, runMain } from "citty"
 import { downloadTemplate } from "giget"
-import { resolve, basename } from "node:path"
-import { existsSync } from "node:fs"
-import { rename, readFile, writeFile } from "node:fs/promises"
+import pc from "picocolors"
+
 import { pruneFeatures } from "./pruner.js"
+import { rewritePackageJson } from "./rewrite-pkg.js"
 
 const FEATURES = [
   {
@@ -74,8 +77,7 @@ const main = defineCommand({
         defaultValue: "./my-project",
         validate(value) {
           if (!value.trim()) return "Please enter a directory name."
-          if (/[A-Z]/.test(value))
-            return "Project name must be lowercase (no uppercase letters)."
+          if (/[A-Z]/.test(value)) return "Project name must be lowercase (no uppercase letters)."
         },
       })
       if (isCancel(answer)) {
@@ -95,7 +97,7 @@ const main = defineCommand({
 
     if (existsSync(targetPath)) {
       cancel(
-        `Directory "${projectDir}" already exists. Choose a different name or delete it first.`
+        `Directory "${projectDir}" already exists. Choose a different name or delete it first.`,
       )
       process.exit(1)
     }
@@ -141,21 +143,7 @@ const main = defineCommand({
     }
 
     // ── 3.5. Rewrite package.json with the real project name ────────────────
-    const pkgPath = resolve(targetPath, "package.json")
-    if (existsSync(pkgPath)) {
-      const projectName = basename(targetPath)
-      const pkgRaw = await readFile(pkgPath, "utf8")
-      const pkgUpdated = pkgRaw
-        .replace(
-          /"name":\s*"kevin-starter"/,
-          `"name": "${projectName}"`
-        )
-        .replace(
-          /kevin-starter-codebase\.xml/g,
-          `${projectName}-codebase.xml`
-        )
-      await writeFile(pkgPath, pkgUpdated, "utf8")
-    }
+    await rewritePackageJson(targetPath)
 
     // ── 4. Copy .template.env → .env ─────────────────────────────────────────
     const templateEnv = resolve(targetPath, ".template.env")
@@ -165,9 +153,7 @@ const main = defineCommand({
     }
 
     // ── 5. Prune unselected features ─────────────────────────────────────────
-    const unselected = ALL_FEATURE_VALUES.filter(
-      (f) => !selectedFeatures.includes(f)
-    )
+    const unselected = ALL_FEATURE_VALUES.filter((f) => !selectedFeatures.includes(f))
 
     if (unselected.length > 0) {
       s.start(`Pruning ${unselected.join(", ")}…`)
@@ -192,7 +178,7 @@ const main = defineCommand({
         `  ${pc.cyan("pnpm dev")}`,
         "",
         "Don't forget to fill in your ${pc.dim('.env')} before starting the server.",
-      ].join("\n")
+      ].join("\n"),
     )
   },
 })

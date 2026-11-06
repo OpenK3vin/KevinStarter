@@ -1,6 +1,6 @@
 {
   "name": "create-k3vin-start",
-  "version": "0.1.2",
+  "version": "0.1.4",
   "description": "Scaffold a new KevinStarter project — TanStack Start + better-auth + Drizzle + PostgreSQL",
   "keywords": [
     "tanstack",

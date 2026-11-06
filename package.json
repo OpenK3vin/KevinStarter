@@ -1,6 +1,6 @@
 {
   "name": "kevin-starter",
-  "version": "0.1.0",
+  "version": "0.2.2",
   "type": "module",
   "imports": {
     "@/*": "./src/*"
@@ -18,9 +18,9 @@
     "db:push": "dotenv -e .env -- drizzle-kit push",
     "db:seed": "tsx --env-file .env src/db/seed.ts",
     "codebase:compile": "repomix -o kevin-starter-codebase.xml",
-    "cli:version:patch": "pnpm --filter create-k3vin-start version patch --no-git-tag-version",
-    "cli:version:minor": "pnpm --filter create-k3vin-start version minor --no-git-tag-version",
-    "cli:version:major": "pnpm --filter create-k3vin-start version major --no-git-tag-version",
+    "cli:version:patch": "npm version patch --no-git-tag-version --prefix cli",
+    "cli:version:minor": "npm version minor --no-git-tag-version --prefix cli",
+    "cli:version:major": "npm version major --no-git-tag-version --prefix cli",
     "release": "pnpm --filter create-k3vin-start release"
   },
   "dependencies": {

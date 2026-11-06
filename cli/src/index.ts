@@ -13,9 +13,9 @@ import {
 } from "@clack/prompts"
 import pc from "picocolors"
 import { downloadTemplate } from "giget"
-import { resolve } from "node:path"
+import { resolve, basename } from "node:path"
 import { existsSync } from "node:fs"
-import { rename } from "node:fs/promises"
+import { rename, readFile, writeFile } from "node:fs/promises"
 import { pruneFeatures } from "./pruner.js"
 
 const FEATURES = [
@@ -138,6 +138,23 @@ const main = defineCommand({
       s.stop(pc.red("Download failed."))
       clackLog.error(String(error))
       process.exit(1)
+    }
+
+    // ── 3.5. Rewrite package.json with the real project name ────────────────
+    const pkgPath = resolve(targetPath, "package.json")
+    if (existsSync(pkgPath)) {
+      const projectName = basename(targetPath)
+      const pkgRaw = await readFile(pkgPath, "utf8")
+      const pkgUpdated = pkgRaw
+        .replace(
+          /"name":\s*"kevin-starter"/,
+          `"name": "${projectName}"`
+        )
+        .replace(
+          /kevin-starter-codebase\.xml/g,
+          `${projectName}-codebase.xml`
+        )
+      await writeFile(pkgPath, pkgUpdated, "utf8")
     }
 
     // ── 4. Copy .template.env → .env ─────────────────────────────────────────
